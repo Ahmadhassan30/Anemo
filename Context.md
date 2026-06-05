@@ -47,6 +47,71 @@ Nginx is configured to support SSE proxying.
 apps/ for web and api apps, packages/ for shared types.
 infra/ for compose and nginx, scripts/ for eval and demo utilities, docs/ for documentation.
 
+Directory tree:
+
+.
+├─ .env.example
+├─ .gitignore
+├─ Context.md
+├─ README.md
+├─ propsal.md
+├─ turbo.json
+├─ package.json
+├─ apps/
+│  ├─ web/
+│  │  ├─ app/
+│  │  ├─ components/
+│  │  ├─ lib/
+│  │  ├─ store/
+│  │  ├─ types/
+│  │  ├─ .env.local.example
+│  │  ├─ next.config.ts
+│  │  ├─ tailwind.config.ts
+│  │  ├─ tsconfig.json
+│  │  └─ package.json
+│  └─ api/
+│     ├─ agents/
+│     ├─ db/
+│     ├─ middleware/
+│     ├─ models/
+│     ├─ orchestrator/
+│     ├─ routers/
+│     ├─ schemas/
+│     ├─ services/
+│     ├─ tasks/
+│     ├─ tests/
+│     ├─ utils/
+│     ├─ alembic.ini
+│     ├─ config.py
+│     ├─ Dockerfile
+│     ├─ main.py
+│     ├─ requirements.txt
+│     └─ .env.example
+├─ packages/
+│  └─ types/
+│     ├─ index.ts
+│     └─ package.json
+├─ infra/
+│  ├─ docker-compose.yml
+│  ├─ docker-compose.prod.yml
+│  ├─ nginx/
+│  │  └─ nginx.conf
+│  └─ scripts/
+│     ├─ setup_dev.sh
+│     ├─ run_worker.sh
+│     └─ migrate.sh
+├─ scripts/
+│  ├─ eval/
+│  │  ├─ whisper_benchmark.py
+│  │  └─ manim_llm_eval.py
+│  └─ demo/
+│     └─ generate_demo_video.py
+└─ docs/
+	├─ architecture.md
+	├─ agent-pipeline.md
+	├─ api-reference.md
+	└─ deployment.md
+
 ## Last Updated
 
 2026-06-05
