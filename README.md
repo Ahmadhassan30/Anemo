@@ -1,4 +1,4 @@
-# LectureOS
+# agentic-framwork-for-lecture-to-animation
 
 ## Overview
 
