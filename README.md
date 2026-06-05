@@ -2,7 +2,7 @@
 
 ## Overview
 
-LectureOS is an agentic AI SaaS platform that turns raw professor lectures into 3Blue1Brown-style animated educational videos.
+This is an agentic AI SaaS platform that turns raw professor lectures into 3Blue1Brown-style animated educational videos.
 It includes a Professor Portal for uploads and live pipeline monitoring, and a Student Portal for videos, quizzes, and a RAG chatbot.
 
 ## Monorepo Layout
