@@ -114,4 +114,10 @@ Directory tree:
 
 ## Last Updated
 
-2026-06-05
+2026-06-10
+
+## Web App Verification
+
+- Next.js verified in apps/web: `next@15.0.0`, `react@18.3.0`, `react-dom@18.3.0`.
+- Next.js app router and config present; no additional Next.js setup required.
+- Local dev server verified: `http://localhost:3000` started successfully on 2026-06-10.
