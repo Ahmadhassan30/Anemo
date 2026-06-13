@@ -17,8 +17,7 @@ Before running setup you need:
 
 | Key | Where to get it | Required? |
 |-----|----------------|-----------|
-| UPLOADTHING_SECRET | uploadthing.com/dashboard | **YES** |
-| UPLOADTHING_APP_ID | uploadthing.com/dashboard | **YES** |
+| UPLOADTHING_TOKEN | uploadthing.com/dashboard | **YES** |
 | DEEPSEEK_API_KEY | platform.deepseek.com | **YES** |
 | JWT_SECRET | run: `openssl rand -hex 32` | **YES** |
 | NEXTAUTH_SECRET | run: `openssl rand -hex 32` | **YES** |
@@ -127,9 +126,8 @@ Docker Desktop is not running.
 in the taskbar stops animating (takes 30-60 seconds).
 
 ### "UploadThing upload fails"
-Either `UPLOADTHING_SECRET` is wrong, or `UPLOADTHING_APP_ID` does not
-match the secret.
-**Fix**: Go to uploadthing.com/dashboard, copy both values again,
+Either `UPLOADTHING_TOKEN` is wrong.
+**Fix**: Go to uploadthing.com/dashboard, copy the token again,
 paste into `apps/web/.env.local`, then:
 ```bash
 docker compose -f infra/docker-compose.yml restart web

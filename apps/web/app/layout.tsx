@@ -2,6 +2,7 @@
  * Purpose: Root layout for the LectureOS web application.
  */
 import React from "react";
+import { Providers } from "./providers";
 
 export const metadata = {
   title: "LectureOS",
@@ -15,7 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

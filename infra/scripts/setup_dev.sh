@@ -15,6 +15,11 @@ echo "  ✓ Docker is running"
 
 # Step 2 — Copy env files if they don't exist
 echo "[2/8] Setting up environment files..."
+if [ ! -f .env ]; then
+  cp .env.example .env
+  echo "  ✓ Created .env (root)"
+fi
+
 if [ ! -f apps/api/.env ]; then
   cp apps/api/.env.example apps/api/.env
   echo "  ✓ Created apps/api/.env"
@@ -27,8 +32,7 @@ if [ ! -f apps/web/.env.local ]; then
   cp apps/web/.env.local.example apps/web/.env.local
   echo "  ✓ Created apps/web/.env.local"
   echo "  ⚠ ACTION REQUIRED: Open apps/web/.env.local and fill in:"
-  echo "      UPLOADTHING_SECRET"
-  echo "      UPLOADTHING_APP_ID"
+  echo "      UPLOADTHING_TOKEN"
   echo "      NEXTAUTH_SECRET (run: openssl rand -hex 32)"
 fi
 

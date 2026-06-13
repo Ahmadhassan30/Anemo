@@ -58,12 +58,12 @@ fi
 echo ""
 echo "UploadThing config:"
 ut_set=$(docker compose -f infra/docker-compose.yml exec web \
-  sh -c 'echo ${UPLOADTHING_SECRET}' 2>/dev/null || echo "")
-if [[ "$ut_set" == sk_live* ]]; then
-  echo "  ✓ UPLOADTHING_SECRET is configured"
+  sh -c 'echo ${UPLOADTHING_TOKEN}' 2>/dev/null || echo "")
+if [[ "$ut_set" == eyJ* ]]; then
+  echo "  ✓ UPLOADTHING_TOKEN is configured"
 else
-  echo "  ✗ UPLOADTHING_SECRET is not set or still a placeholder"
-  echo "    → Open apps/web/.env.local and add your UploadThing keys"
+  echo "  ✗ UPLOADTHING_TOKEN is not set or still a placeholder"
+  echo "    → Open apps/web/.env.local and add your UploadThing token"
   all_healthy=false
 fi
 
