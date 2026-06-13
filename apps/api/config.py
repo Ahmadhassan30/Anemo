@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     DEEPSEEK_API_KEY: str
     YOUTUBE_CLIENT_ID: str
     YOUTUBE_CLIENT_SECRET: str
+    UPLOADTHING_SECRET: str
     JWT_SECRET: str
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 60 * 24
