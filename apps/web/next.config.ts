@@ -5,7 +5,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  serverExternalPackages: ["next-auth"]
+  serverExternalPackages: ["next-auth"],
+  output: "standalone"
 };
 
 export default nextConfig;
+
