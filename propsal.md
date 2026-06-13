@@ -114,7 +114,10 @@ Figure | presents the end ~~-~~ t ~~o-~~ end agentic pipeline. Each red ~~-~~ bo
 **==> picture [219 x 287] intentionally omitted <==**
 
 **----- Start of picture text -----**<br>
-Professor hae Object<br>Upload Portal “Storage (S3)<br>trigger<br>WhisperAgent 1 v3 tre psf.-LM-GonceptABE it 2<br>Transcription Segmentation<br>Mh amnidism Code Manim<br>Generation Render<br>Agent 6 ildexed Ag ent 5 final. mp4 Agent 7<br>RAG Video YouTube<br>Indexing Composition Publish<br>pgvector<br>Student Professor<br>Portal Dashboard<br>**----- End of picture text -----**<br>
+Professor hae Object
+Upload Portal “Storage (UploadThing)
+trigger
+WhisperAgent 1 v3 tre psf.-LM-GonceptABE it 2<br>Transcription Segmentation<br>Mh amnidism Code Manim<br>Generation Render<br>Agent 6 ildexed Ag ent 5 final. mp4 Agent 7<br>RAG Video YouTube<br>Indexing Composition Publish<br>pgvector<br>Student Professor<br>Portal Dashboard<br>**----- End of picture text -----**<br>
 
 
 Figure 1: LectureOS end ~~-~~ t ~~o-~~ end agentic pipeline. 
@@ -222,7 +225,7 @@ Table 3: Full technology stack for LectureOS.
 |||engine|
 ||BAAI/bge-~~s~~mall-~~e~~n~~-v~~1.5|Sentence embeddings for RAG (runs lo~~-~~|
 |||cally, 384~~-~~dim)|
-||AWS S3|Rawvideo and rendered clip storage|
+||UploadThing|Raw video and rendered clip storage|
 |Infrastructure|YouTube DataAPI v3|Automated publishing with OAuth2|
 ||Vercel(frontend)|Edge~~-d~~eployedNext.jsfrontend|
 
@@ -251,7 +254,7 @@ Table 4: Fou ~~r-~~ week development sprint plan.
 |Week|Focus||Deliverables|
 |---|---|---|---|
 |1|Foundation||DB schema, FastAPI skeleton, authentication (profes~~-~~|
-||||sor/student roles), raw video upload to $3, Whisper|
+||||sor/student roles), raw video upload to UploadThing, Whisper|
 ||||transcription agent working end~~-t~~o~~-~~end, Next.js portal|
 ||||shell.|
 |2|Core AI Pipeline||Concept segmentation agent, Manim code generation|

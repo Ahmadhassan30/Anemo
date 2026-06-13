@@ -19,7 +19,13 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="LectureOS API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(
+    title="LectureOS API",
+    version="1.0.0",
+    lifespan=lifespan,
+    docs_url="/api/v1/docs",
+    openapi_url="/api/v1/openapi.json"
+)
 
 # Ensure the static files directory exists
 os.makedirs(settings.MANIM_OUTPUT_DIR, exist_ok=True)
@@ -43,6 +49,7 @@ app.include_router(youtube.router, prefix="/api/v1")
 
 
 @app.get("/health")
+@app.get("/api/v1/health")
 async def health() -> dict[str, str]:
     return {"status": "ok", "service": "lectureos-api"}
 

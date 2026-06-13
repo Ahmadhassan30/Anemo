@@ -14,7 +14,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     """Log incoming requests and outgoing responses."""
 
     async def dispatch(self, request: Request, call_next) -> Response:
-        if request.url.path == "/health":
+        if request.url.path in ("/health", "/api/v1/health"):
             return await call_next(request)
 
         start_time = perf_counter()
