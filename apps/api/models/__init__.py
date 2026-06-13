@@ -1,19 +1,25 @@
 """SQLAlchemy model package exports."""
-from .base import Base
-from .user import User
-from .lecture import Lecture
-from .concept import Concept
+from .agent_run import AgentRun, AgentRunStatus
+from .base import Base, TimestampMixin, UUIDMixin
+from .concept import Concept, RenderStatus
 from .embedding import Embedding
+from .lecture import Lecture, LectureStatus, enrollments
 from .quiz import Quiz
-from .agent_run import AgentRun
+from .user import User, UserRole
 
-# TODO: refine model exports as schema evolves
 __all__ = [
     "Base",
+    "TimestampMixin",
+    "UUIDMixin",
     "User",
+    "UserRole",
     "Lecture",
+    "LectureStatus",
+    "enrollments",
     "Concept",
+    "RenderStatus",
     "Embedding",
     "Quiz",
     "AgentRun",
+    "AgentRunStatus",
 ]

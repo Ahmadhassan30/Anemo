@@ -1,13 +1,39 @@
 """AgentRun model for pipeline audit logs."""
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
+import enum
 
-from models.base import Base
+from sqlalchemy import Column, DateTime, Enum as SAEnum, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy.orm import relationship
+
+from models.base import Base, TimestampMixin, UUIDMixin
 
 
-class AgentRun(Base):
+class AgentRunStatus(enum.Enum):
+    """Execution states for an agent attempt."""
+
+    started = "started"
+    success = "success"
+    failed = "failed"
+    retrying = "retrying"
+
+
+class AgentRun(UUIDMixin, TimestampMixin, Base):
     """Audit log of agent execution attempts."""
 
     __tablename__ = "agent_runs"
 
-    # TODO: define columns: id, lecture_id, agent_name, status, error, retry_count
-    pass
+    lecture_id = Column(ForeignKey("lectures.id", ondelete="CASCADE"), nullable=False, index=True)
+    agent_name = Column(String(255), nullable=False)
+    status = Column(
+        SAEnum(AgentRunStatus, name="agent_run_status"),
+        nullable=False,
+        default=AgentRunStatus.started,
+        server_default="started",
+        index=True,
+    )
+    attempt = Column(Integer, nullable=False, default=1, server_default="1")
+    error_message = Column(Text, nullable=True)
+    started_at = Column(DateTime(timezone=True), nullable=False)
+    finished_at = Column(DateTime(timezone=True), nullable=True)
+    metadata_ = Column("metadata", JSON, nullable=True)
+
+    lecture = relationship("Lecture")

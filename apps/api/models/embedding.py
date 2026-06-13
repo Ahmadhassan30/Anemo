@@ -1,13 +1,23 @@
 """Embedding model for pgvector storage."""
-from sqlalchemy import Column, ForeignKey, Text
 
-from models.base import Base
+from pgvector.sqlalchemy import Vector
+from sqlalchemy import Column, ForeignKey, Float, Text
+from sqlalchemy.orm import relationship
+
+from models.base import Base, TimestampMixin, UUIDMixin
 
 
-class Embedding(Base):
-    """Embedding entity linked to concepts."""
+class Embedding(UUIDMixin, TimestampMixin, Base):
+    """Embedding entity linked to lecture and concept chunks."""
 
     __tablename__ = "embeddings"
 
-    # TODO: define columns: id, concept_id, vector, chunk_text
-    pass
+    lecture_id = Column(ForeignKey("lectures.id", ondelete="CASCADE"), nullable=False, index=True)
+    concept_id = Column(ForeignKey("concepts.id", ondelete="CASCADE"), nullable=True, index=True)
+    chunk_text = Column(Text, nullable=False)
+    vector = Column(Vector(384), nullable=False)
+    ts_start = Column(Float, nullable=True)
+    ts_end = Column(Float, nullable=True)
+
+    lecture = relationship("Lecture")
+    concept = relationship("Concept")

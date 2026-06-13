@@ -1,13 +1,21 @@
 """Quiz model for lecture assessments."""
-from sqlalchemy import Column, ForeignKey, String
 
-from models.base import Base
+from sqlalchemy import Column, ForeignKey, String, Text
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
+
+from models.base import Base, TimestampMixin, UUIDMixin
 
 
-class Quiz(Base):
+class Quiz(UUIDMixin, TimestampMixin, Base):
     """Quiz entity with question and answer data."""
 
     __tablename__ = "quizzes"
 
-    # TODO: define columns: id, lecture_id, question, choices, answer
-    pass
+    lecture_id = Column(ForeignKey("lectures.id", ondelete="CASCADE"), nullable=False, index=True)
+    question = Column(Text, nullable=False)
+    choices = Column(JSONB, nullable=False)
+    answer = Column(String(255), nullable=False)
+    explanation = Column(Text, nullable=True)
+
+    lecture = relationship("Lecture")
