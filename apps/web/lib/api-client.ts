@@ -121,9 +121,39 @@ export const api = {
     trigger: async (lectureId: string): Promise<void> => {
       return fetchAPI<void>(`/pipeline/${lectureId}/trigger`, { method: "POST" });
     },
-    // We export the SSE URL for the native EventSource setup
     getSseUrl: (lectureId: string): string => {
       return `${API_BASE_URL}/pipeline/${lectureId}/status`;
     }
+  },
+  students: {
+    getEnrolledLectures: async (): Promise<any[]> => {
+      return fetchAPI<any[]>("/students/lectures");
+    },
+    enroll: async (lectureId: string): Promise<any> => {
+      return fetchAPI<any>("/students/enroll", {
+        method: "POST",
+        body: JSON.stringify({ lecture_id: lectureId }),
+      });
+    },
+    getQuiz: async (lectureId: string): Promise<any> => {
+      return fetchAPI<any>(`/students/lectures/${lectureId}/quiz`);
+    },
+    submitQuiz: async (lectureId: string, answers: Record<string, string>): Promise<any> => {
+      return fetchAPI<any>(`/students/lectures/${lectureId}/quiz/submit`, {
+        method: "POST",
+        body: JSON.stringify({ answers }),
+      });
+    },
+  },
+  chat: {
+    history: async (lectureId: string): Promise<any[]> => {
+      return fetchAPI<any[]>(`/chat/${lectureId}/history`);
+    },
+    send: async (lectureId: string, question: string): Promise<any> => {
+      return fetchAPI<any>("/chat", {
+        method: "POST",
+        body: JSON.stringify({ lecture_id: lectureId, question }),
+      });
+    },
   },
 };
