@@ -66,10 +66,9 @@ export interface LectureListResponse {
 // Client API
 // ---------------------------------------------------------------------------
 
-export interface PresignedUploadResponse {
+export interface CreateLectureResponse {
   lecture_id: string;
   title: string;
-  presigned_url?: string;
 }
 
 export const api = {
@@ -98,8 +97,8 @@ export const api = {
     list: async (page = 1, limit = 10): Promise<LectureListResponse> => {
       return fetchAPI<LectureListResponse>(`/lectures?page=${page}&limit=${limit}`);
     },
-    create: async (title: string): Promise<PresignedUploadResponse> => {
-      return fetchAPI<PresignedUploadResponse>("/lectures", {
+    create: async (title: string): Promise<CreateLectureResponse> => {
+      return fetchAPI<CreateLectureResponse>("/lectures", {
         method: "POST",
         body: JSON.stringify({ title }),
       });

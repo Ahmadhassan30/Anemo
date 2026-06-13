@@ -10,6 +10,7 @@ class UploadThingService:
 
     async def upload_file(self, file_path: str) -> str:
         """Upload a local file to UploadThing using UTAPI and return its URL."""
+        # TODO: upload to S3/Cloudflare R2 in production instead of UploadThing for massive scale
         url = "https://uploadthing.com/api/uploadFiles"
         
         headers = {

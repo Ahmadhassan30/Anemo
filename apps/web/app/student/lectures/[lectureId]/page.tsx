@@ -72,7 +72,7 @@ export default function StudentLectureView() {
   }
 
   // Use the raw_video_url or youtube_url (though HTML5 video struggles with youtube directly)
-  const videoSrc = lecture.raw_video_url || "http://localhost:8000/static/dev_video.mp4";
+  const videoSrc = lecture.raw_video_url || `http://localhost:8000/static/${lectureId}/final.mp4`;
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] md:flex-row overflow-hidden bg-[#0f1117]">
