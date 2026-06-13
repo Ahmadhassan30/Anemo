@@ -1,5 +1,5 @@
 """Pydantic schema package exports."""
-from .auth import LoginRequest, RegisterRequest
+from .auth import LoginRequest, RegisterRequest, TokenResponse, UserResponse
 from .lecture import LectureCreate, LectureRead
 from .concept import ConceptRead
 from .chat import ChatRequest, ChatResponse
@@ -9,6 +9,8 @@ from .pipeline import PipelineEvent
 __all__ = [
     "LoginRequest",
     "RegisterRequest",
+    "TokenResponse",
+    "UserResponse",
     "LectureCreate",
     "LectureRead",
     "ConceptRead",
