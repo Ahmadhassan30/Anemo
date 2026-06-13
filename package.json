@@ -7,7 +7,20 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "test": "turbo test"
+    "test": "turbo test",
+    "setup": "bash infra/scripts/setup_dev.sh",
+    "health": "bash infra/scripts/health_check.sh",
+    "stop": "bash infra/scripts/teardown.sh",
+    "logs": "docker compose -f infra/docker-compose.yml logs -f",
+    "logs:api": "docker compose -f infra/docker-compose.yml logs -f api",
+    "logs:worker": "docker compose -f infra/docker-compose.yml logs -f worker",
+    "logs:web": "docker compose -f infra/docker-compose.yml logs -f web",
+    "logs:nginx": "docker compose -f infra/docker-compose.yml logs -f nginx",
+    "migrate": "docker compose -f infra/docker-compose.yml run --rm api alembic upgrade head",
+    "migrate:down": "docker compose -f infra/docker-compose.yml run --rm api alembic downgrade -1",
+    "seed": "docker compose -f infra/docker-compose.yml run --rm api python -m db.seed",
+    "restart:api": "docker compose -f infra/docker-compose.yml restart api",
+    "restart:worker": "docker compose -f infra/docker-compose.yml restart worker"
   },
   "devDependencies": {
     "turbo": "2.0.0"

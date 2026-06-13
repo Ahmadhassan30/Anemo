@@ -154,17 +154,21 @@ class WhisperService:
         device = "cuda" if torch.cuda.is_available() else "cpu"
         compute_type = "float16" if device == "cuda" else "int8"
 
-        logger.info(
-            "Loading WhisperModel '%s' on %s (compute_type=%s)",
-            settings.WHISPER_MODEL_SIZE,
-            device,
-            compute_type,
-        )
-        return WhisperModel(
+        logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+        logger.info(f"Loading Whisper model: {settings.WHISPER_MODEL_SIZE}")
+        logger.info("If this is your first run, the model will download now.")
+        logger.info("large-v3 is ~3GB — this may take several minutes.")
+        logger.info("This only happens once. Do not restart the worker.")
+        logger.info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+        model = WhisperModel(
             settings.WHISPER_MODEL_SIZE,
             device=device,
             compute_type=compute_type,
         )
+
+        logger.info(f"✓ Whisper {settings.WHISPER_MODEL_SIZE} loaded successfully")
+        return model
 
 
 # ---------------------------------------------------------------------------

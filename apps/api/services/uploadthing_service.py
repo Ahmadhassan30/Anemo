@@ -1,43 +1,25 @@
-"""UploadThing service wrapper for uploading backend pipeline outputs."""
-import httpx
+"""Local static file URL helpers for pipeline outputs.
+
+During development, Manim-generated clips and final composed videos are
+saved to the local filesystem and served via FastAPI's StaticFiles mount.
+The browser-side professor upload goes directly to UploadThing CDN —
+the API never handles that upload.
+"""
+# TODO: upload to S3/Cloudflare R2 in production for final composed videos
 from pathlib import Path
 
 from config import settings
 
 
-class UploadThingService:
-    """Service to upload final produced videos to UploadThing."""
+def get_final_video_url(lecture_id: str) -> str:
+    """Return the local static URL for a composed final video.
 
-    async def upload_file(self, file_path: str) -> str:
-        """Upload a local file to UploadThing using UTAPI and return its URL."""
-        # TODO: upload to S3/Cloudflare R2 in production instead of UploadThing for massive scale
-        url = "https://uploadthing.com/api/uploadFiles"
-        
-        headers = {
-            "x-uploadthing-api-key": settings.UPLOADTHING_SECRET
-        }
-        
-        path_obj = Path(file_path)
-        
-        async with httpx.AsyncClient(timeout=600) as client:
-            with open(file_path, "rb") as f:
-                # We send the file with its filename
-                files = {"files": (path_obj.name, f, "video/mp4")}
-                # By default UTAPI uploads use 'public-read' ACL
-                data = {"acl": "public-read"}
-                
-                response = await client.post(
-                    url,
-                    files=files,
-                    data=data,
-                    headers=headers,
-                )
-                response.raise_for_status()
-                
-                # UTAPI /uploadFiles returns a list of results:
-                # [ { "key": "...", "url": "https://utfs.io/f/...", "name": "...", "size": ... } ]
-                result = response.json()
-                return result[0]["url"]
+    In production this would return an S3/R2 URL instead.
+    """
+    # TODO: upload to S3/Cloudflare R2 in production
+    return f"/static/{lecture_id}/final.mp4"
 
 
-uploadthing_service = UploadThingService()
+def get_final_video_path(lecture_id: str) -> Path:
+    """Return the local filesystem path for a composed final video."""
+    return Path(settings.MANIM_OUTPUT_DIR) / lecture_id / "final.mp4"

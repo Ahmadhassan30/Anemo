@@ -39,7 +39,7 @@ Manim Community Edition for animation rendering.
 
 ## Infrastructure
 
-AWS S3, Redis, Celery, YouTube Data API v3, Vercel frontend hosting, Docker.
+UploadThing (video uploads), Redis, Celery, YouTube Data API v3, Vercel frontend hosting, Docker.
 Nginx is configured to support SSE proxying.
 
 ## Directory Structure
@@ -179,7 +179,7 @@ Router modules currently present:
 - apps/api/routers/students.py
 - apps/api/routers/youtube.py
 
-The docs indicate the API surface covers authentication, lecture CRUD, upload presigning, pipeline trigger and status streaming, and student/chat flows.
+The docs indicate the API surface covers authentication, lecture CRUD, UploadThing upload confirmation, pipeline trigger and status streaming, and student/chat flows.
 
 ### Schemas
 
@@ -211,7 +211,7 @@ Service modules currently present:
 - apps/api/services/llm_service.py
 - apps/api/services/manim_service.py
 - apps/api/services/rag_service.py
-- apps/api/services/s3_service.py
+- apps/api/services/uploadthing_service.py
 - apps/api/services/whisper_service.py
 - apps/api/services/youtube_service.py
 
@@ -264,7 +264,7 @@ Concrete test files currently visible include:
 - apps/api/tests/test_routers/test_chat.py
 - apps/api/tests/test_routers/test_lectures.py
 - apps/api/tests/test_services/test_rag.py
-- apps/api/tests/test_services/test_s3.py
+- apps/api/tests/test_services/test_uploads.py
 
 ### Backend Packaging and Runtime Files
 
@@ -423,7 +423,7 @@ The documentation currently describes these high-level facts:
 
 - The system uses Next.js, FastAPI, Celery, Redis, PostgreSQL, and pgvector.
 - Authentication is JWT-based.
-- Lecture endpoints cover CRUD, upload presigning, and pipeline triggers.
+- Lecture endpoints cover CRUD, UploadThing upload confirmation, and pipeline triggers.
 - The professor dashboard receives live pipeline updates over SSE.
 - Production deploys behind Nginx with SSE proxying configured.
 
@@ -436,7 +436,7 @@ Current stack references in the repo docs and structure:
 - Embeddings: BAAI/bge-small-en-v1.5.
 - Rendering: Manim Community Edition.
 - Media processing: ffmpeg service and audio helpers.
-- Cloud / external integrations: AWS S3 and YouTube Data API v3.
+- Cloud / external integrations: UploadThing (browser-direct video uploads) and YouTube Data API v3. Manim clips served via local FastAPI StaticFiles mount during development.
 
 ## Current Backend and Frontend Verification State
 

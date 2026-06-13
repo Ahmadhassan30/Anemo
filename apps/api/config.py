@@ -9,9 +9,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     REDIS_URL: str
     DEEPSEEK_API_KEY: str
-    YOUTUBE_CLIENT_ID: str
-    YOUTUBE_CLIENT_SECRET: str
-    UPLOADTHING_SECRET: str
+    YOUTUBE_CLIENT_ID: str = "your_youtube_client_id"
+    YOUTUBE_CLIENT_SECRET: str = "your_youtube_client_secret"
     JWT_SECRET: str
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_MINUTES: int = 60 * 24

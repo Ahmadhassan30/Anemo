@@ -1,56 +1,96 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
+set -e
 
-# Determine repository root relative to this script
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="$( cd "$SCRIPT_DIR/../.." && pwd )"
-cd "$REPO_ROOT"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  LectureOS — Local Dev Setup"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-echo "=== Setting up LectureOS Local Development ==="
+# Step 1 — Check Docker is running
+echo "[1/8] Checking Docker..."
+docker info > /dev/null 2>&1 || {
+  echo "ERROR: Docker is not running. Start Docker Desktop first."
+  exit 1
+}
+echo "  ✓ Docker is running"
 
-# 1. Copy env files idempotently
+# Step 2 — Copy env files if they don't exist
+echo "[2/8] Setting up environment files..."
 if [ ! -f apps/api/.env ]; then
-  echo "Copying .env.example to apps/api/.env..."
-  cp .env.example apps/api/.env
-else
-  echo "apps/api/.env already exists."
+  cp apps/api/.env.example apps/api/.env
+  echo "  ✓ Created apps/api/.env"
+  echo "  ⚠ ACTION REQUIRED: Open apps/api/.env and fill in:"
+  echo "      DEEPSEEK_API_KEY"
+  echo "      JWT_SECRET (run: openssl rand -hex 32)"
 fi
 
-# 2. Copy web env files idempotently
 if [ ! -f apps/web/.env.local ]; then
-  echo "Copying .env.example to apps/web/.env.local..."
-  cp .env.example apps/web/.env.local
-else
-  echo "apps/web/.env.local already exists."
+  cp apps/web/.env.local.example apps/web/.env.local
+  echo "  ✓ Created apps/web/.env.local"
+  echo "  ⚠ ACTION REQUIRED: Open apps/web/.env.local and fill in:"
+  echo "      UPLOADTHING_SECRET"
+  echo "      UPLOADTHING_APP_ID"
+  echo "      NEXTAUTH_SECRET (run: openssl rand -hex 32)"
 fi
 
-# 3. Start database and cache services
-echo "Starting postgres and redis..."
+# Step 3 — Install Node dependencies
+echo "[3/8] Installing Node dependencies..."
+pnpm install
+echo "  ✓ Node dependencies installed"
+
+# Step 4 — Start Postgres and Redis first
+echo "[4/8] Starting Postgres and Redis..."
 docker compose -f infra/docker-compose.yml up -d postgres redis
+echo "  ✓ Postgres and Redis containers started"
 
-# 4. Wait for database readiness
-echo "Waiting for postgres to initialize..."
-sleep 5
+# Step 5 — Wait for Postgres to be ready
+echo "[5/8] Waiting for Postgres to be ready..."
+attempt=0
+until docker compose -f infra/docker-compose.yml exec postgres \
+  pg_isready -U lectureos > /dev/null 2>&1; do
+  attempt=$((attempt + 1))
+  if [ $attempt -gt 30 ]; then
+    echo "ERROR: Postgres did not become ready in 60 seconds"
+    echo "Run: docker compose -f infra/docker-compose.yml logs postgres"
+    exit 1
+  fi
+  echo "  ...waiting (${attempt}/30)"
+  sleep 2
+done
+echo "  ✓ Postgres is ready"
 
-# 5. Run Alembic migrations
-echo "Running alembic migrations..."
-cd apps/api
-DATABASE_URL=postgresql+asyncpg://lectureos:secret@localhost:5432/lectureos alembic upgrade head
+# Step 6 — Run Alembic migrations
+echo "[6/8] Running database migrations..."
+docker compose -f infra/docker-compose.yml run --rm api \
+  alembic upgrade head
+echo "  ✓ Migrations complete"
 
-# 6. Seed the database with demo accounts and lectures
-echo "Running database seed..."
-DATABASE_URL=postgresql+asyncpg://lectureos:secret@localhost:5432/lectureos python -m db.seed
+# Step 7 — Seed demo data (idempotent — deletes and re-inserts demo users)
+echo "[7/8] Seeding demo data..."
+docker compose -f infra/docker-compose.yml run --rm api \
+  python -m db.seed
+echo "  ✓ Demo data seeded"
 
-# Return to root and run remaining containers
-cd "$REPO_ROOT"
-
-
-# 7. Start remaining services (api, worker, web, nginx)
-echo "Starting all remaining LectureOS services..."
+# Step 8 — Start all remaining services
+echo "[8/8] Starting all services..."
 docker compose -f infra/docker-compose.yml up -d
+echo "  ✓ All services started"
 
-# 8. Success message
-echo "===================================================="
-echo "LectureOS running at http://localhost"
-echo "===================================================="
+# Make all scripts executable
+chmod +x infra/scripts/setup_dev.sh
+chmod +x infra/scripts/health_check.sh
+chmod +x infra/scripts/teardown.sh
 
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  ✓ LectureOS is running!"
+echo ""
+echo "  App:      http://localhost"
+echo "  API:      http://localhost/api/v1"
+echo "  API Docs: http://localhost/api/v1/docs"
+echo ""
+echo "  Demo Professor: professor@demo.com / demo1234"
+echo "  Demo Student:   student@demo.com / demo1234"
+echo ""
+echo "  NOTE: First pipeline run will download Whisper large-v3"
+echo "  (~3GB). Watch progress with: pnpm logs:worker"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
