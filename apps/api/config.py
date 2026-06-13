@@ -5,16 +5,25 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Typed settings for the LectureOS backend."""
 
-    app_env: str = "development"
-    api_host: str = "0.0.0.0"
-    api_port: int = 8000
-    cors_origins: list[str] = ["http://localhost:3000"]
-
-    database_url: str = ""
-    redis_url: str = ""
-
-    jwt_secret: str = ""
-    jwt_algorithm: str = "HS256"
-    jwt_expires_minutes: int = 60
+    APP_ENV: str = "development"
+    DATABASE_URL: str
+    REDIS_URL: str
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
+    AWS_S3_BUCKET: str
+    AWS_REGION: str = "us-east-1"
+    DEEPSEEK_API_KEY: str
+    YOUTUBE_CLIENT_ID: str
+    YOUTUBE_CLIENT_SECRET: str
+    JWT_SECRET: str
+    JWT_ALGORITHM: str = "HS256"
+    JWT_EXPIRE_MINUTES: int = 60 * 24
+    WHISPER_MODEL_SIZE: str = "large-v3"
+    MANIM_OUTPUT_DIR: str = "/tmp/manim_output"
+    MAX_RENDER_RETRIES: int = 5
+    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+
+settings = Settings()

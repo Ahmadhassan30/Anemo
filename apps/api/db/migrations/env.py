@@ -4,16 +4,15 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from config import Settings
+from config import settings
 from models import Base  # noqa: F401 - importing registers model metadata
 
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-settings = Settings()
-if settings.database_url:
-    config.set_main_option("sqlalchemy.url", settings.database_url)
+if settings.DATABASE_URL:
+    config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
 target_metadata = Base.metadata
 

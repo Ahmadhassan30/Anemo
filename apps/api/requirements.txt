@@ -1,13 +1,13 @@
 fastapi
 uvicorn[standard]
 pydantic-settings
-sqlalchemy
+sqlalchemy[asyncio]
 asyncpg
 alembic
 psycopg2-binary
 pgvector
 redis
-celery
+celery[redis]
 boto3
 python-multipart
 httpx
@@ -15,6 +15,10 @@ python-jose[cryptography]
 passlib[bcrypt]
 sse-starlette
 faster-whisper
+openai
+ffmpeg-python
+manim
+google-api-python-client
 torch
 sentence-transformers
 transformers
