@@ -8,10 +8,6 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     DATABASE_URL: str
     REDIS_URL: str
-    AWS_ACCESS_KEY_ID: str
-    AWS_SECRET_ACCESS_KEY: str
-    AWS_S3_BUCKET: str
-    AWS_REGION: str = "us-east-1"
     DEEPSEEK_API_KEY: str
     YOUTUBE_CLIENT_ID: str
     YOUTUBE_CLIENT_SECRET: str

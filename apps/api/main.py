@@ -5,6 +5,8 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+import os
+from fastapi.staticfiles import StaticFiles
 from config import settings
 from db.session import init_db
 from middleware.logging_middleware import LoggingMiddleware
@@ -18,6 +20,10 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="LectureOS API", version="1.0.0", lifespan=lifespan)
+
+# Ensure the static files directory exists
+os.makedirs(settings.MANIM_OUTPUT_DIR, exist_ok=True)
+app.mount("/static", StaticFiles(directory=settings.MANIM_OUTPUT_DIR), name="static")
 
 app.add_middleware(
     CORSMiddleware,

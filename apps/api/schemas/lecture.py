@@ -1,16 +1,36 @@
 """Lecture request and response schemas."""
-from pydantic import BaseModel
+from datetime import datetime
+from typing import Optional
+from uuid import UUID
+from pydantic import BaseModel, ConfigDict
 
 
 class LectureCreate(BaseModel):
     """Create lecture payload."""
+    title: str
 
-    # TODO: add lecture title and metadata fields
-    pass
+
+class LectureCreateResponse(BaseModel):
+    """Response payload after creating a lecture record."""
+    lecture_id: UUID
+    title: str
+
+
+class LectureConfirmUpload(BaseModel):
+    """Payload to confirm upload of a video to UploadThing."""
+    video_url: str
 
 
 class LectureRead(BaseModel):
     """Lecture read model."""
+    model_config = ConfigDict(from_attributes=True)
 
-    # TODO: add lecture response fields
-    pass
+    id: UUID
+    professor_id: UUID
+    title: str
+    raw_video_url: str
+    status: str
+    youtube_url: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+

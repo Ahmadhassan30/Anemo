@@ -9,7 +9,6 @@ psycopg2-binary
 pgvector
 redis
 celery[redis]
-boto3
 python-multipart
 httpx
 python-jose[cryptography]

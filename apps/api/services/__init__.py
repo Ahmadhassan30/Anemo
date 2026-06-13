@@ -1,5 +1,4 @@
 """Service layer package exports."""
-from .s3_service import S3Service
 from .rag_service import RagService
 from .youtube_service import YouTubeService
 from .whisper_service import WhisperService
@@ -9,7 +8,6 @@ from .llm_service import LlmService
 
 # TODO: refine service exports as APIs stabilize
 __all__ = [
-    "S3Service",
     "RagService",
     "YouTubeService",
     "WhisperService",
