@@ -89,7 +89,7 @@ export default function UploadWizard() {
               <CardDescription className="text-slate-400">Select the raw video file to be processed.</CardDescription>
             </CardHeader>
             <CardContent>
-              <UploadDropzone<OurFileRouter>
+              <UploadDropzone<OurFileRouter, "lectureVideoUploader">
                 endpoint="lectureVideoUploader"
                 onClientUploadComplete={async (res) => {
                   if (!lectureId) return;
