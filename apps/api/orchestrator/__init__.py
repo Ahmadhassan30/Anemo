@@ -1,5 +1,13 @@
 """Orchestrator package exports."""
-from .pipeline import AgentOrchestrator
+from .events import PipelineEvent, PipelineEventType, publish_event, subscribe_events
+from .pipeline import LectureOSPipeline
+from .retry import RetryPolicy
 
-# TODO: expose orchestration helpers
-__all__ = ["AgentOrchestrator"]
+__all__ = [
+    "PipelineEvent",
+    "PipelineEventType",
+    "publish_event",
+    "subscribe_events",
+    "LectureOSPipeline",
+    "RetryPolicy",
+]
