@@ -9,12 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-progress": "^1.1.9",
+    "@radix-ui/react-separator": "^1.1.9",
+    "@radix-ui/react-slot": "^1.2.5",
     "@uploadthing/react": "^7.3.3",
     "clsx": "2.1.0",
+    "lucide-react": "^1.18.0",
     "next": "15.0.0",
     "next-auth": "4.24.0",
     "react": "18.3.0",
     "react-dom": "18.3.0",
+    "tailwind-merge": "^3.6.0",
     "uploadthing": "^7.7.4",
     "zustand": "4.5.0"
   },

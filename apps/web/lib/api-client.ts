@@ -1,71 +1,129 @@
-import type { ApiError } from "@/types/api";
 import { getSession } from "next-auth/react";
 
-export type ApiClientOptions = RequestInit & {
-  baseUrl?: string;
-};
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
-export async function apiFetch<T>(
-  path: string,
-  options: ApiClientOptions = {}
-): Promise<T> {
-  const baseUrl = options.baseUrl || process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1";
-  const url = `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
-  
+async function fetchAPI<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const session = await getSession();
   const headers = new Headers(options.headers);
   headers.set("Content-Type", "application/json");
 
-  // Retrieve NextAuth session to inject JWT authorization header
-  const session = await getSession();
+  // In our JWT-based next-auth setup, the token is kept in the session
   if (session && (session as any).accessToken) {
     headers.set("Authorization", `Bearer ${(session as any).accessToken}`);
-  } else if (session && (session.user as any).id) {
-    // Fallback/Mock auth token during development
-    headers.set("Authorization", `Bearer ${(session.user as any).id}`);
   }
-  
-  const response = await fetch(url, {
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
   });
-  
+
   if (!response.ok) {
-    const errorBody = await response.json().catch(() => ({}));
-    const errorMessage = errorBody.detail || errorBody.message || `HTTP ${response.status}`;
-    throw new Error(errorMessage);
+    let errorMsg = `HTTP Error ${response.status}`;
+    try {
+      const errorData = await response.json();
+      errorMsg = errorData.detail || errorData.message || errorMsg;
+    } catch (e) {}
+    throw new Error(errorMsg);
   }
-  
-  return response.json() as Promise<T>;
+
+  // Handle empty responses
+  const text = await response.text();
+  return text ? JSON.parse(text) : {};
 }
 
-export function normalizeApiError(error: unknown): ApiError {
-  if (error instanceof Error) {
-    return { message: error.message };
-  }
-  return { message: String(error) };
+// ---------------------------------------------------------------------------
+// Typed Interfaces
+// ---------------------------------------------------------------------------
+
+export interface TokenResponse {
+  access_token: string;
+  token_type: string;
 }
 
-export const apiClient = {
+export interface UserResponse {
+  id: string;
+  email: string;
+  role: string;
+}
+
+export interface LectureResponse {
+  id: string;
+  title: string;
+  status: string;
+  raw_video_url?: string;
+  youtube_url?: string;
+  created_at: string;
+}
+
+export interface LectureListResponse {
+  items: LectureResponse[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+// ---------------------------------------------------------------------------
+// Client API
+// ---------------------------------------------------------------------------
+
+export interface PresignedUploadResponse {
+  lecture_id: string;
+  title: string;
+  presigned_url?: string;
+}
+
+export const api = {
+  auth: {
+    login: async (email: string, password: string): Promise<TokenResponse> => {
+      const params = new URLSearchParams();
+      params.append("username", email);
+      params.append("password", password);
+      
+      const res = await fetch(`${API_BASE_URL}/auth/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params,
+      });
+      if (!res.ok) throw new Error("Login failed");
+      return res.json();
+    },
+    register: async (email: string, password: string, role: string): Promise<UserResponse> => {
+      return fetchAPI<UserResponse>("/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ email, password, role }),
+      });
+    },
+  },
   lectures: {
-    create: async (title: string) => {
-      return apiFetch<{ lecture_id: string; title: string }>("/lectures", {
+    list: async (page = 1, limit = 10): Promise<LectureListResponse> => {
+      return fetchAPI<LectureListResponse>(`/lectures?page=${page}&limit=${limit}`);
+    },
+    create: async (title: string): Promise<PresignedUploadResponse> => {
+      return fetchAPI<PresignedUploadResponse>("/lectures", {
         method: "POST",
         body: JSON.stringify({ title }),
       });
     },
-    confirmUpload: async (lectureId: string, videoUrl: string) => {
-      return apiFetch<{ id: string; raw_video_url: string }>(`/lectures/${lectureId}/confirm-upload`, {
+    confirmUpload: async (lectureId: string, publicUrl: string): Promise<LectureResponse> => {
+      return fetchAPI<LectureResponse>(`/lectures/${lectureId}/confirm-upload`, {
         method: "POST",
-        body: JSON.stringify({ video_url: videoUrl }),
+        body: JSON.stringify({ video_url: publicUrl }),
       });
+    },
+    get: async (lectureId: string): Promise<LectureResponse> => {
+      return fetchAPI<LectureResponse>(`/lectures/${lectureId}`);
+    },
+    delete: async (lectureId: string): Promise<void> => {
+      return fetchAPI<void>(`/lectures/${lectureId}`, { method: "DELETE" });
     },
   },
   pipeline: {
-    trigger: async (lectureId: string) => {
-      return apiFetch<{ status: string }>(`/pipeline/${lectureId}/trigger`, {
-        method: "POST",
-      });
+    trigger: async (lectureId: string): Promise<void> => {
+      return fetchAPI<void>(`/pipeline/${lectureId}/trigger`, { method: "POST" });
     },
+    // We export the SSE URL for the native EventSource setup
+    getSseUrl: (lectureId: string): string => {
+      return `${API_BASE_URL}/pipeline/${lectureId}/status`;
+    }
   },
 };
-

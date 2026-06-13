@@ -1,7 +1,6 @@
-/*
- * Purpose: Shared utility helpers for the web app.
- */
-export function cn(): string {
-  // TODO: implement class name merge helper
-  return "";
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
