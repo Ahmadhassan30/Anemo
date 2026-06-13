@@ -7,6 +7,10 @@ celery_app = Celery(
     "lectureos",
     broker=settings.REDIS_URL,
     backend=settings.REDIS_URL,
+    include=[
+        "tasks.pipeline_tasks",
+        "tasks.quiz_tasks"
+    ]
 )
 
 celery_app.conf.update(
@@ -19,5 +23,3 @@ celery_app.conf.update(
     task_acks_late=True,
     worker_prefetch_multiplier=1,  # one task at a time per worker
 )
-
-celery_app.autodiscover_tasks(["tasks"])

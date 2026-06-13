@@ -6,6 +6,7 @@ from .embedding import Embedding
 from .lecture import Lecture, LectureStatus, enrollments
 from .quiz import Quiz
 from .user import User, UserRole
+from .chat_message import ChatMessage
 
 __all__ = [
     "Base",
@@ -22,4 +23,5 @@ __all__ = [
     "Quiz",
     "AgentRun",
     "AgentRunStatus",
+    "ChatMessage",
 ]

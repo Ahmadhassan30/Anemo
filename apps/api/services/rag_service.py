@@ -101,3 +101,7 @@ class RAGService:
             "answer": answer_text,
             "citations": citations
         }
+
+
+rag_service = RAGService()
+
