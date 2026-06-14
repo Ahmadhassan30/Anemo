@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     APP_ENV: str = "development"
     DATABASE_URL: str
     REDIS_URL: str
-    DEEPSEEK_API_KEY: str
+    GROQ_API_KEY: str
     YOUTUBE_CLIENT_ID: str = "your_youtube_client_id"
     YOUTUBE_CLIENT_SECRET: str = "your_youtube_client_secret"
     JWT_SECRET: str

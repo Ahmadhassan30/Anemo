@@ -19,15 +19,15 @@ class LLMService:
 
     def __init__(self) -> None:
         self.client = AsyncOpenAI(
-            api_key=settings.DEEPSEEK_API_KEY,
-            base_url="https://api.deepseek.com"
+            api_key=settings.GROQ_API_KEY,
+            base_url="https://api.groq.com/openai/v1"
         )
 
     async def chat(
         self,
         system: str,
         user: str,
-        model: str = "deepseek-chat",
+        model: str = "llama3-70b-8192",
         temperature: float = 0.2,
         max_tokens: int = 4096,
         response_format: Optional[Dict[str, str]] = None,
@@ -66,7 +66,7 @@ class LLMService:
         self,
         system: str,
         user: str,
-        model: str = "deepseek-chat",
+        model: str = "llama3-70b-8192",
         temperature: float = 0.2,
         max_tokens: int = 4096,
     ) -> dict:
