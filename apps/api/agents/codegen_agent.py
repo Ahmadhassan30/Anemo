@@ -84,7 +84,7 @@ class CodeGenAgent(BaseAgent):
             summary=summary,
             transcript_segment=transcript_segment,
         )
-        plan: dict = await llm_service.chat_json(
+        plan: dict = await llm_service.chat_json_strong(
             system=MANIM_PLANNER_SYSTEM,
             user=planner_user,
         )
@@ -126,7 +126,7 @@ class CodeGenAgent(BaseAgent):
                 color_scheme=color_scheme,
             )
 
-        raw_code: str = await llm_service.chat(
+        raw_code: str = await llm_service.chat_strong(
             system=coder_system,
             user=coder_user,
         )
@@ -139,7 +139,7 @@ class CodeGenAgent(BaseAgent):
 
         critic_user = MANIM_CRITIC_USER.format(code=manim_code)
         try:
-            review: dict = await llm_service.chat_json(
+            review: dict = await llm_service.chat_json_strong(
                 system=MANIM_CRITIC_SYSTEM,
                 user=critic_user,
             )

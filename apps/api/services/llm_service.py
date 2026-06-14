@@ -1,12 +1,17 @@
-"""LLM service wrapping the DeepSeek-V3 API via OpenAI compatibility layer."""
+"""LLM service wrapping the DeepSeek-V3 API via OpenAI compatibility layer, and Gemini via native SDK."""
+import asyncio
 import json
 import logging
 from typing import Any, Dict, Optional
 
+import google.generativeai as genai
 from openai import AsyncOpenAI
 from config import settings
 
 logger = logging.getLogger(__name__)
+
+genai.configure(api_key=settings.GEMINI_API_KEY)
+_gemini_model = genai.GenerativeModel("gemini-2.0-flash")
 
 
 class LLMError(Exception):
@@ -15,7 +20,7 @@ class LLMError(Exception):
 
 
 class LLMService:
-    """Provides a unified async interface to DeepSeek-V3."""
+    """Provides a unified async interface to AI models."""
 
     def __init__(self) -> None:
         self.client = AsyncOpenAI(
@@ -70,11 +75,7 @@ class LLMService:
         temperature: float = 0.2,
         max_tokens: int = 4096,
     ) -> dict:
-        """Call the LLM and parse the response as a JSON object.
-
-        Raises:
-            LLMError: If the API fails or the response cannot be parsed as JSON.
-        """
+        """Call the LLM and parse the response as a JSON object."""
         raw_text = await self.chat(
             system=system,
             user=user,
@@ -89,6 +90,39 @@ class LLMService:
         except json.JSONDecodeError as e:
             logger.error("Failed to parse LLM JSON response: %s\nRaw output: %s", e, raw_text)
             raise LLMError(f"Invalid JSON response: {str(e)}") from e
+
+    async def chat_strong(
+        self,
+        system: str,
+        user: str,
+        max_tokens: int = 4096,
+    ) -> str:
+        """Use Gemini 2.0 Flash for complex tasks like Manim codegen."""
+        await asyncio.sleep(4)  # Gemini free: 15 RPM = 1 per 4s
+        prompt = f"{system}\n\n{user}"
+        response = await asyncio.to_thread(
+            _gemini_model.generate_content, prompt
+        )
+        return response.text
+
+    async def chat_json_strong(
+        self,
+        system: str,
+        user: str,
+    ) -> dict:
+        """Use Gemini 2.0 Flash and parse response as JSON."""
+        result = await self.chat_strong(
+            system,
+            user + "\n\nReturn ONLY valid JSON. No markdown fences. No explanation. No preamble.",
+        )
+        clean = (
+            result.strip()
+            .removeprefix("```json")
+            .removeprefix("```")
+            .removesuffix("```")
+            .strip()
+        )
+        return json.loads(clean)
 
 
 # Singleton

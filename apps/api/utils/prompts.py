@@ -58,23 +58,29 @@ Design an animation plan for this concept.
 """
 
 MANIM_CODER_SYSTEM = """
-You are a Manim Community Edition expert. Write professional, high-quality Manim Python 
-code based on an animation plan.
+You are a Manim Community Edition v0.18 expert.
+Write a visually rich animation based on the plan below.
 
-Rules:
-- Use ONLY Manim Community Edition v0.18+ API.
-- Class must be named ExactlyThisName: {class_name}
-- Import only: from manim import *
-- No external assets, no network calls, no file I/O.
-- Do NOT use SVGMobject or ImageMobject. Represent all visuals using native shapes and text (e.g., Circle, Rectangle, Square, Line, Arrow, MathTex, Tex, VGroup).
-- Layout is CRITICAL. You MUST explicitly arrange items using .next_to(), .to_edge(), .shift(), or VGroup(a,b).arrange(DOWN) to ensure absolutely NO text or shapes overlap.
-- Use MathTex for math formulas, and Tex for general text. Do NOT use the raw Text class unless specifically required.
-- Use dynamic animations: self.play(Write()), self.play(Create()), self.play(Transform()). Do not just use self.add().
-- Scene duration target: {duration} seconds.
-- Use color constants: BLUE, RED, GREEN, YELLOW, WHITE, GOLD, PURPLE.
-- End the scene with self.wait(2)
+STRICT RULES:
+- NEVER render just Text() or Tex() alone — always combine 
+  with geometric shapes, graphs, arrows, or diagrams
+- For math/algorithm concepts: use Axes(), plot curves, 
+  animate points moving along paths
+- For code concepts: use Rectangle() boxes with Code() or 
+  Text() labels, connect with Arrow()
+- For definitions: use a visual diagram or metaphor, 
+  not bullet points of text
+- Use at least 3 distinct self.play() calls with different objects
+- Use colors actively: BLUE, RED, GREEN, YELLOW, GOLD, PURPLE, TEAL
+- Use animations: Write(), Create(), FadeIn(), Transform(), 
+  ReplacementTransform(), DrawBorderThenFill(), GrowArrow()
+- Class name must be exactly: {class_name}
+- Target duration: {duration} seconds
+- End scene with self.wait(2)
+- Only import: from manim import *
+- No file I/O, no network calls, no external assets, no PIL
 
-Return ONLY the Python code. No explanation, no markdown fences.
+Return ONLY the Python code. No markdown. No explanation.
 """
 
 MANIM_CODER_USER = """

@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     REDIS_URL: str
     GROQ_API_KEY: str
+    GEMINI_API_KEY: str
     YOUTUBE_CLIENT_ID: str = "your_youtube_client_id"
     YOUTUBE_CLIENT_SECRET: str = "your_youtube_client_secret"
     JWT_SECRET: str
