@@ -10,15 +10,30 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (credentials?.email) {
+        if (!credentials?.email || !credentials?.password) return null;
+        try {
+          const backendUrl = process.env.NEXTAUTH_BACKEND_URL 
+            || "http://api:8000";
+          const res = await fetch(
+            `${backendUrl}/api/v1/auth/login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            }
+          );
+          if (!res.ok) return null;
+          const data = await res.json();
           return {
-            id: "12345678-1234-1234-1234-1234567890ab",
-            name: "Professor",
+            id: data.user_id,
             email: credentials.email,
-            role: credentials.email.includes("student") ? "student" : "professor"
+            role: data.role,
+            accessToken: data.access_token,
           };
-        }
-        return null;
+        } catch { return null; }
       }
     })
   ],
@@ -26,15 +41,15 @@ export const authOptions: NextAuthOptions = {
     jwt: async ({ token, user }) => {
       if (user) {
         token.id = user.id;
-        token.role = (user as any).role || "professor";
+        token.role = (user as any).role;
+        token.accessToken = (user as any).accessToken;
       }
       return token;
     },
     session: async ({ session, token }) => {
-      if (session.user) {
-        (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
-      }
+      (session.user as any).id = token.id;
+      (session.user as any).role = token.role;
+      (session as any).accessToken = token.accessToken;
       return session;
     }
   },

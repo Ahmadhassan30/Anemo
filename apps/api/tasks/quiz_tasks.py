@@ -51,7 +51,7 @@ async def _generate_quiz_async(lecture_id: str) -> int:
 
         # 2. For each concept, prompt DeepSeek
         for concept in concepts:
-            user_prompt = f"Concept: {concept.concept}\n\nSummary:\n{concept.summary}"
+            user_prompt = f"Concept: {concept.title}\n\nSummary:\n{concept.summary or concept.title}"
             
             try:
                 # Expecting a JSON array directly

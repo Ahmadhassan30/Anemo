@@ -15,9 +15,15 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+def _make_sync_url(url: str) -> str:
+    return url.replace("postgresql+asyncpg://", "postgresql://")
+
+
 if settings.DATABASE_URL:
-    sync_url = settings.DATABASE_URL.replace("postgresql+asyncpg", "postgresql+psycopg2")
-    config.set_main_option("sqlalchemy.url", sync_url)
+    config.set_main_option(
+        "sqlalchemy.url", 
+        _make_sync_url(settings.DATABASE_URL)
+    )
 
 target_metadata = Base.metadata
 def run_migrations_offline() -> None:

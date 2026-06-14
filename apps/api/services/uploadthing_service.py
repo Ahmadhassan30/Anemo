@@ -1,25 +1,33 @@
-"""Local static file URL helpers for pipeline outputs.
-
-During development, Manim-generated clips and final composed videos are
-saved to the local filesystem and served via FastAPI's StaticFiles mount.
-The browser-side professor upload goes directly to UploadThing CDN —
-the API never handles that upload.
-"""
-# TODO: upload to S3/Cloudflare R2 in production for final composed videos
+import shutil
 from pathlib import Path
-
 from config import settings
 
 
 def get_final_video_url(lecture_id: str) -> str:
-    """Return the local static URL for a composed final video.
-
-    In production this would return an S3/R2 URL instead.
-    """
-    # TODO: upload to S3/Cloudflare R2 in production
     return f"/static/{lecture_id}/final.mp4"
 
 
 def get_final_video_path(lecture_id: str) -> Path:
-    """Return the local filesystem path for a composed final video."""
     return Path(settings.MANIM_OUTPUT_DIR) / lecture_id / "final.mp4"
+
+
+async def upload_file(file_path: str) -> str:
+    """
+    Dev mode: copies final video to static serving directory.
+    TODO: Replace with real cloud upload in production.
+    """
+    src = Path(file_path)
+    lecture_id = src.parent.name
+    dest_dir = Path(settings.MANIM_OUTPUT_DIR) / lecture_id
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / "final.mp4"
+    shutil.copy2(str(src), str(dest))
+    return f"/static/{lecture_id}/final.mp4"
+
+
+class UploadthingService:
+    async def upload_file(self, file_path: str) -> str:
+        return await upload_file(file_path)
+
+
+uploadthing_service = UploadthingService()

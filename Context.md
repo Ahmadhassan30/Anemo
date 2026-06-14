@@ -31,7 +31,8 @@ C:.
 |   |   |   |   +---env.py
 |   |   |   |   \---versions
 |   |   |   |       +---001_init_schema.py
-|   |   |   |       \---002_add_pgvector.py
+|   |   |   |       +---002_add_pgvector.py
+|   |   |   |       \---003_add_missing_columns.py
 |   |   |   +---seed.py
 |   |   |   \---session.py
 |   |   +---main.py
@@ -2240,9 +2241,15 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+def _make_sync_url(url: str) -> str:
+    return url.replace("postgresql+asyncpg://", "postgresql://")
+
+
 if settings.DATABASE_URL:
-    sync_url = settings.DATABASE_URL.replace("postgresql+asyncpg", "postgresql+psycopg2")
-    config.set_main_option("sqlalchemy.url", sync_url)
+    config.set_main_option(
+        "sqlalchemy.url", 
+        _make_sync_url(settings.DATABASE_URL)
+    )
 
 target_metadata = Base.metadata
 def run_migrations_offline() -> None:
@@ -2492,6 +2499,29 @@ def downgrade() -> None:
         type_=sa.Text(),
         postgresql_using="vector::text",
     )
+```
+
+### File: apps/api/db/migrations/versions/003_add_missing_columns.py
+
+```
+from alembic import op
+import sqlalchemy as sa
+
+revision = "003_add_missing_columns"
+down_revision = "002_add_pgvector"
+branch_labels = None
+depends_on = None
+
+def upgrade() -> None:
+    op.add_column("concepts",
+        sa.Column("summary", sa.Text(), nullable=True))
+    op.alter_column("lectures", "raw_video_url",
+        existing_type=sa.Text(), nullable=True)
+
+def downgrade() -> None:
+    op.drop_column("concepts", "summary")
+    op.alter_column("lectures", "raw_video_url",
+        existing_type=sa.Text(), nullable=False)
 ```
 
 ### File: apps/api/middleware/__init__.py
@@ -2807,6 +2837,7 @@ class Concept(UUIDMixin, TimestampMixin, Base):
     ts_start = Column(Float, nullable=False)
     ts_end = Column(Float, nullable=False)
     visual_type = Column(String(100), nullable=False)
+    summary = Column(Text, nullable=True)
     manim_code = Column(Text, nullable=True)
     clip_url = Column(Text, nullable=True)
     render_status = Column(
@@ -3842,13 +3873,15 @@ async def delete_lecture(
 import asyncio
 import json
 import logging
-from uuid import UUID
+from uuid import UUID, UUID as PyUUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
+from jose import jwt as jose_jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config import settings
 from db.session import get_db
 from middleware.auth_middleware import require_professor
 from models import Lecture, LectureStatus, User
@@ -3921,8 +3954,8 @@ async def trigger_pipeline(
 async def stream_pipeline_status(
     lecture_id: UUID,
     request: Request,
+    token: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_professor),
 ):
     """Stream real-time pipeline events via Server-Sent Events.
 
@@ -3932,8 +3965,34 @@ async def stream_pipeline_status(
     Includes a 15-second heartbeat to keep the connection alive through
     proxies/load balancers.
     """
-    # Verify lecture exists and belongs to this professor
-    result = await db.execute(select(Lecture).where(Lecture.id == lecture_id))
+    # Resolve token from query param OR Authorization header
+    auth_token = token
+    if not auth_token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            auth_token = auth_header[7:]
+
+    if not auth_token:
+        raise HTTPException(status_code=401, detail="Missing token")
+
+    try:
+        payload = jose_jwt.decode(
+            auth_token,
+            settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+        user_id = PyUUID(str(payload.get("sub")))
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    current_user = result.scalar_one_or_none()
+    if not current_user or current_user.role.value != "professor":
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    result = await db.execute(
+        select(Lecture).where(Lecture.id == lecture_id)
+    )
     lecture = result.scalar_one_or_none()
     if not lecture:
         raise HTTPException(status_code=404, detail="Lecture not found")
@@ -5018,31 +5077,39 @@ rag_service = RAGService()
 ### File: apps/api/services/uploadthing_service.py
 
 ```
-"""Local static file URL helpers for pipeline outputs.
-
-During development, Manim-generated clips and final composed videos are
-saved to the local filesystem and served via FastAPI's StaticFiles mount.
-The browser-side professor upload goes directly to UploadThing CDN —
-the API never handles that upload.
-"""
-# TODO: upload to S3/Cloudflare R2 in production for final composed videos
+import shutil
 from pathlib import Path
-
 from config import settings
 
 
 def get_final_video_url(lecture_id: str) -> str:
-    """Return the local static URL for a composed final video.
-
-    In production this would return an S3/R2 URL instead.
-    """
-    # TODO: upload to S3/Cloudflare R2 in production
     return f"/static/{lecture_id}/final.mp4"
 
 
 def get_final_video_path(lecture_id: str) -> Path:
-    """Return the local filesystem path for a composed final video."""
     return Path(settings.MANIM_OUTPUT_DIR) / lecture_id / "final.mp4"
+
+
+async def upload_file(file_path: str) -> str:
+    """
+    Dev mode: copies final video to static serving directory.
+    TODO: Replace with real cloud upload in production.
+    """
+    src = Path(file_path)
+    lecture_id = src.parent.name
+    dest_dir = Path(settings.MANIM_OUTPUT_DIR) / lecture_id
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / "final.mp4"
+    shutil.copy2(str(src), str(dest))
+    return f"/static/{lecture_id}/final.mp4"
+
+
+class UploadthingService:
+    async def upload_file(self, file_path: str) -> str:
+        return await upload_file(file_path)
+
+
+uploadthing_service = UploadthingService()
 ```
 
 ### File: apps/api/services/whisper_service.py
@@ -5408,7 +5475,7 @@ async def _generate_quiz_async(lecture_id: str) -> int:
 
         # 2. For each concept, prompt DeepSeek
         for concept in concepts:
-            user_prompt = f"Concept: {concept.concept}\n\nSummary:\n{concept.summary}"
+            user_prompt = f"Concept: {concept.title}\n\nSummary:\n{concept.summary or concept.title}"
             
             try:
                 # Expecting a JSON array directly
@@ -5854,6 +5921,7 @@ NEXT_PUBLIC_API_URL=http://localhost/api/v1
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=change_this_to_a_random_32_char_string
 UPLOADTHING_TOKEN=your_uploadthing_token_here
+NEXTAUTH_BACKEND_URL=http://localhost:8000
 ```
 
 ### File: apps/web/Dockerfile
@@ -8518,15 +8586,30 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (credentials?.email) {
+        if (!credentials?.email || !credentials?.password) return null;
+        try {
+          const backendUrl = process.env.NEXTAUTH_BACKEND_URL 
+            || "http://api:8000";
+          const res = await fetch(
+            `${backendUrl}/api/v1/auth/login`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            }
+          );
+          if (!res.ok) return null;
+          const data = await res.json();
           return {
-            id: "12345678-1234-1234-1234-1234567890ab",
-            name: "Professor",
+            id: data.user_id,
             email: credentials.email,
-            role: credentials.email.includes("student") ? "student" : "professor"
+            role: data.role,
+            accessToken: data.access_token,
           };
-        }
-        return null;
+        } catch { return null; }
       }
     })
   ],
@@ -8534,15 +8617,15 @@ export const authOptions: NextAuthOptions = {
     jwt: async ({ token, user }) => {
       if (user) {
         token.id = user.id;
-        token.role = (user as any).role || "professor";
+        token.role = (user as any).role;
+        token.accessToken = (user as any).accessToken;
       }
       return token;
     },
     session: async ({ session, token }) => {
-      if (session.user) {
-        (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
-      }
+      (session.user as any).id = token.id;
+      (session.user as any).role = token.role;
+      (session as any).accessToken = token.accessToken;
       return session;
     }
   },

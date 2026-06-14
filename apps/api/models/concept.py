@@ -27,6 +27,7 @@ class Concept(UUIDMixin, TimestampMixin, Base):
     ts_start = Column(Float, nullable=False)
     ts_end = Column(Float, nullable=False)
     visual_type = Column(String(100), nullable=False)
+    summary = Column(Text, nullable=True)
     manim_code = Column(Text, nullable=True)
     clip_url = Column(Text, nullable=True)
     render_status = Column(

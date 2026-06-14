@@ -2,13 +2,15 @@
 import asyncio
 import json
 import logging
-from uuid import UUID
+from uuid import UUID, UUID as PyUUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import StreamingResponse
+from jose import jwt as jose_jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config import settings
 from db.session import get_db
 from middleware.auth_middleware import require_professor
 from models import Lecture, LectureStatus, User
@@ -81,8 +83,8 @@ async def trigger_pipeline(
 async def stream_pipeline_status(
     lecture_id: UUID,
     request: Request,
+    token: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_professor),
 ):
     """Stream real-time pipeline events via Server-Sent Events.
 
@@ -92,8 +94,34 @@ async def stream_pipeline_status(
     Includes a 15-second heartbeat to keep the connection alive through
     proxies/load balancers.
     """
-    # Verify lecture exists and belongs to this professor
-    result = await db.execute(select(Lecture).where(Lecture.id == lecture_id))
+    # Resolve token from query param OR Authorization header
+    auth_token = token
+    if not auth_token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            auth_token = auth_header[7:]
+
+    if not auth_token:
+        raise HTTPException(status_code=401, detail="Missing token")
+
+    try:
+        payload = jose_jwt.decode(
+            auth_token,
+            settings.JWT_SECRET,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+        user_id = PyUUID(str(payload.get("sub")))
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    result = await db.execute(select(User).where(User.id == user_id))
+    current_user = result.scalar_one_or_none()
+    if not current_user or current_user.role.value != "professor":
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    result = await db.execute(
+        select(Lecture).where(Lecture.id == lecture_id)
+    )
     lecture = result.scalar_one_or_none()
     if not lecture:
         raise HTTPException(status_code=404, detail="Lecture not found")
