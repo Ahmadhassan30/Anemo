@@ -28,7 +28,15 @@ export default function RegisterPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.detail || "Registration failed. Try again.");
+        let errMsg = "Registration failed. Try again.";
+        if (typeof data.detail === "string") {
+          errMsg = data.detail;
+        } else if (Array.isArray(data.detail)) {
+          errMsg = data.detail.map(err => `${err.loc.join('.')}: ${err.msg}`).join(', ');
+        } else if (data.detail && typeof data.detail === "object") {
+          errMsg = JSON.stringify(data.detail);
+        }
+        setError(errMsg);
         setLoading(false);
       } else {
         setSuccess(true);
