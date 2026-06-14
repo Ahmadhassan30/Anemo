@@ -153,13 +153,16 @@ async def overlay_audio(
         t=duration,
     )
 
+    # Pad video with its last frame if it's shorter than audio duration
+    padded_video = video_in.video.filter('tpad', stop_mode='clone', stop_duration=duration)
+
     stream = ffmpeg.output(
-        video_in.video,
+        padded_video,
         audio_in.audio,
         str(out),
-        vcodec="copy",
+        vcodec="libx264",
         acodec="aac",
-        shortest=None,
+        t=duration,
     )
     await asyncio.to_thread(_run_ffmpeg_sync, stream)
     return str(out.resolve())
