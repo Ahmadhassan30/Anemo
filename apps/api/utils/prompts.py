@@ -65,6 +65,7 @@ Rules:
 - Class must be named ExactlyThisName: {class_name}
 - Import only: from manim import *
 - No external assets, no network calls, no file I/O
+- Do NOT use SVGMobject or ImageMobject under any circumstances. Represent all visuals using native shapes and text (e.g., Circle, Rectangle, Square, Line, Arrow, Text, MathTex).
 - Use self.play() for all animations, self.wait() for pauses
 - Scene duration target: {duration} seconds
 - Use color constants: BLUE, RED, GREEN, YELLOW, WHITE, GOLD, PURPLE
