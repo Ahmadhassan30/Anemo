@@ -32,6 +32,11 @@ def run_pipeline_task(self, lecture_id: str) -> None:
         loop.run_until_complete(_mark_failed(lecture_id))
         raise
     finally:
+        try:
+            from db.session import engine
+            loop.run_until_complete(engine.dispose())
+        except Exception:
+            logger.exception("Failed to dispose database engine")
         loop.close()
 
 

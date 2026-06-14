@@ -34,7 +34,7 @@ class AgentRun(UUIDMixin, TimestampMixin, Base):
     attempt = Column(Integer, nullable=False, default=1, server_default="1")
     error_message = Column(Text, nullable=True)
     started_at = Column(DateTime(timezone=True), nullable=False,
-                        server_default=func.now())
+                        default=func.now(), server_default=func.now())
     finished_at = Column(DateTime(timezone=True), nullable=True)
     metadata_ = Column("metadata", JSON, nullable=True)
 

@@ -26,6 +26,11 @@ def generate_quiz_task(lecture_id: str) -> int:
         logger.exception("Quiz generation failed for lecture %s", lecture_id)
         raise
     finally:
+        try:
+            from db.session import engine
+            loop.run_until_complete(engine.dispose())
+        except Exception:
+            logger.exception("Failed to dispose database engine")
         loop.close()
 
 

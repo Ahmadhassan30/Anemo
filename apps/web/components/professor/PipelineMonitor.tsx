@@ -174,9 +174,9 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
             {events.map((e, i) => (
               <div key={i} className="flex gap-4">
                 <span className="text-slate-600 shrink-0">
-                  {new Date(e.timestamp).toISOString().substring(11, 19)}
+                  {new Date(e.timestamp || Date.now()).toISOString().substring(11, 19)}
                 </span>
-                <span className={e.event_type.includes("FAILED") ? "text-red-400" : "text-slate-300"}>
+                <span className={e.event_type && e.event_type.includes("FAILED") ? "text-red-400" : "text-slate-300"}>
                   [{e.agent_name || "SYSTEM"}] {e.message}
                 </span>
               </div>

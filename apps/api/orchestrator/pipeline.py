@@ -161,12 +161,15 @@ class LectureOSPipeline:
                     ]
                     transcript_segment = " ".join(seg_texts)
 
-                    result = await self.agents["codegen"].execute_with_retry(
-                        self.lecture_id,
-                        self.db,
-                        concept=concept,
-                        transcript_segment=transcript_segment,
-                    )
+                    # Create a fresh database session for this concurrent task to avoid InterfaceError
+                    from db.session import async_session_maker
+                    async with async_session_maker() as task_db:
+                        result = await self.agents["codegen"].execute_with_retry(
+                            self.lecture_id,
+                            task_db,
+                            concept=concept,
+                            transcript_segment=transcript_segment,
+                        )
 
                     # Emit a per-concept progress update
                     pct = 30 + int((idx + 1) / len(concepts) * 40)

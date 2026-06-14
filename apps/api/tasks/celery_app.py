@@ -23,3 +23,25 @@ celery_app.conf.update(
     task_acks_late=True,
     worker_prefetch_multiplier=1,  # one task at a time per worker
 )
+
+
+@celery_app.on_after_configure.connect
+def setup_periodic_tasks(sender, **kwargs):
+    pass
+
+
+from celery.signals import worker_process_init
+
+@worker_process_init.connect
+def on_worker_init(**kwargs):
+    """Dispose SQLAlchemy engine pool on Celery worker fork."""
+    try:
+        from db.session import engine
+        # Dispose the sync engine (which underlies the AsyncEngine)
+        engine.sync_engine.dispose()
+        import logging
+        logging.getLogger("celery").info("Disposed SQLAlchemy engine connection pool on worker process start.")
+    except Exception as e:
+        import logging
+        logging.getLogger("celery").exception("Failed to dispose engine connection pool: %s", e)
+

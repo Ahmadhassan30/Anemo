@@ -70,12 +70,23 @@ class BaseAgent(ABC):
 
     async def emit_event(self, lecture_id: str, status: str, attempt: int, error: str | None = None) -> None:
         """Publish progress event to the pipeline event bus."""
+        from datetime import datetime, timezone
+        
+        # Add timestamp and compatible keys to avoid frontend crashes
+        msg = f"Agent {self.name} status: {status} (attempt {attempt})"
+        if error:
+            msg += f" - Error: {error}"
+            
         event: Dict[str, Any] = {
             "type": "agent_status",
+            "event_type": f"AGENT_{status.upper()}" if status in ("started", "failed", "retrying") else "PROGRESS_UPDATE",
             "lecture_id": lecture_id,
             "agent": self.name,
+            "agent_name": self.name,
             "status": status,
             "attempt": attempt,
+            "message": msg,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         if error:
             event["error"] = error

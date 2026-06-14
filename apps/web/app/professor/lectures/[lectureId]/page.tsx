@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { PipelineMonitor } from "@/components/professor/PipelineMonitor";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,10 +12,11 @@ interface PageProps {
 }
 
 async function getLecture(lectureId: string) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   const token = session ? (session as any).accessToken : "";
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+  const backendBase = process.env.NEXTAUTH_BACKEND_URL || "http://localhost:8000";
+  const API_BASE_URL = `${backendBase}/api/v1`;
   
   const res = await fetch(`${API_BASE_URL}/lectures/${lectureId}`, {
     headers: {
