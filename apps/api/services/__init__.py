@@ -1,5 +1,5 @@
 """Service layer package exports."""
-from .rag_service import RagService
+from .rag_service import RAGService, rag_service
 from .youtube_service import YouTubeService
 from .whisper_service import WhisperService, whisper_service
 from .manim_service import ManimService, render_scene, ManimRenderError
@@ -15,7 +15,7 @@ from .llm_service import LLMService, LLMError, llm_service
 
 __all__ = [
     # Classes
-    "RagService",
+    "RAGService",
     "YouTubeService",
     "WhisperService",
     "ManimService",
@@ -26,6 +26,7 @@ __all__ = [
     # Singletons
     "whisper_service",
     "llm_service",
+    "rag_service",
     # Module-level helpers
     "extract_audio",
     "concat_clips",

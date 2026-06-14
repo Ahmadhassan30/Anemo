@@ -9,6 +9,7 @@ from models.base import Base, TimestampMixin, UUIDMixin
 
 class Embedding(UUIDMixin, TimestampMixin, Base):
     """Embedding entity linked to lecture and concept chunks."""
+    __allow_unmapped__ = True
 
     __tablename__ = "embeddings"
 

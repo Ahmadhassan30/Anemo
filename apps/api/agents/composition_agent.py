@@ -11,7 +11,8 @@ from agents.base import BaseAgent
 from models.lecture import Lecture, LectureStatus
 from services.ffmpeg_service import extract_audio, concat_clips, overlay_audio, burn_captions
 from services.whisper_service import whisper_service
-from services.uploadthing_service import uploadthing_service
+from services.uploadthing_service import get_final_video_url, get_final_video_path
+import shutil
 from utils.audio import cleanup_temp_files
 
 logger = logging.getLogger(__name__)
@@ -94,9 +95,12 @@ class CompositionAgent(BaseAgent):
             )
             files_to_cleanup.append(final_path)
 
-            # 6. Upload to UploadThing
-            logger.info("Uploading final video to UploadThing...")
-            final_video_url = await uploadthing_service.upload_file(final_path)
+            # 6. Save to static files directory
+            logger.info("Saving final video to static directory...")
+            final_dest = get_final_video_path(lecture_id)
+            final_dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(final_path, final_dest)
+            final_video_url = get_final_video_url(lecture_id)
 
             # 7. Update lecture status
             result = await db.execute(select(Lecture).where(Lecture.id == lecture_id))

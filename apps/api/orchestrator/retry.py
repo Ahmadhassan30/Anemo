@@ -5,9 +5,6 @@ from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
-# Exceptions that indicate programmer errors — never retry these.
-_NON_RETRYABLE = (ValueError, TypeError, AuthenticationError)
-
 # We define a local alias in case openai.AuthenticationError or similar
 # isn't installed; fall back to a sentinel.
 try:
@@ -15,6 +12,9 @@ try:
 except ImportError:
     class AuthenticationError(Exception):  # type: ignore[no-redef]
         pass
+
+# Exceptions that indicate programmer errors — never retry these.
+_NON_RETRYABLE = (ValueError, TypeError, AuthenticationError)
 
 
 @dataclass

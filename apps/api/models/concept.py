@@ -18,6 +18,7 @@ class RenderStatus(enum.Enum):
 
 class Concept(UUIDMixin, TimestampMixin, Base):
     """Concept entity for timestamps and Manim code."""
+    __allow_unmapped__ = True
 
     __tablename__ = "concepts"
 

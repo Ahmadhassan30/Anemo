@@ -115,5 +115,14 @@ Review this Manim Community Edition code for correctness:
 
 ```python
 {code}
-```
 """
+
+def get_prompt(name: str, **kwargs) -> str:
+    """Get a prompt template by name and optionally format it."""
+    prompt = globals().get(name)
+    if not prompt:
+        raise ValueError(f"Prompt {name} not found")
+    if kwargs:
+        return prompt.format(**kwargs)
+    return prompt
+

@@ -8,6 +8,7 @@ from models.base import Base, TimestampMixin, UUIDMixin
 
 class ChatMessage(UUIDMixin, TimestampMixin, Base):
     """A single message in a student's conversation with a lecture RAG bot."""
+    __allow_unmapped__ = True
 
     __tablename__ = "chat_messages"
 

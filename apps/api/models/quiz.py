@@ -9,6 +9,7 @@ from models.base import Base, TimestampMixin, UUIDMixin
 
 class Quiz(UUIDMixin, TimestampMixin, Base):
     """Quiz entity with question and answer data."""
+    __allow_unmapped__ = True
 
     __tablename__ = "quizzes"
 

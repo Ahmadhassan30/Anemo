@@ -26,6 +26,7 @@ enrollments = Table(
 
 class Lecture(UUIDMixin, TimestampMixin, Base):
     """Lecture entity linked to professor uploads."""
+    __allow_unmapped__ = True
 
     __tablename__ = "lectures"
 

@@ -1,7 +1,7 @@
 """AgentRun model for pipeline audit logs."""
 import enum
 
-from sqlalchemy import Column, DateTime, Enum as SAEnum, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import Column, DateTime, Enum as SAEnum, ForeignKey, Integer, JSON, String, Text, func
 from sqlalchemy.orm import relationship
 
 from models.base import Base, TimestampMixin, UUIDMixin
@@ -18,6 +18,7 @@ class AgentRunStatus(enum.Enum):
 
 class AgentRun(UUIDMixin, TimestampMixin, Base):
     """Audit log of agent execution attempts."""
+    __allow_unmapped__ = True
 
     __tablename__ = "agent_runs"
 
@@ -32,7 +33,8 @@ class AgentRun(UUIDMixin, TimestampMixin, Base):
     )
     attempt = Column(Integer, nullable=False, default=1, server_default="1")
     error_message = Column(Text, nullable=True)
-    started_at = Column(DateTime(timezone=True), nullable=False)
+    started_at = Column(DateTime(timezone=True), nullable=False,
+                        server_default=func.now())
     finished_at = Column(DateTime(timezone=True), nullable=True)
     metadata_ = Column("metadata", JSON, nullable=True)
 

@@ -16,6 +16,7 @@ class UserRole(enum.Enum):
 
 class User(UUIDMixin, TimestampMixin, Base):
     """User entity for authentication and roles."""
+    __allow_unmapped__ = True
 
     __tablename__ = "users"
 
