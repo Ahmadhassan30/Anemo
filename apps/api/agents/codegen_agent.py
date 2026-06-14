@@ -153,16 +153,19 @@ class CodeGenAgent(BaseAgent):
             fixed_code = review.get("fixed_code")
             if fixed_code:
                 logger.debug(
-                    "[%s] Critic found %d issues — using fixed code",
+                    "[%s] Critic found %d issues. Ignoring fixed_code due to hallucination risks, letting Manim test original code.",
                     self.name,
                     len(issues),
                 )
-                manim_code = _strip_markdown_fences(fixed_code)
+                # manim_code = _strip_markdown_fences(fixed_code)
             else:
-                # Issues are unfixable by the critic — trigger retry
-                self._last_error = "; ".join(issues)
-                raise CodeGenError(
-                    f"Critic flagged unfixable issues: {issues}"
+                # Issues are unfixable by the critic - but the critic might be hallucinating.
+                # We will log the issues and let Manim try to render anyway. 
+                # If Manim fails, the real error will trigger the retry.
+                logger.warning(
+                    "[%s] Critic flagged unfixable issues but we will attempt render anyway: %s",
+                    self.name,
+                    issues,
                 )
 
         # ── STEP 4: RENDER ATTEMPT ───────────────────────────────────
