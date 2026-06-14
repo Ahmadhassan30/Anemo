@@ -8,6 +8,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
 
 class Base(DeclarativeBase):
     """Base class for all ORM models."""
+    __allow_unmapped__ = True
 
 
 class UUIDMixin:
