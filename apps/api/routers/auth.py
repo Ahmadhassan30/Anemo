@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from jose import jwt
-from passlib.context import CryptContext
+import bcrypt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,7 +14,14 @@ from models import User, UserRole
 from schemas.auth import LoginRequest, RegisterRequest, TokenResponse, UserResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    try:
+        return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
+    except Exception:
+        return False
 
 
 def _to_user_response(user: User) -> UserResponse:
@@ -35,7 +42,7 @@ async def register(payload: RegisterRequest, db: AsyncSession = Depends(get_db))
 
     user = User(
         email=payload.email,
-        hashed_password=pwd_context.hash(payload.password),
+        hashed_password=hash_password(payload.password),
         role=UserRole(payload.role),
         is_active=True,
     )
@@ -56,7 +63,7 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> To
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    if not pwd_context.verify(payload.password, user.hashed_password):
+    if not verify_password(payload.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",

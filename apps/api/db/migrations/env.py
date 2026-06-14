@@ -4,6 +4,10 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 from config import settings
 from models import Base  # noqa: F401 - importing registers model metadata
 
@@ -12,11 +16,10 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 if settings.DATABASE_URL:
-    config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+    sync_url = settings.DATABASE_URL.replace("postgresql+asyncpg", "postgresql+psycopg2")
+    config.set_main_option("sqlalchemy.url", sync_url)
 
 target_metadata = Base.metadata
-
-
 def run_migrations_offline() -> None:
     """Run migrations without an engine."""
 

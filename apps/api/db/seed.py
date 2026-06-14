@@ -1,7 +1,7 @@
 """Database seed helpers for local development."""
 import asyncio
 import logging
-from passlib.context import CryptContext
+import bcrypt
 from sqlalchemy import delete, select
 from sqlalchemy.dialects.postgresql import insert
 
@@ -13,8 +13,7 @@ logger = logging.getLogger(__name__)
 async def async_seed_data() -> None:
     """Async implementation of the database seeding logic."""
     logger.info("Starting database seed...")
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    hashed_password = pwd_context.hash("demo1234")
+    hashed_password = bcrypt.hashpw("demo1234".encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
     async with async_session_maker() as db:
         logger.info("Creating demo user records (on conflict do nothing)...")
