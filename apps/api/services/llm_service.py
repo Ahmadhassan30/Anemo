@@ -27,7 +27,7 @@ class LLMService:
         self,
         system: str,
         user: str,
-        model: str = "llama-3.1-70b-versatile",
+        model: str = "llama-3.1-8b-instant",
         temperature: float = 0.2,
         max_tokens: int = 4096,
         response_format: Optional[Dict[str, str]] = None,
@@ -66,7 +66,7 @@ class LLMService:
         self,
         system: str,
         user: str,
-        model: str = "llama-3.1-70b-versatile",
+        model: str = "llama-3.1-8b-instant",
         temperature: float = 0.2,
         max_tokens: int = 4096,
     ) -> dict:
