@@ -32,7 +32,7 @@ export default function RegisterPage() {
         if (typeof data.detail === "string") {
           errMsg = data.detail;
         } else if (Array.isArray(data.detail)) {
-          errMsg = data.detail.map(err => `${err.loc.join('.')}: ${err.msg}`).join(', ');
+          errMsg = data.detail.map((err: any) => `${err.loc.join('.')}: ${err.msg}`).join(', ');
         } else if (data.detail && typeof data.detail === "object") {
           errMsg = JSON.stringify(data.detail);
         }
