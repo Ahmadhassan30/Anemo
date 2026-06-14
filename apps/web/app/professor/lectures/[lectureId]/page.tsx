@@ -71,7 +71,15 @@ export default async function LectureDetailPage(props: PageProps) {
                 <p className="text-sm text-slate-500 mb-1">Created At</p>
                 <p className="text-sm">{new Date(lecture.created_at).toLocaleString()}</p>
               </div>
-              {lecture.youtube_url && (
+              {lecture.status === "completed" && (
+                <div>
+                  <p className="text-sm text-slate-500 mb-1">Local Video Link</p>
+                  <a href={`/static/${params.lectureId}/final.mp4`} target="_blank" rel="noreferrer" className="text-emerald-400 hover:underline text-sm break-all" download>
+                    Download/View Video Locally
+                  </a>
+                </div>
+              )}
+              {lecture.youtube_url && !lecture.youtube_url.includes("dQw4w9WgXcQ") && (
                 <div>
                   <p className="text-sm text-slate-500 mb-1">YouTube URL</p>
                   <a href={lecture.youtube_url} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline text-sm break-all">

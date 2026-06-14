@@ -97,13 +97,23 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
             <PlayCircle className="w-5 h-5 text-blue-500" />
             Pipeline Status
           </CardTitle>
-          {status === "completed" && youtubeUrl && (
-            <Button asChild variant="outline" className="border-slate-700 bg-slate-800 hover:bg-slate-700 h-8 gap-2">
-              <a href={youtubeUrl} target="_blank" rel="noreferrer">
-                <ExternalLink className="w-4 h-4 text-red-500" />
-                View on YouTube
-              </a>
-            </Button>
+          {status === "completed" && (
+            <div className="flex gap-2">
+              <Button asChild variant="outline" className="border-slate-700 bg-slate-800 hover:bg-slate-700 h-8 gap-2">
+                <a href={`/static/${lectureId}/final.mp4`} target="_blank" rel="noreferrer" download>
+                  <PlayCircle className="w-4 h-4 text-emerald-500" />
+                  View/Download Video
+                </a>
+              </Button>
+              {youtubeUrl && !youtubeUrl.includes("dQw4w9WgXcQ") && (
+                <Button asChild variant="outline" className="border-slate-700 bg-slate-800 hover:bg-slate-700 h-8 gap-2">
+                  <a href={youtubeUrl} target="_blank" rel="noreferrer">
+                    <ExternalLink className="w-4 h-4 text-red-500" />
+                    View on YouTube
+                  </a>
+                </Button>
+              )}
+            </div>
           )}
         </div>
         <div className="flex items-center gap-4">
