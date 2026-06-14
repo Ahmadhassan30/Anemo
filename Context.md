@@ -5976,7 +5976,7 @@ ENV HOSTNAME="0.0.0.0"
 
 # Add a healthcheck to verify web service status
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/ || exit 1
 
 CMD ["node", "server.js"]
 ```
@@ -9310,6 +9310,8 @@ services:
     volumes:
       - ../apps/api:/app
       - manim_output:/tmp/manim_output
+    healthcheck:
+      disable: true
 
   web:
     build:

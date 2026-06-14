@@ -57,6 +57,8 @@ services:
     volumes:
       - ../apps/api:/app
       - manim_output:/tmp/manim_output
+    healthcheck:
+      disable: true
 
   web:
     build:
