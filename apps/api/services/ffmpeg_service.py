@@ -1,5 +1,6 @@
 """Service for ffmpeg composition, audio extraction, and caption burning."""
 import asyncio
+import logging
 import os
 import tempfile
 from pathlib import Path
@@ -7,6 +8,8 @@ from typing import List
 
 import ffmpeg
 import httpx
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
