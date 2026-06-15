@@ -102,12 +102,18 @@ async def concat_clips(clip_paths: List[str], output_path: str) -> str:
 
     inputs = [ffmpeg.input(str(Path(p).resolve())) for p in clip_paths]
     
-    # Concatenate both video and audio streams
-    joined = ffmpeg.concat(*inputs, v=1, a=1)
+    # Pair and flatten the video and audio streams of each input file
+    streams = []
+    for inp in inputs:
+        streams.append(inp.video)
+        streams.append(inp.audio)
+        
+    # Concatenate the streams
+    joined = ffmpeg.concat(*streams, v=1, a=1)
     
     stream = ffmpeg.output(
-        joined.video,
-        joined.audio,
+        joined.node['v'],
+        joined.node['a'],
         str(out),
         vcodec="libx264",
         acodec="aac",
