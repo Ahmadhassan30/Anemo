@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from config import settings
 from db.session import init_db
 from middleware.logging_middleware import LoggingMiddleware
-from routers import auth, chat, lectures, pipeline, students, youtube
+from routers import auth, chat, lectures, pipeline, students, video, youtube
 
 
 @asynccontextmanager
@@ -46,6 +46,7 @@ app.include_router(pipeline.router, prefix="/api/v1")
 app.include_router(students.router, prefix="/api/v1")
 app.include_router(chat.router, prefix="/api/v1")
 app.include_router(youtube.router, prefix="/api/v1")
+app.include_router(video.router, prefix="/api/v1")
 
 
 @app.get("/health")

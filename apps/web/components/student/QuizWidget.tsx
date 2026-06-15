@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
 interface QuizQuestion {
   id: string;
@@ -85,9 +85,9 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
   if (loading) {
     return (
       <div className="p-6 space-y-4">
-        <div className="h-6 w-1/3 animate-pulse rounded-sm border border-border bg-secondary"></div>
-        <div className="h-24 w-full animate-pulse rounded-sm border border-border bg-secondary"></div>
-        <div className="h-24 w-full animate-pulse rounded-sm border border-border bg-secondary"></div>
+        <div className="h-5 w-1/3 animate-pulse rounded border border-zinc-800 bg-zinc-900/50"></div>
+        <div className="h-20 w-full animate-pulse rounded border border-zinc-800 bg-zinc-900/50"></div>
+        <div className="h-20 w-full animate-pulse rounded border border-zinc-800 bg-zinc-900/50"></div>
       </div>
     );
   }
@@ -95,13 +95,9 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
   if (generating) {
     return (
       <div className="flex h-full flex-col items-center justify-center space-y-4 p-6 text-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary/20 border-t-primary"></div>
-        <p className="font-medium text-foreground">
-          <span className="term-prompt text-primary" />generating_quiz
-          <span className="term-cursor align-middle" aria-hidden />
-        </p>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          // agent is analyzing lecture concepts and assembling questions — this may take a moment.
+        <LoadingSpinner message="Generating quiz..." className="flex-col gap-4 text-center items-center scale-110" />
+        <p className="text-xs text-zinc-400 max-w-xs leading-relaxed">
+          AI agent is analyzing lecture concepts and assembling questions. This may take a moment.
         </p>
       </div>
     );
@@ -109,8 +105,8 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
 
   if (questions.length === 0) {
     return (
-      <div className="p-6 text-center text-sm text-muted-foreground">
-        <span className="text-primary">{"› "}</span>no_quiz_available for this lecture.
+      <div className="p-6 text-center text-xs text-zinc-500 font-mono">
+        no quiz available for this lecture.
       </div>
     );
   }
@@ -118,50 +114,47 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
   const resultMap = new Map(results?.results.map(r => [r.quiz_id, r]));
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto bg-background">
-      <div className="sticky top-0 z-10 border-b border-border bg-card/80 p-4 backdrop-blur-md">
-        <h3 className="term-caret font-semibold tracking-wide text-foreground">knowledge_check</h3>
+    <div className="flex h-full flex-col overflow-y-auto bg-zinc-950">
+      <div className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-900/80 p-4 backdrop-blur-md">
+        <h3 className="font-semibold text-zinc-200 text-xs font-mono uppercase tracking-wider">knowledge check</h3>
         {results ? (
-          <div className="term-chip mt-2 text-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          <div className="pill mt-2 bg-indigo-950 text-indigo-400 border-indigo-900">
             score: {results.score} / {results.total}
           </div>
         ) : (
-          <p className="mt-1 text-xs text-muted-foreground">// test your understanding</p>
+          <p className="mt-1 text-[11px] text-zinc-500">test your understanding of the materials</p>
         )}
       </div>
 
       <div className="space-y-8 p-4">
         {questions.map((q, idx) => {
           const result = resultMap.get(q.id);
-          const isAnswered = answers[q.id] !== undefined;
 
           return (
             <div key={q.id} className="space-y-4">
-              <p className="text-sm font-medium leading-relaxed text-foreground">
-                <span className="mr-2 text-primary">{String(idx + 1).padStart(2, "0")}{" //"}</span>
+              <p className="text-xs font-medium leading-relaxed text-zinc-300">
+                <span className="mr-2 text-indigo-400 font-mono">{(idx + 1).toString().padStart(2, "0")}.</span>
                 {q.question}
               </p>
               <div className="space-y-2">
                 {q.choices.map((choice) => {
-                  // Usually choices are "A. Something", extract letter
                   const letterMatch = choice.match(/^([A-D])[\.\)]?\s*(.*)/i);
                   const letter = letterMatch ? letterMatch[1].toUpperCase() : choice.charAt(0).toUpperCase();
 
                   const isSelected = answers[q.id] === letter;
 
-                  let stateClass = "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground";
+                  let stateClass = "border-zinc-800 bg-zinc-900/30 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200";
                   if (isSelected) {
-                    stateClass = "border-primary bg-primary/10 text-foreground";
+                    stateClass = "border-indigo-500 bg-indigo-950/30 text-zinc-250";
                   }
 
                   if (result) {
                     if (isSelected && result.correct) {
-                      stateClass = "border-term-green bg-term-green/10 text-foreground";
+                      stateClass = "border-green-600 bg-green-950/30 text-green-300";
                     } else if (isSelected && !result.correct) {
-                      stateClass = "border-destructive bg-destructive/10 text-destructive";
+                      stateClass = "border-red-650 bg-red-950/30 text-red-300";
                     } else {
-                      stateClass = "border-border bg-card text-muted-foreground opacity-50";
+                      stateClass = "border-zinc-850 bg-zinc-900/20 text-zinc-500 opacity-50";
                     }
                   }
 
@@ -170,14 +163,14 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
                       key={choice}
                       onClick={() => handleSelect(q.id, letter)}
                       disabled={!!results}
-                      className={`flex w-full items-start gap-3 rounded-sm border p-3 text-left text-sm transition-colors ${stateClass}`}
+                      className={`flex w-full items-start gap-3 rounded border p-3 text-left text-xs transition-colors ${stateClass}`}
                     >
                       <div className="mt-0.5 shrink-0">
                         {result && isSelected ? (
-                          result.correct ? <CheckCircle2 className="h-4 w-4 text-term-green" /> : <XCircle className="h-4 w-4 text-destructive" />
+                          result.correct ? <CheckCircle2 className="h-3.5 w-3.5 text-green-400" /> : <XCircle className="h-3.5 w-3.5 text-red-400" />
                         ) : (
-                          <div className={`flex h-4 w-4 items-center justify-center rounded-sm border ${isSelected ? 'border-primary' : 'border-border'}`}>
-                            {isSelected && <div className="h-2 w-2 rounded-sm bg-primary" />}
+                          <div className={`flex h-3.5 w-3.5 items-center justify-center rounded-full border ${isSelected ? 'border-indigo-500' : 'border-zinc-700'}`}>
+                            {isSelected && <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />}
                           </div>
                         )}
                       </div>
@@ -188,9 +181,9 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
               </div>
 
               {result && (
-                <div className={`rounded-sm border p-4 text-sm ${result.correct ? 'border-term-green/30 bg-term-green/10 text-foreground' : 'border-destructive/30 bg-destructive/10 text-destructive'}`}>
+                <div className={`rounded border p-3.5 text-xs ${result.correct ? 'border-green-800/40 bg-green-950/20 text-green-300' : 'border-red-800/40 bg-red-950/20 text-red-300'}`}>
                   <p className="mb-1 font-semibold">
-                    <span className="text-primary">{"› "}</span>{result.correct ? 'correct' : 'incorrect'}
+                    {result.correct ? 'Correct' : 'Incorrect'}
                   </p>
                   <p className="leading-relaxed opacity-90">{result.explanation}</p>
                 </div>
@@ -200,15 +193,16 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
         })}
 
         {!results && (
-          <Button
+          <button
             onClick={handleSubmit}
             disabled={Object.keys(answers).length < questions.length}
-            className="term-btn term-btn-primary w-full"
+            className="w-full bg-indigo-500 hover:bg-indigo-400 disabled:opacity-50 text-white text-xs py-2 rounded font-medium transition-colors duration-150"
           >
-            $ submit_quiz
-          </Button>
+            Submit quiz
+          </button>
         )}
       </div>
     </div>
   );
 }
+

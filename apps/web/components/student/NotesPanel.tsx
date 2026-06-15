@@ -14,11 +14,10 @@ export function NotesPanel() {
   };
 
   return (
-    <div className="flex h-full flex-col border-r border-border bg-card">
-      <div className="border-b border-border bg-background/40 px-4 py-3">
-        <h3 className="term-caret text-sm font-semibold text-foreground">concepts</h3>
-        <p className="mt-1 text-xs text-muted-foreground">
-          <span className="text-primary">{"// "}</span>
+    <div className="flex h-full flex-col border-r border-zinc-800 bg-zinc-905">
+      <div className="border-b border-zinc-800 bg-zinc-900/40 px-4 py-3">
+        <h3 className="text-xs font-semibold text-zinc-350 uppercase tracking-wider font-mono">concepts</h3>
+        <p className="mt-1 text-[11px] text-zinc-500">
           {concepts.length} key topics extracted
         </p>
       </div>
@@ -32,36 +31,32 @@ export function NotesPanel() {
               <button
                 key={c.id}
                 onClick={() => seekTo(c.ts_start)}
-                className={`group w-full rounded-sm border px-3 py-2.5 text-left transition-all duration-200 ${
+                className={`group w-full rounded border px-3 py-2.5 text-left transition-all duration-200 ${
                   isActive
-                    ? "border-primary bg-primary/10 text-foreground glow-ring"
-                    : "border-border bg-background/30 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                    ? "border-indigo-500 bg-indigo-950/30 text-zinc-200"
+                    : "border-zinc-800 bg-zinc-900/30 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
                 }`}
               >
-                <div className="mb-1.5 flex items-center gap-1.5 font-mono text-xs">
-                  <Clock className="h-3 w-3" />
-                  <span className={isActive ? "font-semibold text-primary glow-text" : "text-muted-foreground"}>
+                <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[10px]">
+                  <Clock className="h-3 w-3 text-zinc-500 group-hover:text-zinc-400" />
+                  <span className={isActive ? "font-semibold text-indigo-400" : "text-zinc-500"}>
                     [{formatTime(c.ts_start)}]
                   </span>
                   {isActive && (
-                    <span className="term-chip ml-auto border-primary/50 text-primary">
-                      <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
+                    <span className="pill ml-auto border-indigo-800 bg-indigo-950 text-indigo-400 text-[9px]">
                       active
                     </span>
                   )}
                 </div>
-                <p className={`text-sm font-medium leading-snug ${isActive ? "text-foreground" : "text-foreground/80"}`}>
-                  <span className="text-primary">{"› "}</span>
+                <p className={`text-xs font-medium leading-snug ${isActive ? "text-zinc-250" : "text-zinc-400"}`}>
                   {i + 1}. {c.concept}
                 </p>
               </button>
             );
           })}
           {concepts.length === 0 && (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              <span className="text-primary">$ </span>
+            <p className="py-8 text-center text-xs text-zinc-500 font-mono">
               no concepts extracted yet
-              <span className="term-cursor" aria-hidden />
             </p>
           )}
         </div>
@@ -69,3 +64,4 @@ export function NotesPanel() {
     </div>
   );
 }
+

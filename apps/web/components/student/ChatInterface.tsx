@@ -1,12 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Send } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { CitationCard } from "./CitationCard";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 interface ChatMessage {
   id?: string;
@@ -26,7 +22,6 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Load history
     api.chat.history(lectureId).then((data) => {
       setMessages(data);
     }).catch(console.error);
@@ -72,44 +67,32 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* titlebar */}
-      <div className="relative px-4 pt-3 pb-2.5 border-b border-border bg-card">
-        <div className="absolute left-4 top-[15px] h-2 w-2 rounded-full bg-term-red opacity-85 shadow-[16px_0_0_var(--term-amber),32px_0_0_var(--term-green)]" />
-        <div className="pl-12">
-          <h3 className="term-caret text-sm font-semibold text-foreground">lecture_chat</h3>
-          <p className="text-xs text-muted-foreground">
-            <span className="text-primary">{"// "}</span>query the transcript_rag tutor
-          </p>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-4 space-y-6" ref={scrollRef}>
+    <div className="flex flex-col h-full bg-zinc-950">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3" ref={scrollRef}>
         {messages.length === 0 && !loading && (
-          <p className="text-xs text-muted-foreground">
-            <span className="text-primary">{"› "}</span>no messages yet — ask a question to begin
-            <span className="term-cursor align-middle" aria-hidden />
+          <p className="text-zinc-600 text-xs font-mono">
+            $ ask a question to begin...
           </p>
         )}
 
         {messages.map((msg, i) => (
           <div key={msg.id || i} className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}>
-            <span className="mb-1 px-1 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              {msg.role === "user" ? "$ you" : "› tutor"}
-            </span>
             <div
-              className={`max-w-[90%] px-3 py-2.5 rounded-sm text-sm leading-relaxed border ${
+              className={`max-w-[85%] rounded px-3 py-2 text-sm ${
                 msg.role === "user"
-                  ? "border-primary/40 bg-primary/10 text-foreground"
-                  : "border-border bg-card text-foreground"
+                  ? "bg-zinc-800 text-zinc-200 ml-auto"
+                  : "bg-indigo-950 text-zinc-200"
               }`}
             >
+              {msg.role === "assistant" && (
+                <span className="text-indigo-400 text-xs font-mono mr-1">AI</span>
+              )}
               {msg.content}
             </div>
 
             {msg.role === "assistant" && msg.citations && msg.citations.length > 0 && (
-              <div className="mt-2 w-[90%] space-y-2">
-                <span className="term-label text-[10px]">// citations</span>
+              <div className="mt-2 w-[85%] space-y-1.5">
                 {msg.citations.map((cit, idx) => (
                   <CitationCard
                     key={idx}
@@ -125,31 +108,32 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
 
         {loading && (
           <div className="flex flex-col items-start">
-            <span className="mb-1 px-1 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              › tutor
-            </span>
-            <div className="max-w-[80%] px-3 py-2.5 rounded-sm border border-border bg-card flex items-center gap-2 text-sm text-muted-foreground">
-              <span className="text-primary">{"› "}</span>thinking
-              <span className="term-cursor" aria-hidden />
+            <div className="bg-indigo-950 text-zinc-400 rounded px-3 py-2 text-sm flex items-center gap-2">
+              <span className="text-indigo-400 text-xs font-mono">AI</span>
+              thinking
+              <div className="border-2 border-indigo-500 border-t-transparent rounded-full w-3 h-3 animate-spin" />
             </div>
           </div>
         )}
       </div>
 
-      <div className="p-4 border-t border-border bg-card flex gap-2 items-center">
-        <span className="text-primary text-sm select-none">$</span>
-        <Input
+      {/* Input */}
+      <div className="border-t border-zinc-800 p-3 flex gap-2">
+        <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="ask_a_question..."
-          className="term-input flex-1"
+          placeholder="Ask a question..."
+          className="bg-zinc-800 text-zinc-100 text-sm px-3 py-2 rounded flex-1 focus:ring-1 focus:ring-indigo-500 focus:outline-none placeholder:text-zinc-500"
           disabled={loading}
         />
-        <Button onClick={handleSend} disabled={loading || !input.trim()} className="term-btn term-btn-primary shrink-0 h-9 px-3">
-          <Send className="w-4 h-4" />
-          <span className="text-xs">send</span>
-        </Button>
+        <button
+          onClick={handleSend}
+          disabled={loading || !input.trim()}
+          className="bg-indigo-500 hover:bg-indigo-400 text-white px-3 py-2 rounded text-sm transition-colors duration-150 disabled:opacity-50"
+        >
+          Send
+        </button>
       </div>
     </div>
   );

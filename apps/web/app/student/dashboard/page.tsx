@@ -5,8 +5,8 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PlayCircle, Library, GraduationCap } from "lucide-react";
+import { PlayCircle, GraduationCap } from "lucide-react";
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
 export default function StudentDashboard() {
   const { data: session } = useSession();
@@ -25,11 +25,7 @@ export default function StudentDashboard() {
   if (loading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
-        <p className="text-sm text-muted-foreground">
-          <span className="text-primary">$ </span>
-          loading enrolled_lectures
-          <span className="term-cursor align-middle" aria-hidden />
-        </p>
+        <LoadingSpinner message="loading enrolled lectures..." />
       </div>
     );
   }
@@ -37,75 +33,74 @@ export default function StudentDashboard() {
   if (lectures.length === 0) {
     return (
       <div className="container mx-auto max-w-4xl px-4 py-16">
-        <div className="term-window flex flex-col items-center justify-center px-6 pb-12 pt-14 text-center glow-ring">
-          <div className="absolute right-4 top-3 text-[11px] text-muted-foreground">~/student/learning</div>
-          <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-sm border border-border text-primary">
-            <Library className="h-7 w-7" />
+        <div className="flex flex-col items-center justify-center border border-zinc-800 bg-zinc-900/50 rounded-lg p-12 text-center">
+          <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-indigo-400 border border-zinc-700">
+            <GraduationCap className="h-6 w-6" />
           </div>
-          <span className="term-chip mb-5">
-            <span className="h-1.5 w-1.5 rounded-full bg-term-amber" />
-            no_enrollments
+          <span className="pill bg-zinc-800 text-zinc-400 border-zinc-700 mb-4">
+            no enrollments
           </span>
-          <h2 className="mb-3 text-2xl font-bold text-foreground">
-            <span className="term-prompt text-muted-foreground" />
-            welcome_to <span className="text-primary glow-text">lectureos</span>
+          <h2 className="mb-3 text-xl font-semibold text-zinc-100">
+            Welcome to LectureOS
           </h2>
-          <p className="mb-8 max-w-md text-sm leading-relaxed text-muted-foreground">
-            // no lectures enrolled yet. browse the catalog to find interactive lessons
-            that bring concepts to life.
+          <p className="mb-8 max-w-md text-xs text-zinc-400 leading-relaxed">
+            You are not enrolled in any lectures yet. Browse the available catalog to find animated interactive lessons.
           </p>
-          <Button asChild className="term-btn term-btn-primary h-auto px-6 py-3 text-base">
-            <Link href="/student/enroll">$ browse_available_lectures</Link>
-          </Button>
+          <Link
+            href="/student/enroll"
+            className="bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-semibold px-4 py-2.5 rounded transition-colors duration-150"
+          >
+            Browse available lectures
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-12">
+    <div className="container mx-auto max-w-6xl px-6 py-12">
       <div className="mb-8 flex items-center justify-between gap-4">
         <div>
-          <span className="term-label">// student</span>
-          <h1 className="mt-2 flex items-center gap-3 text-3xl font-bold text-foreground">
-            <GraduationCap className="h-7 w-7 text-primary" />
-            my_learning
-            <span className="term-cursor align-middle" aria-hidden />
+          <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-mono">student</span>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-100">
+            My Learning
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            <span className="text-primary">{"› "}</span>
-            continue where you left off — {lectures.length} enrolled
+          <p className="mt-1 text-xs text-zinc-400">
+            Continue where you left off — {lectures.length} enrolled
           </p>
         </div>
-        <Button asChild className="term-btn h-auto px-4 py-2">
-          <Link href="/student/enroll">browse_catalog</Link>
-        </Button>
+        <Link
+          href="/student/enroll"
+          className="border border-zinc-700 hover:bg-zinc-800 text-zinc-300 text-xs px-3.5 py-2 rounded transition-colors duration-150"
+        >
+          Browse catalog
+        </Link>
       </div>
 
-      <hr className="term-rule mb-8" />
+      <hr className="border-zinc-800 mb-8" />
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {lectures.map((lecture) => (
-          <Card key={lecture.id} className="term-card flex flex-col p-0 transition-colors hover:border-primary/40">
-            <CardHeader className="p-5 pb-4">
-              <div className="group relative mb-4 flex aspect-video w-full items-center justify-center overflow-hidden rounded-sm border border-border bg-background">
-                <PlayCircle className="relative z-10 h-12 w-12 text-muted-foreground transition-colors group-hover:text-primary" />
-                <span className="absolute left-2 top-2 z-10 text-[10px] text-muted-foreground">{"// preview"}</span>
+          <Card key={lecture.id} className="flex flex-col bg-zinc-900 border-zinc-850 p-0 hover:border-zinc-700 transition-colors">
+            <CardHeader className="p-4 pb-3">
+              <div className="group relative mb-3 flex aspect-video w-full items-center justify-center overflow-hidden rounded border border-zinc-800 bg-zinc-950">
+                <PlayCircle className="relative z-10 h-10 w-10 text-zinc-500 transition-colors group-hover:text-indigo-400" />
+                <span className="absolute left-2.5 top-2.5 z-10 text-[9px] font-mono text-zinc-650">// preview</span>
               </div>
-              <CardTitle className="term-caret line-clamp-2 text-base font-semibold text-foreground">{lecture.title}</CardTitle>
+              <CardTitle className="line-clamp-2 text-sm font-medium text-zinc-200">{lecture.title}</CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 px-5 pb-2">
-              <span className="term-chip">
-                <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
-                ready_to_watch
+            <CardContent className="flex-1 px-4 pb-2">
+              <span className="pill bg-indigo-950 text-indigo-400 border-indigo-900">
+                ready to watch
               </span>
             </CardContent>
-            <CardFooter className="border-t border-border p-5 pt-4">
-              <Button asChild className="term-btn term-btn-primary w-full">
-                <Link href={`/student/lectures/${lecture.id}`}>
-                  $ watch_lecture
-                </Link>
-              </Button>
+            <CardFooter className="border-t border-zinc-850 p-4 pt-3">
+              <Link
+                href={`/student/lectures/${lecture.id}`}
+                className="w-full bg-indigo-500 hover:bg-indigo-400 text-white text-xs py-2 rounded text-center font-medium transition-colors duration-150 block"
+              >
+                Watch lecture
+              </Link>
             </CardFooter>
           </Card>
         ))}
@@ -113,3 +108,4 @@ export default function StudentDashboard() {
     </div>
   );
 }
+

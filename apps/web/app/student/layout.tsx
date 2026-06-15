@@ -1,5 +1,5 @@
 /*
- * Purpose: Layout wrapper for student portal pages — terminal shell.
+ * Purpose: Layout wrapper for student portal pages.
  */
 import React from "react";
 import Link from "next/link";
@@ -10,32 +10,29 @@ export default function StudentLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto flex h-14 items-center justify-between px-4">
+    <div className="min-h-screen bg-zinc-950 text-zinc-200">
+      <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-md">
+        <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <Link href="/student/dashboard" className="flex items-center gap-2 text-sm">
-              <span className="text-primary">{"//"}</span>
-              <span className="font-semibold tracking-wide text-foreground">lecture</span>
-              <span className="font-semibold tracking-wide text-primary glow-text">os</span>
+            <Link href="/student/dashboard" className="font-mono font-bold text-zinc-100 text-sm">
+              LectureOS
             </Link>
-            <span className="term-chip">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+            <span className="pill bg-indigo-950 text-indigo-400 border-indigo-800">
               student
             </span>
           </div>
           <nav className="flex items-center gap-1 text-sm">
             <Link
               href="/student/dashboard"
-              className="term-caret rounded-sm px-2.5 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
+              className="px-3 py-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 rounded transition-colors duration-150"
             >
-              dashboard
+              Dashboard
             </Link>
             <Link
               href="/student/enroll"
-              className="term-caret rounded-sm px-2.5 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
+              className="px-3 py-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 rounded transition-colors duration-150"
             >
-              enroll
+              Enroll
             </Link>
           </nav>
         </div>
@@ -44,3 +41,4 @@ export default function StudentLayout({
     </div>
   );
 }
+

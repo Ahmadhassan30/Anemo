@@ -1,9 +1,6 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { UploadCloud, FileVideo, X } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 interface UploadDropzoneProps {
   onFileSelect: (file: File | null) => void;
@@ -27,13 +24,13 @@ export function UploadDropzone({ onFileSelect }: UploadDropzoneProps) {
   const processFile = (file: File) => {
     setError(null);
     if (!file.type.startsWith("video/")) {
-      setError("invalid_format — expected video/* (mp4, mov, webm).");
+      setError("Invalid format — expected video (mp4, mov, webm).");
       return;
     }
 
     // 2GB limit
     if (file.size > 2 * 1024 * 1024 * 1024) {
-      setError("file_too_large — exceeds 2GB maximum size limit.");
+      setError("File too large — exceeds 2 GB maximum.");
       return;
     }
 
@@ -65,66 +62,42 @@ export function UploadDropzone({ onFileSelect }: UploadDropzoneProps) {
   };
 
   return (
-    <Card
-      className={`term-panel relative overflow-hidden border border-dashed rounded-md transition-colors duration-200 p-8 flex flex-col items-center justify-center min-h-[300px] bg-card ${
-        dragActive ? "border-primary bg-primary/10 glow-ring" : "border-border hover:border-primary/40"
+    <div
+      className={`relative border-2 border-dashed rounded min-h-[256px] flex flex-col items-center justify-center gap-3 transition-colors duration-150 ${
+        dragActive
+          ? "bg-indigo-950/20 border-indigo-500"
+          : selectedFile
+          ? "border-zinc-800 bg-zinc-900"
+          : "border-zinc-700 bg-zinc-900 hover:border-indigo-500"
       }`}
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
       onDragOver={handleDrag}
       onDrop={handleDrop}
     >
-      {/* corner label */}
-      <span className="absolute left-4 top-3 text-[11px] text-muted-foreground">
-        <span className="text-primary">{"// "}</span>ingest
-      </span>
-
       {selectedFile ? (
-        <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300">
-          <div className="relative">
-            <div className="w-32 h-32 rounded-sm bg-background flex items-center justify-center border border-border overflow-hidden">
-              {/* Preview via object URL if needed, but a placeholder is fine too */}
-              <video
-                src={URL.createObjectURL(selectedFile)}
-                className="w-full h-full object-cover opacity-50"
-              />
-              <FileVideo className="w-8 h-8 text-primary absolute" />
-            </div>
-            <button
-              onClick={removeFile}
-              className="absolute -top-2 -right-2 bg-secondary text-muted-foreground p-1 rounded-sm border border-border hover:border-destructive hover:text-destructive transition"
-            >
-              <X className="w-4 h-4" />
-            </button>
+        <div className="flex flex-col items-center gap-3 p-4 fade-in">
+          <div className="font-mono text-zinc-300 text-sm">{selectedFile.name}</div>
+          <div className="text-zinc-500 text-xs">
+            {(selectedFile.size / (1024 * 1024)).toFixed(1)} MB
           </div>
-          <div className="text-center">
-            <span className="term-chip mb-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              file_staged
-            </span>
-            <p className="font-medium text-foreground truncate max-w-xs">
-              <span className="text-primary">{"› "}</span>{selectedFile.name}
-            </p>
-            <p className="text-sm text-muted-foreground">{(selectedFile.size / (1024 * 1024)).toFixed(1)} MB</p>
-          </div>
+          <div className="text-green-400 text-xs">✔ ready to process</div>
+          <button
+            onClick={removeFile}
+            className="mt-2 text-zinc-600 hover:text-red-400 text-xs transition-colors duration-150"
+          >
+            ✘ remove
+          </button>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-16 h-16 rounded-sm border border-border bg-secondary flex items-center justify-center text-primary">
-            <UploadCloud className="w-8 h-8" />
-          </div>
-          <div>
-            <p className="font-semibold text-foreground">
-              <span className="text-primary">{"$ "}</span>drop_lecture_video
-              <span className="term-cursor align-middle" aria-hidden />
-            </p>
-            <p className="text-sm text-muted-foreground mt-1">// or click to browse from your machine</p>
-            <p className="text-xs text-muted-foreground/70 mt-2">[ mp4 · mov · webm — max 2gb ]</p>
-          </div>
-          <label htmlFor="file-upload">
-            <Button variant="outline" className="term-btn mt-4" asChild>
-              <span>select_file</span>
-            </Button>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <span className="text-4xl text-zinc-600">↑</span>
+          <p className="text-zinc-300">Drop lecture video here</p>
+          <p className="text-zinc-500 text-sm font-mono">MP4 · MOV · up to 2 GB</p>
+          <label htmlFor="file-upload" className="mt-3 cursor-pointer">
+            <span className="border border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-200 text-sm px-4 py-2 rounded transition-colors duration-150 inline-block">
+              Select file
+            </span>
           </label>
           <input
             id="file-upload"
@@ -137,10 +110,10 @@ export function UploadDropzone({ onFileSelect }: UploadDropzoneProps) {
       )}
 
       {error && (
-        <p className="text-destructive text-sm mt-4 text-center">
-          <span className="text-destructive">{"› "}</span>{error}
+        <p className="text-red-400 text-sm mt-4 text-center">
+          {error}
         </p>
       )}
-    </Card>
+    </div>
   );
 }

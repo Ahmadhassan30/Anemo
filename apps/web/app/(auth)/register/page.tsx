@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, Mail, User, AlertCircle, CheckCircle2 } from "lucide-react";
+import { TerminalAnimation } from "@/components/TerminalAnimation";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -52,143 +52,113 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md">
-        {/* prompt eyebrow */}
-        <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
-          <span className="text-primary">{"//"}</span>
-          <span className="term-label">auth / register</span>
+    <div className="flex h-screen overflow-hidden">
+      {/* Left Column */}
+      <div className="hidden lg:flex lg:w-1/2 bg-zinc-950 flex-col justify-between p-12">
+        <div>
+          <span className="font-mono font-bold text-zinc-100 text-lg">LectureOS</span>
         </div>
+        <div className="max-w-xs">
+          <p className="text-2xl font-light text-zinc-300 leading-relaxed">
+            Turn any lecture into an animated course.
+          </p>
+        </div>
+        <div className="max-w-md">
+          <TerminalAnimation />
+        </div>
+      </div>
 
-        <div className="term-window glow-ring pt-9">
-          <div className="absolute right-4 top-3 text-[11px] text-muted-foreground">
-            ~/lectureos/register
-          </div>
+      {/* Right Column */}
+      <div className="w-full lg:w-1/2 bg-zinc-900 border-l border-zinc-800 flex items-center justify-center">
+        <div className="w-full max-w-sm mx-auto px-8">
+          <h1 className="text-zinc-100 text-2xl font-semibold mb-8">Create account</h1>
 
-          <div className="space-y-7 px-6 pb-7">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                <span className="text-primary">{"› "}</span>
-                lecture<span className="text-primary glow-text">os</span>
-                <span className="term-cursor align-middle" aria-hidden />
-              </h1>
-              <p className="mt-2 text-sm text-muted-foreground term-prompt">
-                create_account --to publish or learn
-              </p>
+          {error && (
+            <div className="mb-6 rounded border border-red-800 bg-red-950 px-4 py-3 text-sm text-red-400">
+              {error}
             </div>
+          )}
 
-            {error && (
-              <div className="flex items-center gap-3 rounded-sm border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                <AlertCircle className="h-4 w-4 shrink-0" />
-                <p>
-                  <span className="text-destructive/70">err: </span>
-                  {error}
-                </p>
-              </div>
-            )}
+          {success && (
+            <div className="mb-6 rounded border border-green-800 bg-green-950 px-4 py-3 text-sm text-green-400">
+              ✔ Account created — redirecting to sign in...
+            </div>
+          )}
 
-            {success && (
-              <div className="flex items-center gap-3 rounded-sm border border-primary/40 bg-primary/10 p-3 text-sm text-primary">
-                <CheckCircle2 className="h-4 w-4 shrink-0" />
-                <p>ok: account_created — redirecting to /login ...</p>
-              </div>
-            )}
-
-            <form className="space-y-5" onSubmit={handleSubmit}>
-              <div className="space-y-5">
-                <div>
-                  <label className="term-label mb-2 block">
-                    account_type
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setRole("professor")}
-                      className={`flex items-center justify-center gap-2 rounded-sm border py-2.5 text-sm transition-all ${
-                        role === "professor"
-                          ? "border-primary bg-primary/10 text-primary glow-ring"
-                          : "border-border bg-background/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                      }`}
-                    >
-                      <User className="h-4 w-4" />
-                      professor
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setRole("student")}
-                      className={`flex items-center justify-center gap-2 rounded-sm border py-2.5 text-sm transition-all ${
-                        role === "student"
-                          ? "border-accent bg-accent/10 text-accent"
-                          : "border-border bg-background/40 text-muted-foreground hover:border-accent/40 hover:text-foreground"
-                      }`}
-                    >
-                      <User className="h-4 w-4" />
-                      student
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="term-label mb-2 block">
-                    email_address
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
-                      <Mail className="h-4 w-4" />
-                    </span>
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@school.edu"
-                      className="term-input pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="term-label mb-2 block">
-                    password
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
-                      <Lock className="h-4 w-4" />
-                    </span>
-                    <input
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="•••••••• (min 8 chars)"
-                      className="term-input pl-10"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            <div>
+              <label className="uppercase tracking-widest text-[10px] text-zinc-500 mb-3 block">
+                Account type
+              </label>
+              <div className="grid grid-cols-2 gap-3">
                 <button
-                  type="submit"
-                  disabled={loading || success}
-                  className="term-btn term-btn-primary w-full py-2.5"
+                  type="button"
+                  onClick={() => setRole("professor")}
+                  className={`py-2.5 text-sm rounded border transition-colors duration-150 ${
+                    role === "professor"
+                      ? "border-indigo-500 bg-indigo-950 text-indigo-400"
+                      : "border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600"
+                  }`}
                 >
-                  {loading ? "registering..." : "$ create_account"}
+                  Professor
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole("student")}
+                  className={`py-2.5 text-sm rounded border transition-colors duration-150 ${
+                    role === "student"
+                      ? "border-indigo-500 bg-indigo-950 text-indigo-400"
+                      : "border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600"
+                  }`}
+                >
+                  Student
                 </button>
               </div>
-            </form>
-
-            <hr className="term-rule" />
-
-            <div className="text-center">
-              <p className="text-xs text-muted-foreground">
-                already_registered?{" "}
-                <Link href="/login" className="term-link">
-                  sign_in
-                </Link>
-              </p>
             </div>
-          </div>
+
+            <div>
+              <label className="uppercase tracking-widest text-[10px] text-zinc-500 mb-2 block">
+                Email
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@school.edu"
+                className="w-full bg-zinc-800 text-zinc-100 placeholder:text-zinc-500 px-4 py-3 rounded focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-colors duration-150"
+              />
+            </div>
+
+            <div>
+              <label className="uppercase tracking-widest text-[10px] text-zinc-500 mb-2 block">
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="•••••••• (min 8 chars)"
+                className="w-full bg-zinc-800 text-zinc-100 placeholder:text-zinc-500 px-4 py-3 rounded focus:ring-1 focus:ring-indigo-500 focus:outline-none transition-colors duration-150"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || success}
+              className="bg-indigo-500 hover:bg-indigo-400 text-white font-medium py-3 w-full rounded transition-colors duration-150 disabled:opacity-50"
+            >
+              {loading ? "Creating account..." : "Create account"}
+            </button>
+          </form>
+
+          <p className="text-zinc-500 text-sm text-center mt-6">
+            Already have an account?{" "}
+            <Link href="/login" className="text-zinc-300 hover:text-zinc-100 transition-colors">
+              Sign in →
+            </Link>
+          </p>
         </div>
       </div>
     </div>

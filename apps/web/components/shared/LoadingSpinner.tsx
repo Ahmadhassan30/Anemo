@@ -1,15 +1,16 @@
 /*
- * Purpose: Loading indicator for async states — terminal style.
+ * Purpose: Loading indicator — indigo spinning ring with optional message.
  */
 import React from "react";
 import { cn } from "@/lib/utils";
 
-export function LoadingSpinner({ label = "loading", className }: { label?: string; className?: string }) {
+export function LoadingSpinner({ message, className }: { message?: string; className?: string }) {
   return (
-    <div className={cn("inline-flex items-center gap-2 text-sm text-muted-foreground", className)}>
-      <span className="term-prompt text-primary" />
-      <span>{label}</span>
-      <span className="term-cursor" aria-hidden />
+    <div className={cn("flex items-center gap-3", className)}>
+      <div className="border-2 border-indigo-500 border-t-transparent rounded-full w-4 h-4 animate-spin" />
+      {message && (
+        <span className="font-mono text-xs text-zinc-500">{message}</span>
+      )}
     </div>
   );
 }

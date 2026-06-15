@@ -3,69 +3,40 @@
  */
 import React from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export default function ProfessorDashboardPage() {
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="term-label mb-2">{"// professor"}</p>
-          <h1 className="term-prompt text-3xl font-bold tracking-tight text-foreground">
-            dashboard
-            <span className="term-cursor align-middle" aria-hidden />
-          </h1>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            overview of lectures, pipeline status, and analytics.
-          </p>
-        </div>
-        <Link href="/professor/upload">
-          <Button className="term-btn term-btn-primary h-9 px-4 text-xs">
-            $ new_lecture
-          </Button>
-        </Link>
+    <main className="bg-zinc-950 min-h-screen">
+      {/* Header */}
+      <div className="py-12 px-8">
+        <h1 className="text-3xl font-light text-zinc-100">Good morning</h1>
+        <p className="text-zinc-500 text-sm mt-1 font-mono">
+          0 lectures · 0 concepts rendered
+        </p>
       </div>
 
-      <div className="mb-6 flex flex-wrap items-center gap-2 text-xs">
-        <span className="term-chip">
-          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
-          lectures: 0
-        </span>
-        <span className="term-chip">
-          <span className="h-1.5 w-1.5 rounded-full bg-term-amber" />
-          pipeline: idle
-        </span>
-        <span className="term-chip">
-          <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
-          ready
-        </span>
+      {/* Empty State */}
+      <div className="px-8">
+        <div className="flex flex-col items-center justify-center py-24">
+          <p className="text-zinc-600 font-mono text-sm">
+            $ no lectures yet — upload your first one
+          </p>
+          <Link
+            href="/professor/upload"
+            className="mt-6 bg-indigo-500 hover:bg-indigo-400 text-white font-medium text-sm px-6 py-2.5 rounded transition-colors duration-150"
+          >
+            Upload lecture →
+          </Link>
+        </div>
       </div>
 
-      <section className="term-window pt-9">
-        <div className="absolute right-4 top-3 text-[11px] text-muted-foreground">~/lectures</div>
-        <div className="px-6 pb-10 pt-2 text-center">
-          <p className="text-muted-foreground">
-            <span className="text-primary">{"› "}</span>
-            no lectures found
-          </p>
-          <h2 className="term-caret mt-4 text-xl font-semibold text-foreground">
-            queue is empty
-          </h2>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-            upload a video lecture to start concept extraction and animation.
-          </p>
-          <div className="mt-7 flex justify-center">
-            <Link href="/professor/upload">
-              <Button
-                variant="outline"
-                className="term-btn px-5 py-2 text-sm"
-              >
-                $ upload_first_lecture
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* FAB */}
+      <Link
+        href="/professor/upload"
+        className="fixed bottom-8 right-8 w-12 h-12 bg-indigo-500 hover:bg-indigo-400 rounded-full text-white text-xl flex items-center justify-center transition-colors duration-150"
+      >
+        +
+      </Link>
     </main>
   );
 }

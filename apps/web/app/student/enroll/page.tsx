@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, LectureResponse } from "@/lib/api-client";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Plus } from "lucide-react";
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
 export default function EnrollPage() {
   const router = useRouter();
@@ -51,82 +51,75 @@ export default function EnrollPage() {
   );
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-12">
-      <div className="mb-8 space-y-5">
-        <p className="term-label">{"// student / enroll"}</p>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          <span className="term-prompt text-muted-foreground" />
-          course_catalog
-          <span className="term-cursor align-middle" aria-hidden />
+    <div className="container mx-auto max-w-5xl px-6 py-12">
+      <div className="mb-8 space-y-4">
+        <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-mono">student / enroll</span>
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">
+          Course Catalog
         </h1>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          discover and enroll in available interactive lectures.
+        <p className="text-xs text-zinc-400">
+          Discover and enroll in available interactive lectures.
         </p>
 
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
           <Input
-            placeholder="grep --title ..."
+            placeholder="Search lectures..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="term-input pl-9"
+            className="pl-9 bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-550 focus-visible:ring-1 focus-visible:ring-indigo-500"
           />
         </div>
       </div>
 
       {loading ? (
-        <div className="term-panel flex h-40 items-center justify-center text-sm text-muted-foreground">
-          <span className="text-primary">{"› "}</span>fetching catalog
-          <span className="term-cursor" aria-hidden />
+        <div className="flex h-40 items-center justify-center">
+          <LoadingSpinner message="fetching catalog..." />
         </div>
       ) : filteredLectures.length === 0 ? (
-        <div className="term-panel p-12 text-center text-sm text-muted-foreground">
-          <span className="text-primary">{"› "}</span>
-          {search ? "no_matches — empty result set." : "no_completed_lectures available right now."}
+        <div className="border border-zinc-800 bg-zinc-900/40 rounded-lg p-12 text-center text-xs text-zinc-500">
+          {search ? "No matches found." : "No completed lectures available right now."}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredLectures.map(lecture => {
             const isEnrolled = enrolledIds.has(lecture.id);
             return (
-              <Card key={lecture.id} className="flex flex-col transition-colors hover:border-primary/40">
-                <CardHeader>
-                  <span className="term-chip mb-2 w-fit">
-                    <span className={`h-1.5 w-1.5 rounded-full ${isEnrolled ? "bg-term-cyan" : "bg-primary"}`} />
+              <Card key={lecture.id} className="flex flex-col bg-zinc-900 border-zinc-850 p-0 hover:border-zinc-700 transition-colors">
+                <CardHeader className="p-4 pb-2">
+                  <span className={`pill mb-2 w-fit ${isEnrolled ? "bg-green-950 text-green-400 border-green-900" : "bg-indigo-950 text-indigo-400 border-indigo-900"}`}>
                     {isEnrolled ? "enrolled" : "available"}
                   </span>
-                  <CardTitle className="line-clamp-2 text-base leading-snug">
-                    <span className="text-primary">{"› "}</span>{lecture.title}
+                  <CardTitle className="line-clamp-2 text-sm font-medium leading-snug text-zinc-200">
+                    {lecture.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="flex-1">
-                  <p className="text-xs text-muted-foreground">
-                    <span className="text-primary">$ </span>
+                <CardContent className="flex-1 px-4 pb-2">
+                  <p className="text-[10px] font-mono text-zinc-500">
                     published {new Date(lecture.created_at).toLocaleDateString()}
                   </p>
                 </CardContent>
-                <CardFooter className="term-rule mt-2 block pt-4">
+                <CardFooter className="border-t border-zinc-850 p-4 pt-3 mt-2 block">
                   {isEnrolled ? (
-                    <Button
-                      variant="secondary"
-                      className="w-full"
+                    <button
+                      className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs py-2 rounded font-medium transition-colors duration-150 block text-center"
                       onClick={() => router.push(`/student/lectures/${lecture.id}`)}
                     >
-                      open_lecture
-                    </Button>
+                      Open lecture
+                    </button>
                   ) : (
-                    <Button
+                    <button
                       onClick={() => handleEnroll(lecture.id)}
                       disabled={enrolling === lecture.id}
-                      className="w-full gap-2"
+                      className="w-full bg-indigo-500 hover:bg-indigo-400 disabled:opacity-50 text-white text-xs py-2 rounded font-medium transition-colors duration-150 flex items-center justify-center gap-1.5"
                     >
                       {enrolling === lecture.id ? (
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/20 border-t-primary-foreground" />
+                        <div className="border-2 border-white border-t-transparent rounded-full w-3 h-3 animate-spin" />
                       ) : (
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-3 w-3" />
                       )}
-                      enroll_now
-                    </Button>
+                      Enroll now
+                    </button>
                   )}
                 </CardFooter>
               </Card>
@@ -137,3 +130,4 @@ export default function EnrollPage() {
     </div>
   );
 }
+

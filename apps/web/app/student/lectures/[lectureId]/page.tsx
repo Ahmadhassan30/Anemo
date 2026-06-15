@@ -9,7 +9,6 @@ import { VideoPlayer } from "@/components/student/VideoPlayer";
 import { NotesPanel } from "@/components/student/NotesPanel";
 import { ChatInterface } from "@/components/student/ChatInterface";
 import { QuizWidget } from "@/components/student/QuizWidget";
-import { MessageSquare, CheckSquare, ListVideo } from "lucide-react";
 
 export default function StudentLectureView() {
   const params = useParams();
@@ -18,8 +17,7 @@ export default function StudentLectureView() {
 
   const [lecture, setLecture] = useState<LectureResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"chat" | "quiz">("chat");
-  const [mobileView, setMobileView] = useState<"video" | "notes" | "interactive">("video");
+  const [activeTab, setActiveTab] = useState<"chat" | "quiz" | "notes">("chat");
 
   const setConcepts = useLectureStore(s => s.setConcepts);
   const resetStore = useLectureStore(s => s.reset);
@@ -33,8 +31,6 @@ export default function StudentLectureView() {
         if (!active) return;
         setLecture(lec);
 
-        // Pass concepts to store
-        // We know backend returns `concepts` array inside the lecture object
         if ((lec as any).concepts) {
           setConcepts((lec as any).concepts);
         }
@@ -57,124 +53,83 @@ export default function StudentLectureView() {
 
   if (loading) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-3 bg-background">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-border border-t-primary" />
-        <p className="text-sm text-muted-foreground">
-          <span className="text-primary">$ </span>loading_lecture
-          <span className="term-cursor" aria-hidden />
-        </p>
+      <div className="flex h-screen items-center justify-center bg-zinc-950">
+        <div className="flex items-center gap-3">
+          <div className="border-2 border-indigo-500 border-t-transparent rounded-full w-4 h-4 animate-spin" />
+          <span className="font-mono text-xs text-zinc-500">loading lecture...</span>
+        </div>
       </div>
     );
   }
 
   if (!lecture) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background px-4">
-        <div className="term-panel max-w-md px-6 py-5 text-center">
-          <p className="text-sm text-destructive">
-            <span className="text-primary">{"› "}</span>error: lecture_not_found
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            lecture not found or you are not enrolled.
-          </p>
-        </div>
+      <div className="flex h-screen items-center justify-center bg-zinc-950">
+        <p className="text-zinc-500 font-mono text-sm">
+          Lecture not found or you are not enrolled.
+        </p>
       </div>
     );
   }
 
-  // Use the local final video if the status is completed, else fallback to raw video
   const videoSrc = lecture.status === "completed"
-    ? `/static/${lectureId}/final.mp4`
+    ? `/api/v1/lectures/${lectureId}/video`
     : (lecture.raw_video_url || "");
 
+  const concepts = (lecture as any).concepts || [];
+
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] md:flex-row overflow-hidden bg-background">
-
-      {/* Mobile Tab Bar (Visible only on small screens) */}
-      <div className="md:hidden flex border-b border-border bg-card shrink-0">
-        <button onClick={() => setMobileView("video")} className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 transition-colors ${mobileView === "video" ? "text-primary border-b-2 border-primary bg-secondary" : "text-muted-foreground hover:text-foreground"}`}>
-          <PlayIcon className="w-4 h-4" /> video
-        </button>
-        <button onClick={() => setMobileView("notes")} className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 transition-colors ${mobileView === "notes" ? "text-primary border-b-2 border-primary bg-secondary" : "text-muted-foreground hover:text-foreground"}`}>
-          <ListVideo className="w-4 h-4" /> notes
-        </button>
-        <button onClick={() => setMobileView("interactive")} className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 transition-colors ${mobileView === "interactive" ? "text-primary border-b-2 border-primary bg-secondary" : "text-muted-foreground hover:text-foreground"}`}>
-          <MessageSquare className="w-4 h-4" /> interactive
-        </button>
-      </div>
-
-      {/* Left Column (20%): Notes Panel */}
-      <div className={`${mobileView === "notes" ? "block" : "hidden"} md:block w-full md:w-[20%] h-full shrink-0 overflow-hidden border-r border-border`}>
-        <NotesPanel />
-      </div>
-
-      {/* Center Column (55%): Video Player */}
-      <div className={`${mobileView === "video" ? "block" : "hidden"} md:block w-full md:w-[55%] h-full overflow-y-auto p-4 md:p-6 bg-background`}>
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="term-panel px-5 py-4">
-            <div className="flex items-center gap-2">
-              <span className="term-chip">
-                <span className={`h-1.5 w-1.5 rounded-full ${lecture.status === "completed" ? "bg-primary" : "animate-blink bg-term-amber"}`} />
-                {lecture.status}
-              </span>
-              <span className="text-[11px] text-muted-foreground">~/lectures/{lectureId}</span>
-            </div>
-            <h1 className="mt-3 text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-              <span className="term-prompt text-muted-foreground" />{lecture.title}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              <span className="text-primary">{"› "}</span>interactive lecture playback
-            </p>
-          </div>
-
+    <div className="h-screen overflow-hidden bg-zinc-950 grid grid-cols-[1fr_380px]">
+      {/* LEFT: Video + Concept Tabs */}
+      <div className="flex flex-col overflow-hidden">
+        {/* Video */}
+        <div className="bg-black flex-shrink-0">
           <VideoPlayer src={videoSrc} />
         </div>
+
+        {/* Concept tabs */}
+        {concepts.length > 0 && (
+          <div className="bg-zinc-900 border-t border-zinc-800 p-3 overflow-x-auto">
+            <div className="flex gap-1">
+              {concepts.map((c: any, i: number) => (
+                <button
+                  key={c.id || i}
+                  className="px-3 py-1.5 font-mono text-xs whitespace-nowrap rounded transition-colors duration-150 text-zinc-500 hover:text-zinc-300"
+                >
+                  {c.concept}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Right Column (25%): Chat / Quiz */}
-      <div className={`${mobileView === "interactive" ? "block" : "hidden"} md:block w-full md:w-[25%] h-full shrink-0 border-l border-border flex flex-col`}>
-        <div className="flex border-b border-border bg-card shrink-0">
-          <button
-            className={`flex-1 py-3 flex items-center justify-center gap-2 text-xs transition-colors ${activeTab === "chat" ? "text-primary border-b-2 border-primary bg-secondary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"}`}
-            onClick={() => setActiveTab("chat")}
-          >
-            <MessageSquare className="w-4 h-4" /> chat
-          </button>
-          <button
-            className={`flex-1 py-3 flex items-center justify-center gap-2 text-xs transition-colors ${activeTab === "quiz" ? "text-primary border-b-2 border-primary bg-secondary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"}`}
-            onClick={() => setActiveTab("quiz")}
-          >
-            <CheckSquare className="w-4 h-4" /> quiz
-          </button>
+      {/* RIGHT: Chat / Quiz / Notes */}
+      <div className="bg-zinc-900 border-l border-zinc-800 flex flex-col">
+        {/* Tab header */}
+        <div className="border-b border-zinc-800 flex shrink-0">
+          {(["chat", "quiz", "notes"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`h-10 px-4 flex items-center text-xs font-medium transition-colors duration-150 ${
+                activeTab === tab
+                  ? "text-zinc-100 border-b-2 border-indigo-500"
+                  : "text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
 
+        {/* Tab content */}
         <div className="flex-1 overflow-hidden">
-          {activeTab === "chat" ? (
-            <ChatInterface lectureId={lectureId} />
-          ) : (
-            <QuizWidget lectureId={lectureId} />
-          )}
+          {activeTab === "chat" && <ChatInterface lectureId={lectureId} />}
+          {activeTab === "quiz" && <QuizWidget lectureId={lectureId} />}
+          {activeTab === "notes" && <NotesPanel />}
         </div>
       </div>
     </div>
-  );
-}
-
-function PlayIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polygon points="6 3 20 12 6 21 6 3" />
-    </svg>
   );
 }

@@ -1,26 +1,25 @@
 /*
- * Purpose: Top navigation for the web app — terminal title bar.
+ * Purpose: Top navigation — minimal zinc bar.
  */
 import React from "react";
 import Link from "next/link";
 
 export function Navbar() {
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2 text-sm">
-          <span className="text-primary">{"//"}</span>
-          <span className="font-semibold tracking-wide text-foreground">lecture</span>
-          <span className="font-semibold tracking-wide text-primary glow-text">os</span>
+    <nav className="h-12 bg-zinc-900 border-b border-zinc-800 px-6 flex items-center justify-between">
+      <Link href="/" className="font-mono font-bold text-zinc-100 text-sm">
+        LectureOS
+      </Link>
+      <div className="flex items-center gap-4 text-sm">
+        <Link href="/login" className="text-zinc-400 hover:text-zinc-200 transition-colors duration-150">
+          Sign in
         </Link>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <Link href="/login" className="term-link">
-            sign_in
-          </Link>
-          <Link href="/register" className="term-btn term-btn-primary h-8 px-3 text-xs">
-            get_started
-          </Link>
-        </div>
+        <Link
+          href="/register"
+          className="bg-indigo-500 hover:bg-indigo-400 text-white text-xs px-3 py-1.5 rounded transition-colors duration-150"
+        >
+          Get started
+        </Link>
       </div>
     </nav>
   );
