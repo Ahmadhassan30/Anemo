@@ -8,8 +8,11 @@ from .ffmpeg_service import (
     extract_audio,
     concat_clips,
     overlay_audio,
+    sync_video_to_audio,
     burn_captions,
     get_video_duration,
+    get_audio_duration,
+    generate_srt_from_segments,
 )
 from .llm_service import LLMService, LLMError, llm_service
 
@@ -31,8 +34,11 @@ __all__ = [
     "extract_audio",
     "concat_clips",
     "overlay_audio",
+    "sync_video_to_audio",
     "burn_captions",
     "get_video_duration",
+    "get_audio_duration",
+    "generate_srt_from_segments",
     "render_scene",
 ]
 

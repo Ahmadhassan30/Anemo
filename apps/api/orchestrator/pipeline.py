@@ -6,6 +6,8 @@ from typing import Any, Dict
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from pathlib import Path
+
 from agents.ingest_agent import IngestAgent
 from agents.transcription_agent import TranscriptionAgent
 from agents.segmentation_agent import SegmentationAgent
@@ -16,6 +18,9 @@ from agents.publish_agent import PublishAgent
 from models.lecture import Lecture, LectureStatus
 from models.concept import Concept
 from orchestrator.events import PipelineEvent, PipelineEventType, publish_event
+from services.narration_service import narration_service
+from services.tts_service import tts_service
+from services.ffmpeg_service import get_audio_duration
 
 logger = logging.getLogger(__name__)
 
@@ -163,6 +168,34 @@ class LectureOSPipeline:
                     transcript=transcript,
                 )
                 concepts: list[dict] = segmentation_result.get("concepts", [])
+
+            # ── Stage 3b: Generate narration + TTS per concept ───────
+            media_dir = Path(f"/tmp/lectures/{self.lecture_id}")
+            media_dir.mkdir(parents=True, exist_ok=True)
+
+            await self.emit(self._make_event(
+                PipelineEventType.PROGRESS_UPDATE,
+                "Generating professional narration for each concept...",
+                28,
+                agent_name="narration",
+            ))
+
+            for concept in concepts:
+                segment = self._get_segment(concept, transcript)
+                script = await narration_service.generate_script(concept, segment)
+                tts_path = await tts_service.synthesize(
+                    script,
+                    str(media_dir / f"tts_{concept['id']}.mp3"),
+                )
+                duration = get_audio_duration(tts_path)
+                concept["narration_script"] = script
+                concept["tts_path"] = tts_path
+                concept["target_duration"] = max(duration, 30.0)
+                concept["title"] = concept.get("concept") or concept.get("title", "")
+                logger.info(
+                    "Narration ready for '%s': %.1fs",
+                    concept["title"], concept["target_duration"],
+                )
 
             # ── Stage 4 (30→70%): CodeGen — sequential ─────────────
             await self.emit(self._make_event(

@@ -17,6 +17,7 @@ export default function UploadWizard() {
   const [title, setTitle] = useState("");
   const [lectureId, setLectureId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [mockUrl, setMockUrl] = useState("http://api:8080/dummy.mp4");
 
   // Step 1
   const handleCreate = async () => {
@@ -31,6 +32,21 @@ export default function UploadWizard() {
       setStep(2);
     } catch (e: any) {
       setError(e.message);
+    }
+  };
+
+  const handleBypassUpload = async () => {
+    if (!lectureId) return;
+    if (!mockUrl.trim()) {
+      setError("Please enter a valid mock video URL.");
+      return;
+    }
+    setError(null);
+    try {
+      await api.lectures.confirmUpload(lectureId, mockUrl.trim());
+      setStep(3);
+    } catch (e: any) {
+      setError("Failed to bypass upload: " + e.message);
     }
   };
 
@@ -88,7 +104,7 @@ export default function UploadWizard() {
               <CardTitle>Upload Video</CardTitle>
               <CardDescription className="text-slate-400">Select the raw video file to be processed.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
               <UploadDropzone<OurFileRouter, "lectureVideoUploader">
                 endpoint="lectureVideoUploader"
                 onClientUploadComplete={async (res) => {
@@ -109,6 +125,34 @@ export default function UploadWizard() {
                   allowedContent: "text-slate-400"
                 }}
               />
+              
+              <div className="flex items-center my-4">
+                <Separator className="flex-1 bg-slate-800" />
+                <span className="mx-3 text-xs text-slate-500 uppercase font-bold text-slate-400">Or Local Dev Bypass</span>
+                <Separator className="flex-1 bg-slate-800" />
+              </div>
+
+              <div className="space-y-3 p-4 rounded-lg border border-slate-800 bg-slate-950/40">
+                <p className="text-xs text-slate-400">
+                  Bypass the S3 cloud upload. Enter a URL accessible from inside the docker containers (e.g. the seeded dummy video).
+                </p>
+                <div className="flex gap-2">
+                  <Input 
+                    value={mockUrl}
+                    onChange={e => setMockUrl(e.target.value)}
+                    className="bg-slate-900 border-slate-800 text-xs text-slate-300"
+                    placeholder="http://api:8080/dummy.mp4"
+                  />
+                  <Button 
+                    type="button"
+                    onClick={handleBypassUpload}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs whitespace-nowrap"
+                  >
+                    Bypass & Confirm
+                  </Button>
+                </div>
+              </div>
+
               {error && <p className="text-red-400 text-sm mt-4">{error}</p>}
             </CardContent>
             <CardFooter className="flex justify-end border-t border-slate-800 pt-6 gap-4">

@@ -126,10 +126,11 @@ class SegmentationAgent(BaseAgent):
             result_concepts.append({
                 "id": str(c.id),
                 "concept": data["concept"],
+                "title": data["concept"],
                 "ts_start": data["ts_start"],
                 "ts_end": data["ts_end"],
                 "visual_type": data["visual_type"],
-                "summary": data["summary"]
+                "summary": data["summary"],
             })
 
         return {"concepts": result_concepts}

@@ -123,6 +123,55 @@ async def concat_clips(clip_paths: List[str], output_path: str) -> str:
     return str(out.resolve())
 
 
+async def sync_video_to_audio(
+    video_path: str,
+    audio_path: str,
+    output_path: str,
+) -> str:
+    """Match a silent animation clip to a narration track without speeding up."""
+    audio_duration = get_audio_duration(audio_path)
+    if audio_duration <= 0:
+        raise ValueError(f"Invalid audio duration for: {audio_path}")
+
+    out = Path(output_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+
+    video_duration = get_video_duration(video_path)
+    video_in = ffmpeg.input(str(Path(video_path).resolve()))
+    audio_in = ffmpeg.input(str(Path(audio_path).resolve()))
+
+    if video_duration > audio_duration:
+        pts_ratio = audio_duration / video_duration
+        processed_video = video_in.video.filter("setpts", f"{pts_ratio}*PTS")
+        logger.info(
+            "Slowing video %s from %.2fs to %.2fs",
+            video_path, video_duration, audio_duration,
+        )
+    elif video_duration < audio_duration:
+        pad_seconds = audio_duration - video_duration
+        processed_video = video_in.video.filter(
+            "tpad", stop_mode="clone", stop_duration=pad_seconds,
+        )
+        logger.info(
+            "Padding video %s from %.2fs to %.2fs",
+            video_path, video_duration, audio_duration,
+        )
+    else:
+        processed_video = video_in.video
+
+    stream = ffmpeg.output(
+        processed_video,
+        audio_in.audio,
+        str(out),
+        vcodec="libx264",
+        acodec="aac",
+        t=audio_duration,
+        pix_fmt="yuv420p",
+    )
+    await asyncio.to_thread(_run_ffmpeg_sync, stream)
+    return str(out.resolve())
+
+
 async def overlay_audio(
     video_path: str,
     audio_path: str,
@@ -247,6 +296,43 @@ def get_video_duration(path: str) -> float:
     raise RuntimeError(f"Could not determine duration for: {path}")
 
 
+def get_audio_duration(path: str) -> float:
+    """Return the duration of a local audio file in seconds."""
+    return get_video_duration(path)
+
+
+def generate_srt_from_segments(
+    segments: list[dict],
+    output_path: str,
+) -> str:
+    """Write an SRT file from timed text segments.
+
+    Each segment dict: {"start": float, "end": float, "text": str}
+    """
+    out = Path(output_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+
+    def _fmt(seconds: float) -> str:
+        h = int(seconds // 3600)
+        m = int((seconds % 3600) // 60)
+        s = int(seconds % 60)
+        ms = int((seconds % 1) * 1000)
+        return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
+
+    lines: list[str] = []
+    for i, seg in enumerate(segments, start=1):
+        text = seg.get("text", "").strip()
+        if not text:
+            continue
+        lines.append(str(i))
+        lines.append(f"{_fmt(seg['start'])} --> {_fmt(seg['end'])}")
+        lines.append(text)
+        lines.append("")
+
+    out.write_text("\n".join(lines), encoding="utf-8")
+    return str(out.resolve())
+
+
 # ---------------------------------------------------------------------------
 # Legacy class wrapper kept for backwards-compat with services/__init__.py
 # ---------------------------------------------------------------------------
@@ -259,6 +345,11 @@ class FfmpegService:
 
     async def concat_clips(self, clip_paths: List[str], output_path: str) -> str:
         return await concat_clips(clip_paths, output_path)
+
+    async def sync_video_to_audio(
+        self, video_path: str, audio_path: str, output_path: str,
+    ) -> str:
+        return await sync_video_to_audio(video_path, audio_path, output_path)
 
     async def overlay_audio(
         self,

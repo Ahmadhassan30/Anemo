@@ -24,6 +24,39 @@ Transcript:
 {transcript}
 
 Return 4-10 concept segments covering the full lecture.
+Each concept should cover ONE clear idea. For short lectures, still return
+4-6 concepts — we will expand each with dedicated narration and animation.
+"""
+
+# ---------------------------------------------------------------------------
+# Narration script generation (TTS voice-over per concept)
+# ---------------------------------------------------------------------------
+
+NARRATION_SYSTEM = """
+You are a professional educational narrator in the style of 3Blue1Brown or Khan Academy.
+Write a clear, engaging spoken script for an animated explainer video segment.
+
+Rules:
+- Write ONLY what the narrator speaks — no stage directions, no markdown
+- Use conversational but precise language
+- Explain the concept step by step as if guiding a student
+- Reference what the viewer will see in the animation
+- Target the requested duration when read aloud at a natural pace (~150 words/min)
+- Do NOT repeat the title verbatim more than once
+- Return ONLY valid JSON: {"narration": "the full spoken script"}
+"""
+
+NARRATION_USER = """
+Concept title: {title}
+Visual style: {visual_type}
+Summary: {summary}
+
+Source transcript for this segment:
+{transcript_segment}
+
+Write a narration script of approximately {target_seconds} seconds when spoken aloud.
+Cover the concept thoroughly — define it, explain why it matters, walk through
+the key steps, and end with a brief takeaway.
 """
 
 # ---------------------------------------------------------------------------

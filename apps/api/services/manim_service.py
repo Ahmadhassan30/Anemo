@@ -41,11 +41,11 @@ async def render_scene(
     scene_file.write_text(manim_code, encoding="utf-8")
     logger.debug("Wrote Manim source to %s", scene_file)
 
-    # 2. Run Manim render (-qm = medium quality 720p30)
+    # 2. Run Manim render (-qh = high quality 1080p60)
     cmd = [
         "manim",
         "render",
-        "-qm",
+        "-qh",
         str(scene_file),
         class_name,
         "--media_dir",
@@ -82,7 +82,7 @@ async def render_scene(
     #    Manim places output at:
     #      {media_dir}/videos/{source_stem}/{quality}/{ClassName}.mp4
     #    With -qm the quality folder is 720p30.
-    expected = out / "videos" / concept_id / "720p30" / f"{class_name}.mp4"
+    expected = out / "videos" / concept_id / "1080p60" / f"{class_name}.mp4"
     if expected.is_file():
         logger.info("Rendered MP4: %s", expected)
         return str(expected.resolve())

@@ -11,6 +11,7 @@ GRAPH_ANIMATION_TEMPLATE = '''from manim import *
 
 class {class_name}(Scene):
     def construct(self):
+        self.camera.background_color = "#0f1117"
         title = Text("{title}", font_size=40, color=BLUE)
         title.to_edge(UP, buff=0.4)
         self.play(Write(title), run_time=2)
@@ -40,8 +41,8 @@ class {class_name}(Scene):
 
         explanation = Text("{explanation}", font_size=26, color=GREEN)
         explanation.to_edge(DOWN, buff=0.4)
-        self.play(FadeIn(explanation), run_time=1.5)
-        self.wait(3)
+        self.play(FadeIn(explanation), run_time=2)
+        self.wait({closing_wait})
 '''
 
 # ─────────────────────────────────────────
@@ -51,6 +52,7 @@ EQUATION_DISPLAY_TEMPLATE = '''from manim import *
 
 class {class_name}(Scene):
     def construct(self):
+        self.camera.background_color = "#0f1117"
         title = Text("{title}", font_size=38, color=BLUE)
         title.to_edge(UP, buff=0.5)
         self.play(Write(title), run_time=2)
@@ -86,8 +88,8 @@ class {class_name}(Scene):
 
         explanation = Text("{explanation}", font_size=24, color=TEAL)
         explanation.to_edge(DOWN, buff=0.4)
-        self.play(FadeIn(explanation), run_time=1.5)
-        self.wait(3)
+        self.play(FadeIn(explanation), run_time=2)
+        self.wait({closing_wait})
 '''
 
 # ─────────────────────────────────────────
@@ -97,6 +99,7 @@ DIAGRAM_FLOW_TEMPLATE = '''from manim import *
 
 class {class_name}(Scene):
     def construct(self):
+        self.camera.background_color = "#0f1117"
         title = Text("{title}", font_size=38, color=BLUE)
         title.to_edge(UP, buff=0.4)
         self.play(Write(title), run_time=2)
@@ -138,8 +141,8 @@ class {class_name}(Scene):
 
         highlight = boxes[-1][0].copy()
         highlight.set_color(RED).set_fill(RED, 0.6)
-        self.play(Transform(boxes[-1][0], highlight), run_time=1.5)
-        self.wait(3)
+        self.play(Transform(boxes[-1][0], highlight), run_time=2)
+        self.wait({closing_wait})
 '''
 
 # ─────────────────────────────────────────
@@ -149,6 +152,7 @@ TEXT_BULLETS_TEMPLATE = '''from manim import *
 
 class {class_name}(Scene):
     def construct(self):
+        self.camera.background_color = "#0f1117"
         title = Text("{title}", font_size=40, color=BLUE)
         title.to_edge(UP, buff=0.5)
         self.play(Write(title), run_time=2)
@@ -185,8 +189,8 @@ class {class_name}(Scene):
 
         summary = Text("{summary}", font_size=24, color=GREEN)
         summary.to_edge(DOWN, buff=0.4)
-        self.play(FadeIn(summary), run_time=1.5)
-        self.wait(3)
+        self.play(FadeIn(summary), run_time=2)
+        self.wait({closing_wait})
 '''
 
 # ─────────────────────────────────────────
@@ -196,6 +200,7 @@ CODE_WALKTHROUGH_TEMPLATE = '''from manim import *
 
 class {class_name}(Scene):
     def construct(self):
+        self.camera.background_color = "#0f1117"
         title = Text("{title}", font_size=36, color=BLUE)
         title.to_edge(UP, buff=0.4)
         self.play(Write(title), run_time=2)
@@ -238,8 +243,8 @@ class {class_name}(Scene):
 
         annotation = Text("{annotation}", font_size=24, color=RED)
         annotation.to_edge(DOWN, buff=0.3)
-        self.play(Write(annotation), run_time=1.5)
-        self.wait(3)
+        self.play(Write(annotation), run_time=2)
+        self.wait({closing_wait})
 '''
 
 # ─────────────────────────────────────────
@@ -249,6 +254,7 @@ GEOMETRIC_PROOF_TEMPLATE = '''from manim import *
 
 class {class_name}(Scene):
     def construct(self):
+        self.camera.background_color = "#0f1117"
         title = Text("{title}", font_size=38, color=BLUE)
         title.to_edge(UP, buff=0.4)
         self.play(Write(title), run_time=2)
@@ -278,8 +284,8 @@ class {class_name}(Scene):
         self.play(FadeIn(proof, shift=UP*0.2), run_time=1.5)
 
         box = SurroundingRectangle(measure, color=RED, buff=0.2)
-        self.play(Create(box), run_time=1.2)
-        self.wait(3)
+        self.play(Create(box), run_time=2)
+        self.wait({closing_wait})
 '''
 
 TEMPLATES = {
@@ -337,36 +343,36 @@ Create a 4-step flow diagram for this educational concept.
 Concept: {concept_title}
 Transcript: {transcript}
 
-Use REAL domain-specific words from the concept.
-Do NOT use generic labels like "Step 1", "Input", "Output".
+Use REAL domain-specific words from the concept and transcript.
+Do NOT use generic labels like "Step 1", "Input", "Output", "Process".
 
 Return ONLY valid JSON, no markdown:
 {{
-  "title": "short title max 5 words",
-  "step1": "Real first step (max 3 words)",
-  "step2": "Real second step (max 3 words)",
-  "step3": "Real third step (max 3 words)",
-  "step4": "Real fourth step (max 3 words)",
-  "description": "One sentence describing the full process, max 12 words"
+  "title": "short title max 6 words",
+  "step1": "Real first stage (max 4 words)",
+  "step2": "Real second stage (max 4 words)",
+  "step3": "Real third stage (max 4 words)",
+  "step4": "Real fourth stage (max 4 words)",
+  "description": "One clear sentence describing the full process, max 15 words"
 }}
 """
 
 BULLETS_PARAMS_PROMPT = """
-Extract 4 key facts for bullet point slides.
+Extract 4 key teaching points for an animated explainer slide.
 Concept: {concept_title}
 Transcript: {transcript}
 
-Use REAL content from the transcript. No generic text.
-Each bullet must be a distinct fact, max 7 words each.
+Use REAL content from the transcript. No generic filler text.
+Each bullet must teach something specific, max 10 words each.
 
 Return ONLY valid JSON, no markdown:
 {{
-  "title": "short title max 5 words",
-  "bullet1": "First distinct fact max 7 words",
-  "bullet2": "Second distinct fact max 7 words",
-  "bullet3": "Third distinct fact max 7 words",
-  "bullet4": "Fourth distinct fact max 7 words",
-  "summary": "One takeaway sentence max 12 words"
+  "title": "short title max 6 words",
+  "bullet1": "First teaching point max 10 words",
+  "bullet2": "Second teaching point max 10 words",
+  "bullet3": "Third teaching point max 10 words",
+  "bullet4": "Fourth teaching point max 10 words",
+  "summary": "One memorable takeaway max 15 words"
 }}
 """
 
@@ -475,15 +481,17 @@ class TemplateService:
         concept: dict,
         transcript_segment: str,
         class_name: str,
+        target_duration: float = 45.0,
     ) -> str:
         template = TEMPLATES.get(visual_type, TEMPLATES["text_bullets"])
         prompt_t  = PARAM_PROMPTS.get(visual_type, PARAM_PROMPTS["text_bullets"])
         defaults  = DEFAULT_PARAMS.get(visual_type, DEFAULT_PARAMS["text_bullets"])
+        concept_title = concept.get("concept") or concept.get("title") or "Key Concept"
 
         try:
             prompt = prompt_t.format(
-                concept_title=concept.get("title", ""),
-                transcript=transcript_segment[:600],
+                concept_title=concept_title,
+                transcript=transcript_segment[:1200],
             )
             params = await llm_service.chat_json(
                 system=(
@@ -502,7 +510,14 @@ class TemplateService:
             params = {}
 
         # Merge: defaults first, then LLM params override
-        merged = {**defaults, **params, "class_name": class_name}
+        closing_wait = max(int(target_duration - 32), 10)
+        merged = {
+            **defaults,
+            **params,
+            "class_name": class_name,
+            "title": concept_title,
+            "closing_wait": closing_wait,
+        }
 
         # Sanitize highlight_line
         if visual_type == "code_walkthrough":

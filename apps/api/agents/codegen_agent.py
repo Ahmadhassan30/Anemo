@@ -69,6 +69,7 @@ class CodeGenAgent(BaseAgent):
                 concept=concept,
                 transcript_segment=transcript_segment,
                 class_name=class_name,
+                target_duration=float(concept.get("target_duration", 45.0)),
             )
 
             # ── STEP 2: Update concept status to rendering ───────────────
@@ -98,6 +99,7 @@ class CodeGenAgent(BaseAgent):
                     concept=concept,
                     transcript_segment=transcript_segment,
                     class_name=class_name,
+                    target_duration=float(concept.get("target_duration", 45.0)),
                 )
                 try:
                     clip_path = await render_scene(
