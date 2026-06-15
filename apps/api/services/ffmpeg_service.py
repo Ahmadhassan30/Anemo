@@ -123,8 +123,9 @@ async def overlay_audio(
 ) -> str:
     """Extract an audio segment from the professor recording and overlay it onto a clip.
 
-    Trims [ts_start, ts_end] from *audio_path*, mixes it at the same volume
-    level onto *video_path*, and writes the result to *output_path*.
+    If the video clip is longer than the audio segment, it is sped up using
+    the 'setpts' filter to fit the audio duration. If the video is shorter,
+    it is padded with its last frame using the 'tpad' filter.
 
     Args:
         video_path: Local path to the silent video clip.
@@ -143,6 +144,7 @@ async def overlay_audio(
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
 
+    video_duration = get_video_duration(video_path)
     video_in = ffmpeg.input(str(Path(video_path).resolve()))
     audio_in = ffmpeg.input(
         str(Path(audio_path).resolve()),
@@ -150,11 +152,18 @@ async def overlay_audio(
         t=duration,
     )
 
-    # Pad video with its last frame if it's shorter than audio duration
-    padded_video = video_in.video.filter('tpad', stop_mode='clone', stop_duration=duration)
+    if video_duration > duration:
+        # Speed up the video to fit the audio duration
+        pts_ratio = duration / video_duration
+        processed_video = video_in.video.filter('setpts', f"{pts_ratio}*PTS")
+        logger.info(f"Speeding up video {video_path} from {video_duration:.2f}s to {duration:.2f}s (ratio {pts_ratio:.3f})")
+    else:
+        # Pad video with its last frame if it's shorter than audio duration
+        processed_video = video_in.video.filter('tpad', stop_mode='clone', stop=-1)
+        logger.info(f"Padding video {video_path} from {video_duration:.2f}s to {duration:.2f}s")
 
     stream = ffmpeg.output(
-        padded_video,
+        processed_video,
         audio_in.audio,
         str(out),
         vcodec="libx264",
