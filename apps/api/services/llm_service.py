@@ -4,14 +4,10 @@ import json
 import logging
 from typing import Any, Dict, Optional
 
-import google.generativeai as genai
 from openai import AsyncOpenAI
 from config import settings
 
 logger = logging.getLogger(__name__)
-
-genai.configure(api_key=settings.GEMINI_API_KEY)
-_gemini_model = genai.GenerativeModel("gemini-2.0-flash")
 
 
 class LLMError(Exception):
@@ -97,14 +93,16 @@ class LLMService:
         user: str,
         max_tokens: int = 4096,
     ) -> str:
-        """Use Gemini 2.0 Flash for complex tasks like Manim codegen."""
-        await asyncio.sleep(4)  # Gemini free: 15 RPM = 1 per 4s
-        prompt = f"{system}\n\n{user}"
-        response = await asyncio.to_thread(
-            _gemini_model.generate_content, prompt
+        """Use a fallback Groq model since 70b hit daily limits."""
+        # Add a sleep to prevent hitting the Tokens Per Minute (TPM) limit
+        await asyncio.sleep(10)
+        return await self.chat(
+            system=system,
+            user=user,
+            model="llama-3.1-8b-instant",
+            temperature=0.2,
+            max_tokens=max_tokens,
         )
-        return response.text
-
     async def chat_json_strong(
         self,
         system: str,
