@@ -24,7 +24,7 @@ class LLMService:
         self,
         system: str,
         user: str,
-        model: str = "llama-3.3-70b-versatile",
+        model: str = "mistral-saba-24b",
         temperature: float = 0.2,
         max_tokens: int = 4096,
     ) -> str:
