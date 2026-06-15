@@ -11,12 +11,12 @@ export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 export const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
+>(({ className, sideOffset = 6, ...props }, ref) => (
   <DropdownMenuPrimitive.Portal>
     <DropdownMenuPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
-      className={`z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md ${className || ""}`}
+      className={`z-50 min-w-[9rem] overflow-hidden rounded-md border border-border bg-card p-1 font-mono text-sm text-foreground shadow-glow ${className || ""}`}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
@@ -29,7 +29,7 @@ export const DropdownMenuItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={`relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ${className || ""}`}
+    className={`relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-muted-foreground outline-none transition-colors before:text-primary before:opacity-0 before:transition-opacity before:content-['›'] focus:bg-secondary focus:text-primary focus:before:opacity-100 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ${className || ""}`}
     {...props}
   />
 ))

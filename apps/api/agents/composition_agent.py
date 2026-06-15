@@ -12,8 +12,12 @@ from services.ffmpeg_service import (
     sync_video_to_audio,
     burn_captions,
     get_audio_duration,
-    generate_srt_from_segments,
+    generate_ass_from_segments,
+    build_caption_cues,
 )
+
+# Final cut hard cap (seconds) — keeps every produced video at or under a minute.
+MAX_FINAL_SECONDS = 60.0
 from services.uploadthing_service import get_final_video_url, get_final_video_path
 import shutil
 from utils.audio import cleanup_temp_files
@@ -69,11 +73,13 @@ class CompositionAgent(BaseAgent):
                 clip_duration = get_audio_duration(tts_path)
                 narration = c.get("narration_script", "")
                 if narration:
-                    caption_segments.append({
-                        "start": timeline_offset,
-                        "end": timeline_offset + clip_duration,
-                        "text": narration,
-                    })
+                    caption_segments.extend(
+                        build_caption_cues(
+                            narration,
+                            timeline_offset,
+                            timeline_offset + clip_duration,
+                        )
+                    )
                 timeline_offset += clip_duration
 
                 composed_clips.append(str(out_clip))
@@ -83,15 +89,16 @@ class CompositionAgent(BaseAgent):
             await concat_clips(composed_clips, composed_path)
             files_to_cleanup.append(composed_path)
 
-            srt_path = str(tmp_dir / "subtitles.srt")
-            generate_srt_from_segments(caption_segments, srt_path)
-            files_to_cleanup.append(srt_path)
+            ass_path = str(tmp_dir / "subtitles.ass")
+            generate_ass_from_segments(caption_segments, ass_path)
+            files_to_cleanup.append(ass_path)
 
             final_path = str(tmp_dir / "final.mp4")
             await burn_captions(
                 video_path=composed_path,
-                srt_path=srt_path,
+                subtitle_path=ass_path,
                 output_path=final_path,
+                max_seconds=MAX_FINAL_SECONDS,
             )
             files_to_cleanup.append(final_path)
 

@@ -54,9 +54,11 @@ Summary: {summary}
 Source transcript for this segment:
 {transcript_segment}
 
-Write a narration script of approximately {target_seconds} seconds when spoken aloud.
-Cover the concept thoroughly — define it, explain why it matters, walk through
-the key steps, and end with a brief takeaway.
+Write a TIGHT narration of about {target_seconds} seconds when spoken aloud at a
+natural pace — roughly {word_budget} words. Do NOT exceed the word budget.
+Lead with the single most important insight, add one or two supporting points,
+and end with a short takeaway. Be vivid and concrete, and reference what the
+viewer sees on screen. Return ONLY valid JSON: {{"narration": "the spoken script"}}
 """
 
 # ---------------------------------------------------------------------------

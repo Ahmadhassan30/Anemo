@@ -14,14 +14,17 @@ export function NotesPanel() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0f1117] border-r border-slate-800">
-      <div className="p-4 border-b border-slate-800 bg-slate-900/50">
-        <h3 className="font-semibold text-slate-200">Concepts</h3>
-        <p className="text-xs text-slate-500">{concepts.length} key topics extracted</p>
+    <div className="flex h-full flex-col border-r border-border bg-card">
+      <div className="border-b border-border bg-background/40 px-4 py-3">
+        <h3 className="term-caret text-sm font-semibold text-foreground">concepts</h3>
+        <p className="mt-1 text-xs text-muted-foreground">
+          <span className="text-primary">{"// "}</span>
+          {concepts.length} key topics extracted
+        </p>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-2">
+        <div className="space-y-1.5 p-3">
           {concepts.map((c, i) => {
             const isActive = activeConcept === c.id;
 
@@ -29,26 +32,37 @@ export function NotesPanel() {
               <button
                 key={c.id}
                 onClick={() => seekTo(c.ts_start)}
-                className={`w-full text-left p-3 rounded-lg border transition-all duration-200 group ${
-                  isActive 
-                    ? "bg-blue-500/10 border-blue-500 text-blue-100 shadow-[0_0_15px_rgba(59,130,246,0.15)]" 
-                    : "bg-slate-900/30 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-300"
+                className={`group w-full rounded-sm border px-3 py-2.5 text-left transition-all duration-200 ${
+                  isActive
+                    ? "border-primary bg-primary/10 text-foreground glow-ring"
+                    : "border-border bg-background/30 text-muted-foreground hover:border-primary/40 hover:text-foreground"
                 }`}
               >
-                <div className="flex items-center gap-2 text-xs font-mono mb-1.5 opacity-80">
-                  <Clock className="w-3 h-3" />
-                  <span className={isActive ? "text-blue-400 font-semibold" : ""}>
-                    {formatTime(c.ts_start)}
+                <div className="mb-1.5 flex items-center gap-1.5 font-mono text-xs">
+                  <Clock className="h-3 w-3" />
+                  <span className={isActive ? "font-semibold text-primary glow-text" : "text-muted-foreground"}>
+                    [{formatTime(c.ts_start)}]
                   </span>
+                  {isActive && (
+                    <span className="term-chip ml-auto border-primary/50 text-primary">
+                      <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
+                      active
+                    </span>
+                  )}
                 </div>
-                <p className={`text-sm font-medium leading-snug ${isActive ? "text-slate-100" : "text-slate-300"}`}>
+                <p className={`text-sm font-medium leading-snug ${isActive ? "text-foreground" : "text-foreground/80"}`}>
+                  <span className="text-primary">{"› "}</span>
                   {i + 1}. {c.concept}
                 </p>
               </button>
             );
           })}
           {concepts.length === 0 && (
-            <p className="text-sm text-slate-500 text-center py-8">No concepts extracted yet.</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              <span className="text-primary">$ </span>
+              no concepts extracted yet
+              <span className="term-cursor" aria-hidden />
+            </p>
           )}
         </div>
       </ScrollArea>

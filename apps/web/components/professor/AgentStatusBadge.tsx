@@ -14,26 +14,58 @@ export function AgentStatusBadge({ status, className }: AgentStatusBadgeProps) {
   if (visualStatus === "started") visualStatus = "running";
   if (visualStatus === "success") visualStatus = "done";
 
+  // Hairline-bordered chip styles per state — ink-on-near-black with restrained accents.
   const statusStyles: Record<string, string> = {
-    pending: "bg-slate-800 text-slate-300 hover:bg-slate-800",
-    running: "bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/20",
-    done: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20",
-    failed: "bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/20",
-    retrying: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/20",
+    pending: "border-border bg-secondary text-muted-foreground",
+    running: "border-term-cyan/40 bg-term-cyan/10 text-term-cyan",
+    done: "border-primary/40 bg-primary/10 text-primary",
+    failed: "border-destructive/40 bg-destructive/10 text-destructive",
+    retrying: "border-term-amber/40 bg-term-amber/10 text-term-amber",
+  };
+
+  // Colored status dot per state.
+  const dotStyles: Record<string, string> = {
+    pending: "bg-muted-foreground",
+    running: "bg-term-cyan",
+    done: "bg-primary",
+    failed: "bg-destructive",
+    retrying: "bg-term-amber",
+  };
+
+  // Terminal-voice label per state.
+  const statusLabels: Record<string, string> = {
+    pending: "pending",
+    running: "running",
+    done: "ok",
+    failed: "failed",
+    retrying: "retry",
   };
 
   const currentStyle = statusStyles[visualStatus] || statusStyles.pending;
+  const currentDot = dotStyles[visualStatus] || dotStyles.pending;
+  const currentLabel = statusLabels[visualStatus] || visualStatus;
   const isPulsing = visualStatus === "running";
 
   return (
-    <Badge variant="secondary" className={cn("capitalize font-medium flex gap-2 items-center px-2.5 py-0.5", currentStyle, className)}>
-      {isPulsing && (
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-        </span>
+    <Badge
+      variant="outline"
+      className={cn(
+        "flex items-center gap-1.5 rounded-sm px-2 py-0.5 font-mono lowercase tracking-tight",
+        currentStyle,
+        className
       )}
-      {visualStatus}
+    >
+      <span className="select-none opacity-50">[</span>
+      {isPulsing ? (
+        <span className="relative flex h-1.5 w-1.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-term-cyan opacity-75"></span>
+          <span className={cn("relative inline-flex h-1.5 w-1.5 rounded-full", currentDot)}></span>
+        </span>
+      ) : (
+        <span className={cn("inline-flex h-1.5 w-1.5 rounded-full", currentDot)}></span>
+      )}
+      {currentLabel}
+      <span className="select-none opacity-50">]</span>
     </Badge>
   );
 }

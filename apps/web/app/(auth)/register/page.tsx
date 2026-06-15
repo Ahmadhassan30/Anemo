@@ -52,129 +52,143 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Gradient Orbs */}
-      <div className="absolute top-1/4 left-1/4 -z-10 h-96 w-96 rounded-full bg-teal-500/10 blur-[120px]" />
-      <div className="absolute bottom-1/4 right-1/4 -z-10 h-96 w-96 rounded-full bg-indigo-500/10 blur-[120px]" />
-
-      <div className="w-full max-w-md space-y-8 rounded-2xl border border-slate-800/60 bg-slate-900/40 p-8 shadow-2xl backdrop-blur-xl">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent">
-            LectureOS
-          </h1>
-          <p className="mt-2 text-sm text-slate-400">
-            Create an account to start publishing or learning
-          </p>
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        {/* prompt eyebrow */}
+        <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
+          <span className="text-primary">{"//"}</span>
+          <span className="term-label">auth / register</span>
         </div>
 
-        {error && (
-          <div className="flex items-center gap-3 rounded-lg bg-red-500/10 border border-red-500/25 p-4 text-sm text-red-400">
-            <AlertCircle className="h-5 w-5 shrink-0" />
-            <p>{error}</p>
+        <div className="term-window glow-ring pt-9">
+          <div className="absolute right-4 top-3 text-[11px] text-muted-foreground">
+            ~/lectureos/register
           </div>
-        )}
 
-        {success && (
-          <div className="flex items-center gap-3 rounded-lg bg-emerald-500/10 border border-emerald-500/25 p-4 text-sm text-emerald-400">
-            <CheckCircle2 className="h-5 w-5 shrink-0" />
-            <p>Registration successful! Redirecting to login...</p>
-          </div>
-        )}
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4 rounded-md">
+          <div className="space-y-7 px-6 pb-7">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                Account Type
-              </label>
-              <div className="grid grid-cols-2 gap-4">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                <span className="text-primary">{"› "}</span>
+                lecture<span className="text-primary glow-text">os</span>
+                <span className="term-cursor align-middle" aria-hidden />
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground term-prompt">
+                create_account --to publish or learn
+              </p>
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-3 rounded-sm border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <p>
+                  <span className="text-destructive/70">err: </span>
+                  {error}
+                </p>
+              </div>
+            )}
+
+            {success && (
+              <div className="flex items-center gap-3 rounded-sm border border-primary/40 bg-primary/10 p-3 text-sm text-primary">
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                <p>ok: account_created — redirecting to /login ...</p>
+              </div>
+            )}
+
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <div className="space-y-5">
+                <div>
+                  <label className="term-label mb-2 block">
+                    account_type
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setRole("professor")}
+                      className={`flex items-center justify-center gap-2 rounded-sm border py-2.5 text-sm transition-all ${
+                        role === "professor"
+                          ? "border-primary bg-primary/10 text-primary glow-ring"
+                          : "border-border bg-background/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                      }`}
+                    >
+                      <User className="h-4 w-4" />
+                      professor
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRole("student")}
+                      className={`flex items-center justify-center gap-2 rounded-sm border py-2.5 text-sm transition-all ${
+                        role === "student"
+                          ? "border-accent bg-accent/10 text-accent"
+                          : "border-border bg-background/40 text-muted-foreground hover:border-accent/40 hover:text-foreground"
+                      }`}
+                    >
+                      <User className="h-4 w-4" />
+                      student
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="term-label mb-2 block">
+                    email_address
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                      <Mail className="h-4 w-4" />
+                    </span>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="admin@school.edu"
+                      className="term-input pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="term-label mb-2 block">
+                    password
+                  </label>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                      <Lock className="h-4 w-4" />
+                    </span>
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="•••••••• (min 8 chars)"
+                      className="term-input pl-10"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
                 <button
-                  type="button"
-                  onClick={() => setRole("professor")}
-                  className={`flex items-center justify-center gap-2 rounded-lg border py-3 text-sm font-semibold transition-all ${
-                    role === "professor"
-                      ? "border-teal-500 bg-teal-500/10 text-teal-300"
-                      : "border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700"
-                  }`}
+                  type="submit"
+                  disabled={loading || success}
+                  className="term-btn term-btn-primary w-full py-2.5"
                 >
-                  <User className="h-4 w-4" />
-                  Professor
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole("student")}
-                  className={`flex items-center justify-center gap-2 rounded-lg border py-3 text-sm font-semibold transition-all ${
-                    role === "student"
-                      ? "border-indigo-500 bg-indigo-500/10 text-indigo-300"
-                      : "border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700"
-                  }`}
-                >
-                  <User className="h-4 w-4" />
-                  Student
+                  {loading ? "registering..." : "$ create_account"}
                 </button>
               </div>
-            </div>
+            </form>
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
-                  <Mail className="h-5 w-5" />
-                </span>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. admin@school.edu"
-                  className="block w-full rounded-lg border border-slate-800 bg-slate-950/60 py-3 pl-10 pr-3 text-slate-200 placeholder-slate-600 outline-none transition-all focus:border-teal-500/80 focus:ring-1 focus:ring-teal-500/40 text-sm"
-                />
-              </div>
-            </div>
+            <hr className="term-rule" />
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
-                  <Lock className="h-5 w-5" />
-                </span>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="•••••••• (Min 8 chars)"
-                  className="block w-full rounded-lg border border-slate-800 bg-slate-950/60 py-3 pl-10 pr-3 text-slate-200 placeholder-slate-600 outline-none transition-all focus:border-teal-500/80 focus:ring-1 focus:ring-teal-500/40 text-sm"
-                />
-              </div>
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">
+                already_registered?{" "}
+                <Link href="/login" className="term-link">
+                  sign_in
+                </Link>
+              </p>
             </div>
           </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading || success}
-              className="group relative flex w-full justify-center rounded-lg bg-gradient-to-r from-teal-500 to-indigo-600 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-teal-500/50 disabled:opacity-50 disabled:pointer-events-none"
-            >
-              {loading ? "Registering..." : "Create Account"}
-            </button>
-          </div>
-        </form>
-
-        <div className="text-center mt-6">
-          <p className="text-xs text-slate-500">
-            Already have an account?{" "}
-            <Link
-              href="/login"
-              className="font-medium text-teal-400 hover:text-teal-300 transition-colors"
-            >
-              Sign in
-            </Link>
-          </p>
         </div>
       </div>
     </div>

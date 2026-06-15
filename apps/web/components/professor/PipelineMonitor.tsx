@@ -20,13 +20,13 @@ const AGENT_ORDER = [
 ];
 
 const AGENT_LABELS: Record<string, string> = {
-  "ingest_agent": "Ingest & Extract Audio",
-  "transcription_agent": "Transcribe Audio (Whisper)",
-  "segmentation_agent": "Extract Concepts (DeepSeek)",
-  "codegen_agent": "Generate Code & Render (Manim)",
-  "composition_agent": "Compose Final Video",
-  "rag_indexing_agent": "Index Transcript Embeddings (BGE)",
-  "publish_agent": "Publish to YouTube",
+  "ingest_agent": "ingest_extract_audio",
+  "transcription_agent": "transcribe_audio (whisper)",
+  "segmentation_agent": "extract_concepts (deepseek)",
+  "codegen_agent": "generate_code_render (manim)",
+  "composition_agent": "compose_final_video",
+  "rag_indexing_agent": "index_transcript_embeddings (bge)",
+  "publish_agent": "publish_to_youtube",
 };
 
 interface PipelineMonitorProps {
@@ -68,14 +68,14 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
   const getAgentStatus = (agentKey: string): AgentStatus => {
     // If pipeline failed globally, we might mark active as failed
     if (status === "failed" && currentAgent === agentKey) return "failed";
-    
+
     // Look for explicit completion or failure events
     const agentEvents = events.filter(e => e.agent_name === agentKey);
     const hasFailed = agentEvents.some(e => e.event_type === "AGENT_FAILED");
     const hasRetrying = agentEvents.some(e => e.event_type === "AGENT_RETRYING");
     const hasCompleted = agentEvents.some(e => e.event_type === "AGENT_COMPLETED");
     const hasStarted = agentEvents.some(e => e.event_type === "AGENT_STARTED");
-    
+
     if (hasFailed) return "failed";
     if (hasCompleted) return "done";
     if (hasRetrying) return "retrying";
@@ -85,86 +85,114 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
     const thisIdx = AGENT_ORDER.indexOf(agentKey);
     const curIdx = currentAgent ? AGENT_ORDER.indexOf(currentAgent) : -1;
     if (curIdx > thisIdx) return "done";
-    
+
     return "pending";
   };
 
   return (
-    <Card className="bg-[#0f1117] border-slate-800 text-slate-200">
-      <CardHeader className="border-b border-slate-800 pb-4">
-        <div className="flex justify-between items-center mb-4">
-          <CardTitle className="text-xl flex items-center gap-2">
-            <PlayCircle className="w-5 h-5 text-blue-500" />
-            Pipeline Status
+    <Card className="term-panel bg-card border-border text-foreground glow-ring">
+      <CardHeader className="term-rule rounded-none border-0 pb-4 [border-bottom:1px_solid_hsl(var(--border))]">
+        <div className="mb-5 flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+            <PlayCircle className="h-5 w-5 text-primary" />
+            <span className="text-muted-foreground">{"//"}</span>
+            <span className="text-foreground">pipeline_status</span>
+            <span className="term-cursor align-middle" aria-hidden />
           </CardTitle>
-          {status === "completed" && (
-            <div className="flex gap-2">
-              <Button asChild variant="outline" className="border-slate-700 bg-slate-800 hover:bg-slate-700 h-8 gap-2">
-                <a href={`/static/${lectureId}/final.mp4`} target="_blank" rel="noreferrer" download>
-                  <PlayCircle className="w-4 h-4 text-emerald-500" />
-                  View/Download Video
-                </a>
-              </Button>
-              {youtubeUrl && !youtubeUrl.includes("dQw4w9WgXcQ") && (
-                <Button asChild variant="outline" className="border-slate-700 bg-slate-800 hover:bg-slate-700 h-8 gap-2">
-                  <a href={youtubeUrl} target="_blank" rel="noreferrer">
-                    <ExternalLink className="w-4 h-4 text-red-500" />
-                    View on YouTube
+          <div className="flex items-center gap-2">
+            <span className="term-chip">
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  status === "running"
+                    ? "animate-blink bg-primary"
+                    : status === "failed"
+                    ? "bg-destructive"
+                    : status === "completed"
+                    ? "bg-primary"
+                    : "bg-muted-foreground"
+                }`}
+              />
+              {status || "idle"}
+            </span>
+            {status === "completed" && (
+              <>
+                <Button asChild variant="ghost" className="term-btn h-8 gap-2 px-3 text-xs">
+                  <a href={`/static/${lectureId}/final.mp4`} target="_blank" rel="noreferrer" download>
+                    <PlayCircle className="h-4 w-4 text-primary" />
+                    download_video
                   </a>
                 </Button>
-              )}
-            </div>
-          )}
+                {youtubeUrl && !youtubeUrl.includes("dQw4w9WgXcQ") && (
+                  <Button asChild variant="ghost" className="term-btn h-8 gap-2 px-3 text-xs">
+                    <a href={youtubeUrl} target="_blank" rel="noreferrer">
+                      <ExternalLink className="h-4 w-4 text-accent" />
+                      view_on_youtube
+                    </a>
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-4">
-          <Progress value={progress} className="h-2 flex-1 bg-slate-800" />
-          <span className="text-sm font-medium w-12 text-right">{progress}%</span>
+          <span className="term-label shrink-0">progress</span>
+          <Progress value={progress} className="h-1.5 flex-1 rounded-sm bg-secondary" />
+          <span className="w-12 text-right font-mono text-sm text-primary glow-text">{progress}%</span>
         </div>
       </CardHeader>
 
       <CardContent className="pt-6">
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-md text-red-400 text-sm">
-            SSE Connection Error: {error}
+          <div className="mb-6 rounded-sm border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+            <span className="term-prompt font-medium" />
+            sse_connection_error: {error}
           </div>
         )}
 
-        <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[1.4rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-800 before:to-transparent">
+        <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[1.4rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-px before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
           {AGENT_ORDER.map((agentKey, index) => {
             const agentStatus = getAgentStatus(agentKey);
             const isActive = agentStatus === "running" || agentStatus === "retrying";
-            
+
             // Find specific error message if any
-            const errorMsg = agentStatus === "failed" 
-              ? events.find(e => e.agent_name === agentKey && e.event_type === "AGENT_FAILED")?.message 
+            const errorMsg = agentStatus === "failed"
+              ? events.find(e => e.agent_name === agentKey && e.event_type === "AGENT_FAILED")?.message
               : null;
 
             return (
               <div key={agentKey} className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active`}>
                 {/* Node */}
-                <div className={`flex items-center justify-center w-6 h-6 rounded-full border-4 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow absolute left-0 md:left-1/2 -translate-x-1/2 -translate-y-4 sm:translate-y-0 transform ${
-                  agentStatus === "done" ? "bg-emerald-500 border-emerald-900" :
-                  agentStatus === "running" ? "bg-blue-500 border-blue-900" :
-                  agentStatus === "failed" ? "bg-red-500 border-red-900" :
-                  "bg-slate-700 border-slate-900"
+                <div className={`flex items-center justify-center w-2.5 h-2.5 rounded-full border-2 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute left-0 md:left-1/2 -translate-x-1/2 -translate-y-4 sm:translate-y-0 transform ${
+                  agentStatus === "done" ? "bg-primary border-primary shadow-glow" :
+                  agentStatus === "running" ? "bg-primary border-primary animate-blink shadow-glow" :
+                  agentStatus === "failed" ? "bg-destructive border-destructive" :
+                  "bg-muted-foreground border-border"
                 }`}></div>
-                
+
                 {/* Content */}
-                <div className={`w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-xl border ${
-                  isActive ? "bg-slate-800/50 border-blue-500/30" : "bg-slate-900/50 border-slate-800"
+                <div className={`w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-md border transition-colors ${
+                  isActive ? "border-primary/40 bg-secondary/60 glow-ring" :
+                  agentStatus === "failed" ? "border-destructive/40 bg-destructive/[0.04]" :
+                  "border-border bg-card/60"
                 }`}>
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-semibold text-slate-200">{AGENT_LABELS[agentKey]}</h3>
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <h3 className="term-caret truncate font-semibold text-foreground">{AGENT_LABELS[agentKey]}</h3>
                     <AgentStatusBadge status={agentStatus} />
                   </div>
-                  <p className="text-xs text-slate-500">Step {index + 1} of {AGENT_ORDER.length}</p>
-                  
+                  <p className="text-xs text-muted-foreground">
+                    step {String(index + 1).padStart(2, "0")} / {String(AGENT_ORDER.length).padStart(2, "0")}
+                  </p>
+
                   {errorMsg && (
-                    <p className="mt-2 text-sm text-red-400 break-words">{errorMsg}</p>
+                    <p className="mt-2 break-words text-sm text-destructive">
+                      <span className="text-destructive">{"› "}</span>
+                      {errorMsg}
+                    </p>
                   )}
                   {isActive && agentKey === "codegen_agent" && (
-                    <p className="mt-2 text-xs text-blue-400 italic">
-                      {events.filter(e => e.event_type === "PROGRESS_UPDATE").pop()?.message || "Rendering in parallel..."}
+                    <p className="mt-2 text-xs italic text-primary">
+                      <span className="not-italic text-primary">{"› "}</span>
+                      {events.filter(e => e.event_type === "PROGRESS_UPDATE").pop()?.message || "rendering in parallel..."}
                     </p>
                   )}
                 </div>
@@ -174,19 +202,34 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
         </div>
 
         {/* Live Event Log Terminal */}
-        <div className="mt-8 rounded-lg bg-black border border-slate-800 overflow-hidden">
-          <div className="bg-slate-900 px-4 py-2 border-b border-slate-800 flex justify-between items-center text-xs text-slate-400 font-mono">
-            <span>Terminal Output</span>
-            {status === "running" && <span className="animate-pulse">● Live</span>}
+        <div className="mt-8 overflow-hidden rounded-md border border-border bg-background">
+          <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2 text-xs text-muted-foreground">
+            <span className="flex items-center gap-2">
+              <span className="text-primary">{"//"}</span>
+              terminal_output
+            </span>
+            {status === "running" && (
+              <span className="flex items-center gap-1.5 text-primary">
+                <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
+                live
+              </span>
+            )}
           </div>
-          <div ref={scrollRef} className="p-4 h-48 overflow-y-auto font-mono text-xs text-slate-400 space-y-1">
-            {events.length === 0 && <div className="text-slate-600">Waiting for pipeline to start...</div>}
+          <div ref={scrollRef} className="h-48 space-y-1 overflow-y-auto p-4 text-xs text-muted-foreground">
+            {events.length === 0 && (
+              <div className="text-muted-foreground/60">
+                <span className="term-prompt text-primary" />
+                waiting for pipeline to start
+                <span className="term-cursor align-middle" aria-hidden />
+              </div>
+            )}
             {events.map((e, i) => (
               <div key={i} className="flex gap-4">
-                <span className="text-slate-600 shrink-0">
+                <span className="shrink-0 text-muted-foreground/60">
                   {new Date(e.timestamp || Date.now()).toISOString().substring(11, 19)}
                 </span>
-                <span className={e.event_type && e.event_type.includes("FAILED") ? "text-red-400" : "text-slate-300"}>
+                <span className={e.event_type && e.event_type.includes("FAILED") ? "text-destructive" : "text-foreground"}>
+                  <span className="text-primary">{"› "}</span>
                   [{e.agent_name || "SYSTEM"}] {e.message}
                 </span>
               </div>

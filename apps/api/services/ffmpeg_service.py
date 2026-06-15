@@ -2,6 +2,7 @@
 import asyncio
 import logging
 import os
+import re
 import tempfile
 from pathlib import Path
 from typing import List
@@ -10,6 +11,59 @@ import ffmpeg
 import httpx
 
 logger = logging.getLogger(__name__)
+
+# High-quality H.264 encode tuned for flat-color animation. CRF 18 is visually
+# lossless; -tune animation favors clean edges; faststart enables web streaming.
+_VIDEO_QUALITY = {
+    "vcodec": "libx264",
+    "pix_fmt": "yuv420p",
+    "crf": 18,
+    "preset": "medium",
+    "tune": "animation",
+}
+# Loudness normalization to broadcast target (EBU R128) for consistent narration.
+_LOUDNORM = "loudnorm=I=-16:TP=-1.5:LRA=11"
+
+# Premium caption styling baked into a generated ASS file (libass). Burning an
+# ASS file avoids the fragile comma/space escaping that `force_style=` requires.
+# Colours are &HAABBGGRR (alpha-blue-green-red). Light ink on a translucent box.
+_ASS_HEADER = """[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Caption,DejaVu Sans,52,&H00F3EDE6,&H000000FF,&H00120D08,&H99000000,-1,0,0,0,100,100,0,0,3,1,0,2,120,120,64,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+"""
+
+
+def build_caption_cues(text: str, start: float, end: float) -> List[dict]:
+    """Split narration into sentence-level cues timed across [start, end].
+
+    Replaces the old single-block-per-concept caption with readable, paced
+    sentences so the screen never shows a wall of text.
+    """
+    text = (text or "").strip()
+    if not text:
+        return []
+    sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+    if not sentences:
+        return []
+    span = max(end - start, 0.3)
+    total_chars = sum(len(s) for s in sentences) or 1
+    cues: List[dict] = []
+    t = start
+    for s in sentences:
+        dur = span * (len(s) / total_chars)
+        cues.append({"start": round(t, 3), "end": round(min(t + dur, end), 3), "text": s})
+        t += dur
+    return cues
 
 
 # ---------------------------------------------------------------------------
@@ -115,9 +169,9 @@ async def concat_clips(clip_paths: List[str], output_path: str) -> str:
         joined.node['v'],
         joined.node['a'],
         str(out),
-        vcodec="libx264",
         acodec="aac",
-        pix_fmt="yuv420p",
+        **_VIDEO_QUALITY,
+        **{"b:a": "192k"},
     )
     await asyncio.to_thread(_run_ffmpeg_sync, stream)
     return str(out.resolve())
@@ -163,10 +217,10 @@ async def sync_video_to_audio(
         processed_video,
         audio_in.audio,
         str(out),
-        vcodec="libx264",
         acodec="aac",
         t=audio_duration,
-        pix_fmt="yuv420p",
+        **_VIDEO_QUALITY,
+        **{"b:a": "192k", "af": _LOUDNORM},
     )
     await asyncio.to_thread(_run_ffmpeg_sync, stream)
     return str(out.resolve())
@@ -234,15 +288,22 @@ async def overlay_audio(
 
 async def burn_captions(
     video_path: str,
-    srt_path: str,
+    subtitle_path: str,
     output_path: str,
+    *,
+    max_seconds: float | None = None,
 ) -> str:
-    """Burn SRT subtitles directly into the video stream, keeping the audio stream.
+    """Burn styled subtitles into the video, keeping the audio stream.
+
+    Styling is carried by the subtitle file itself (an ASS file produced by
+    :func:`generate_ass_from_segments`), so no fragile ``force_style`` escaping
+    is needed. A plain ``.srt`` also works (libass default style).
 
     Args:
         video_path: Local path to the source video.
-        srt_path: Local path to the .srt subtitle file.
+        subtitle_path: Local path to the .ass (preferred) or .srt subtitle file.
         output_path: Destination path for the captioned video.
+        max_seconds: Optional hard cap on output duration (final-cut safety net).
 
     Returns:
         Absolute path to the output video.
@@ -252,15 +313,18 @@ async def burn_captions(
 
     # On Windows the subtitles filter requires forward-slash paths with
     # escaped colons; on Linux raw paths work fine.
-    srt_escaped = str(Path(srt_path).resolve()).replace("\\", "/").replace(":", "\\:")
+    sub_escaped = str(Path(subtitle_path).resolve()).replace("\\", "/").replace(":", "\\:")
+
+    out_kwargs = {**_VIDEO_QUALITY, "acodec": "copy", "movflags": "+faststart"}
+    if max_seconds:
+        out_kwargs["t"] = float(max_seconds)
 
     input_file = ffmpeg.input(str(Path(video_path).resolve()))
     stream = ffmpeg.output(
-        input_file.video.filter("subtitles", srt_escaped),
+        input_file.video.filter("subtitles", sub_escaped),
         input_file.audio,
         str(out),
-        vcodec="libx264",
-        acodec="copy",
+        **out_kwargs,
     )
     await asyncio.to_thread(_run_ffmpeg_sync, stream)
     return str(out.resolve())
@@ -333,6 +397,49 @@ def generate_srt_from_segments(
     return str(out.resolve())
 
 
+def _ass_time(seconds: float) -> str:
+    """Format seconds as ASS timestamp H:MM:SS.cc (centiseconds)."""
+    seconds = max(float(seconds), 0.0)
+    h = int(seconds // 3600)
+    m = int((seconds % 3600) // 60)
+    s = seconds % 60
+    return f"{h:d}:{m:02d}:{int(s):02d}.{int(round((s - int(s)) * 100)):02d}"
+
+
+def _ass_text(text: str) -> str:
+    """Neutralize characters that have meaning in an ASS Dialogue line."""
+    return (
+        str(text)
+        .replace("\\", " ")
+        .replace("{", "(")
+        .replace("}", ")")
+        .replace("\n", " ")
+        .replace("\r", " ")
+        .strip()
+    )
+
+
+def generate_ass_from_segments(segments: list[dict], output_path: str) -> str:
+    """Write a premium-styled ASS subtitle file from timed text segments.
+
+    Each segment dict: {"start": float, "end": float, "text": str}
+    """
+    out = Path(output_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+
+    lines = [_ASS_HEADER]
+    for seg in segments:
+        text = _ass_text(seg.get("text", ""))
+        if not text:
+            continue
+        lines.append(
+            f"Dialogue: 0,{_ass_time(seg['start'])},{_ass_time(seg['end'])},"
+            f"Caption,,0,0,0,,{text}"
+        )
+    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return str(out.resolve())
+
+
 # ---------------------------------------------------------------------------
 # Legacy class wrapper kept for backwards-compat with services/__init__.py
 # ---------------------------------------------------------------------------
@@ -362,9 +469,10 @@ class FfmpegService:
         return await overlay_audio(video_path, audio_path, output_path, ts_start, ts_end)
 
     async def burn_captions(
-        self, video_path: str, srt_path: str, output_path: str
+        self, video_path: str, subtitle_path: str, output_path: str,
+        *, max_seconds: float | None = None,
     ) -> str:
-        return await burn_captions(video_path, srt_path, output_path)
+        return await burn_captions(video_path, subtitle_path, output_path, max_seconds=max_seconds)
 
     def get_video_duration(self, path: str) -> float:
         return get_video_duration(path)

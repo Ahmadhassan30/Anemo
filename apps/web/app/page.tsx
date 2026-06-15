@@ -1,115 +1,139 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, Video, Sparkles, Brain, GraduationCap } from "lucide-react";
+import { ArrowRight, Video, Brain, GraduationCap, Sparkles } from "lucide-react";
+
+const PIPELINE = ["ingest", "transcribe", "segment", "animate", "narrate", "publish"];
+
+const BOOT = [
+  { cmd: "lectureos render --input lecture.mp4", out: null },
+  { cmd: null, out: "transcribing audio ............. ok" },
+  { cmd: null, out: "segmenting concepts ............ 6 found" },
+  { cmd: null, out: "generating manim scenes ........ ok" },
+  { cmd: null, out: "rendering 1080p60 + narration .. ok" },
+  { cmd: null, out: "final cut → 00:58 / 60s ........ done" },
+];
 
 export default function LandingPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100 relative overflow-hidden">
-      {/* Background Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 h-[500px] w-[800px] rounded-full bg-gradient-to-r from-teal-500/10 to-indigo-500/10 blur-[150px]" />
-      
-      {/* Navbar */}
-      <header className="border-b border-slate-900 bg-slate-950/60 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent">
-              LectureOS
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/login"
-              className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-            >
-              Sign In
+    <div className="relative flex min-h-screen flex-col">
+      {/* Nav */}
+      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <Link href="/" className="flex items-center gap-2 text-sm">
+            <span className="text-primary">{"//"}</span>
+            <span className="font-semibold tracking-wide text-foreground">lecture</span>
+            <span className="font-semibold tracking-wide text-primary glow-text">os</span>
+          </Link>
+          <div className="flex items-center gap-4 text-sm">
+            <Link href="/login" className="term-link">
+              sign_in
             </Link>
-            <Link
-              href="/register"
-              className="rounded-lg bg-teal-500 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-teal-400 transition-colors shadow-lg shadow-teal-500/20"
-            >
-              Get Started
+            <Link href="/register" className="term-btn term-btn-primary h-8 px-3 text-xs">
+              get_started <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main className="flex-1 flex flex-col justify-center items-center px-4 py-20 text-center max-w-5xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-500/20 bg-teal-500/5 text-xs text-teal-300 font-semibold mb-6">
-          <Sparkles className="h-3.5 w-3.5" />
-          Autonomous 3Blue1Brown-style Video Agent
-        </div>
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-4 py-16 sm:px-6">
+        <span className="term-chip mb-7">
+          <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
+          autonomous 3blue1brown-style video agent
+        </span>
 
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight">
-          Transform Raw Lectures Into{" "}
-          <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
-            Beautiful Animations
-          </span>
+        <h1 className="max-w-4xl text-center text-4xl font-bold leading-tight tracking-tight md:text-6xl">
+          <span className="term-prompt text-muted-foreground" />
+          Turn raw lectures into{" "}
+          <span className="text-primary glow-text">animated explainers</span>
+          <span className="term-cursor align-middle" aria-hidden />
         </h1>
 
-        <p className="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
-          LectureOS transcribes your lecture, segments core concepts, generates 
-          Manim code, renders visual scenes, and publishes fully synchronized 
-          videos.
+        <p className="mt-6 max-w-2xl text-center text-base leading-relaxed text-muted-foreground md:text-lg">
+          A pipeline of agents transcribes the audio, segments the core concepts, generates Manim
+          scenes, renders them with synchronized narration, and ships a captioned one-minute cut.
         </p>
 
-        <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            href="/register"
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-indigo-600 px-8 py-4 text-base font-semibold hover:brightness-110 transition-all shadow-xl shadow-teal-500/10"
-          >
-            Create Free Account
-            <ArrowRight className="h-5 w-5" />
+        <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+          <Link href="/register" className="term-btn term-btn-primary px-6 py-3 text-base">
+            $ create_account <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link
-            href="/login"
-            className="flex items-center justify-center rounded-xl border border-slate-800 bg-slate-950/40 px-8 py-4 text-base font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition-all backdrop-blur-sm"
-          >
-            Sign In to Dashboard
+          <Link href="/login" className="term-btn px-6 py-3 text-base">
+            sign_in_to_dashboard
           </Link>
         </div>
 
-        {/* Features Grid */}
-        <section className="mt-32 grid grid-cols-1 md:grid-cols-3 gap-8 text-left w-full">
-          <div className="rounded-2xl border border-slate-900 bg-slate-900/20 p-8 backdrop-blur-sm">
-            <div className="h-12 w-12 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400 mb-6">
-              <Video className="h-6 w-6" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-100">Dev-Bypass Uploads</h3>
-            <p className="mt-3 text-slate-400 text-sm leading-relaxed">
-              Bypasses cloud CDNs in dev mode, mirroring files directly to local mounts 
-              for immediate visual checking and faster iteration.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-slate-900 bg-slate-900/20 p-8 backdrop-blur-sm">
-            <div className="h-12 w-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-6">
-              <Brain className="h-6 w-6" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-100">AI Code Generation</h3>
-            <p className="mt-3 text-slate-400 text-sm leading-relaxed">
-              A robust Planner-Coder-Critic system translates transcribed concepts into 
-              syntactically correct Python Manim script rendering.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-slate-900 bg-slate-900/20 p-8 backdrop-blur-sm">
-            <div className="h-12 w-12 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 mb-6">
-              <GraduationCap className="h-6 w-6" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-100">Interactive Student RAG</h3>
-            <p className="mt-3 text-slate-400 text-sm leading-relaxed">
-              Enrolled students can interact with a specialized chatbot grounded in 
-              lecture transcripts, offering direct timestamp-linked citation links.
+        {/* Terminal session window */}
+        <section className="term-window mt-16 w-full max-w-3xl pt-9 glow-ring">
+          <div className="absolute right-4 top-3 text-[11px] text-muted-foreground">~/lectureos</div>
+          <div className="space-y-1.5 px-5 pb-5 text-sm leading-relaxed">
+            {BOOT.map((line, i) =>
+              line.cmd ? (
+                <p key={i} className="text-foreground">
+                  <span className="text-primary">$ </span>
+                  {line.cmd}
+                </p>
+              ) : (
+                <p key={i} className="text-muted-foreground">
+                  <span className="text-primary">{"› "}</span>
+                  {line.out}
+                </p>
+              )
+            )}
+            <p className="pt-1 text-primary">
+              ✓ pipeline complete<span className="term-cursor" aria-hidden />
             </p>
           </div>
         </section>
+
+        {/* Pipeline strip */}
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-2 text-xs">
+          {PIPELINE.map((stage, i) => (
+            <React.Fragment key={stage}>
+              <span className="term-chip">{stage}</span>
+              {i < PIPELINE.length - 1 && <span className="text-primary/60">{"──›"}</span>}
+            </React.Fragment>
+          ))}
+        </div>
+
+        {/* Features */}
+        <section className="mt-20 grid w-full grid-cols-1 gap-4 text-left md:grid-cols-3">
+          {[
+            {
+              icon: Video,
+              title: "dev-bypass uploads",
+              body: "Bypasses cloud CDNs in dev mode, mirroring files to local mounts for immediate visual checks and faster iteration.",
+            },
+            {
+              icon: Brain,
+              title: "template codegen",
+              body: "A premium template engine fills curated Manim scenes from tiny parameter calls — no LLM writes code, so renders never rate-limit.",
+            },
+            {
+              icon: GraduationCap,
+              title: "student RAG tutor",
+              body: "Enrolled students query a chatbot grounded in lecture transcripts, with direct timestamp-linked citations.",
+            },
+          ].map(({ icon: Icon, title, body }) => (
+            <div key={title} className="term-card transition-colors hover:border-primary/40">
+              <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-sm border border-border text-primary">
+                <Icon className="h-4 w-4" />
+              </div>
+              <h3 className="term-caret font-semibold text-foreground">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
+            </div>
+          ))}
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 py-8 bg-slate-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-600">
-          &copy; {new Date().getFullYear()} LectureOS. Built for Next-Gen Educational Animations.
+      <footer className="border-t border-border py-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 text-xs text-muted-foreground sm:px-6">
+          <span>
+            <span className="text-primary">{"//"}</span> lectureos
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5" />
+            &copy; {new Date().getFullYear()} — next-gen educational animation
+          </span>
         </div>
       </footer>
     </div>

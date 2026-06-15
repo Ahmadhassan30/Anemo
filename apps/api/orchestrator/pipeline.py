@@ -24,6 +24,13 @@ from services.ffmpeg_service import get_audio_duration
 
 logger = logging.getLogger(__name__)
 
+# Final video is hard-capped to ~1 minute. We pick the most important concepts,
+# split the budget across them, and pace narration/animation to fit.
+MAX_VIDEO_CONCEPTS = 6
+TOTAL_VIDEO_BUDGET = 58.0  # seconds; headroom under the 60s hard cap
+MIN_CONCEPT_SECONDS = 6.0
+HARD_VIDEO_CAP = 60.0
+
 
 class LectureOSPipeline:
     """Orchestrates the full lecture → animation → publish pipeline."""
@@ -169,9 +176,28 @@ class LectureOSPipeline:
                 )
                 concepts: list[dict] = segmentation_result.get("concepts", [])
 
-            # ── Stage 3b: Generate narration + TTS per concept ───────
+            # ── Stage 3b: Select concepts + generate narration/TTS ───
             media_dir = Path(f"/tmp/lectures/{self.lecture_id}")
             media_dir.mkdir(parents=True, exist_ok=True)
+
+            # Keep the full concept set for RAG/chapters, but cap the *video*
+            # to the first N concepts so the final cut stays under ~1 minute.
+            ordered_concepts = sorted(concepts, key=lambda c: c.get("ts_start", 0.0))
+            video_concepts = ordered_concepts[:MAX_VIDEO_CONCEPTS]
+            if len(ordered_concepts) > len(video_concepts):
+                logger.info(
+                    "Video capped to %d/%d concepts to fit the %.0fs budget",
+                    len(video_concepts), len(ordered_concepts), TOTAL_VIDEO_BUDGET,
+                )
+            per_concept = max(
+                TOTAL_VIDEO_BUDGET / max(len(video_concepts), 1),
+                MIN_CONCEPT_SECONDS,
+            )
+            target_seconds = max(int(round(per_concept)), 6)
+            logger.info(
+                "Per-concept budget: %.1fs (%d concepts, target_seconds=%d)",
+                per_concept, len(video_concepts), target_seconds,
+            )
 
             await self.emit(self._make_event(
                 PipelineEventType.PROGRESS_UPDATE,
@@ -180,9 +206,11 @@ class LectureOSPipeline:
                 agent_name="narration",
             ))
 
-            for concept in concepts:
+            for concept in video_concepts:
                 segment = self._get_segment(concept, transcript)
-                script = await narration_service.generate_script(concept, segment)
+                script = await narration_service.generate_script(
+                    concept, segment, target_seconds=target_seconds,
+                )
                 tts_path = await tts_service.synthesize(
                     script,
                     str(media_dir / f"tts_{concept['id']}.mp3"),
@@ -190,26 +218,27 @@ class LectureOSPipeline:
                 duration = get_audio_duration(tts_path)
                 concept["narration_script"] = script
                 concept["tts_path"] = tts_path
-                concept["target_duration"] = max(duration, 30.0)
+                concept["target_duration"] = per_concept
                 concept["title"] = concept.get("concept") or concept.get("title", "")
                 logger.info(
-                    "Narration ready for '%s': %.1fs",
-                    concept["title"], concept["target_duration"],
+                    "Narration ready for '%s': %.1fs (budget %.1fs)",
+                    concept["title"], duration, per_concept,
                 )
 
             # ── Stage 4 (30→70%): CodeGen — sequential ─────────────
+            total_video = len(video_concepts)
             await self.emit(self._make_event(
                 PipelineEventType.AGENT_STARTED,
-                f"Starting codegen for {len(concepts)} concepts",
+                f"Starting codegen for {total_video} concepts",
                 30,
                 agent_name="codegen_agent",
             ))
 
             codegen_results: list[dict] = []
 
-            for i, concept in enumerate(concepts):
+            for i, concept in enumerate(video_concepts):
                 logger.info(
-                    f"Codegen concept {i+1}/{len(concepts)}: "
+                    f"Codegen concept {i+1}/{total_video}: "
                     f"{concept.get('title')}"
                 )
                 try:
@@ -230,23 +259,23 @@ class LectureOSPipeline:
                     })
 
                 # Emit a per-concept progress update
-                pct = 30 + int((i + 1) / len(concepts) * 40)
+                pct = 30 + int((i + 1) / max(total_video, 1) * 40)
                 await self.emit(self._make_event(
                     PipelineEventType.PROGRESS_UPDATE,
-                    f"Rendered concept {i + 1}/{len(concepts)}: "
+                    f"Rendered concept {i + 1}/{total_video}: "
                     f"{concept.get('concept', '')}",
                     pct,
                     agent_name="codegen_agent",
                 ))
 
-            # Merge clip_url back into concepts list for composition
+            # Merge clip_url back into the video concept list for composition
             clip_lookup = {r["concept_id"]: r["clip_url"] for r in codegen_results}
-            for c in concepts:
+            for c in video_concepts:
                 c["clip_url"] = clip_lookup.get(c["id"], c.get("clip_url"))
 
             await self.emit(self._make_event(
                 PipelineEventType.AGENT_COMPLETED,
-                f"codegen_agent completed — {len(concepts)} concepts rendered",
+                f"codegen_agent completed — {total_video} concepts rendered",
                 70,
                 agent_name="codegen_agent",
             ))
@@ -254,7 +283,7 @@ class LectureOSPipeline:
             # ── Stage 5 (70→80%): Composition ────────────────────────
             composition_result = await self._run_stage(
                 "composition", 70, 80,
-                concepts=concepts,
+                concepts=video_concepts,
                 audio_path=audio_path,
                 transcript=transcript,
             )

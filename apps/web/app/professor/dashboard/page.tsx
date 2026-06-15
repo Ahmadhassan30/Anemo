@@ -7,28 +7,65 @@ import { Button } from "@/components/ui/button";
 
 export default function ProfessorDashboardPage() {
   return (
-    <main className="container max-w-4xl mx-auto py-12 px-4">
-      <div className="flex items-center justify-between mb-8">
+    <main className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-100">Dashboard</h1>
-          <p className="text-slate-400 mt-2">Overview of lectures, pipeline status, and analytics.</p>
+          <p className="term-label mb-2">{"// professor"}</p>
+          <h1 className="term-prompt text-3xl font-bold tracking-tight text-foreground">
+            dashboard
+            <span className="term-cursor align-middle" aria-hidden />
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            overview of lectures, pipeline status, and analytics.
+          </p>
         </div>
         <Link href="/professor/upload">
-          <Button className="bg-blue-600 hover:bg-blue-500 text-white">
-            + New Lecture
+          <Button className="term-btn term-btn-primary h-9 px-4 text-xs">
+            $ new_lecture
           </Button>
         </Link>
       </div>
 
-      <div className="bg-[#0f1117] border border-slate-800 rounded-lg p-8 text-center">
-        <h2 className="text-xl font-semibold text-slate-200 mb-2">No Lectures Yet</h2>
-        <p className="text-slate-400 mb-6">Upload a video lecture to get started with concept extraction and animation.</p>
-        <Link href="/professor/upload">
-          <Button variant="outline" className="border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800 hover:text-white">
-            Upload Your First Lecture
-          </Button>
-        </Link>
+      <div className="mb-6 flex flex-wrap items-center gap-2 text-xs">
+        <span className="term-chip">
+          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
+          lectures: 0
+        </span>
+        <span className="term-chip">
+          <span className="h-1.5 w-1.5 rounded-full bg-term-amber" />
+          pipeline: idle
+        </span>
+        <span className="term-chip">
+          <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
+          ready
+        </span>
       </div>
+
+      <section className="term-window pt-9">
+        <div className="absolute right-4 top-3 text-[11px] text-muted-foreground">~/lectures</div>
+        <div className="px-6 pb-10 pt-2 text-center">
+          <p className="text-muted-foreground">
+            <span className="text-primary">{"› "}</span>
+            no lectures found
+          </p>
+          <h2 className="term-caret mt-4 text-xl font-semibold text-foreground">
+            queue is empty
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+            upload a video lecture to start concept extraction and animation.
+          </p>
+          <div className="mt-7 flex justify-center">
+            <Link href="/professor/upload">
+              <Button
+                variant="outline"
+                className="term-btn px-5 py-2 text-sm"
+              >
+                $ upload_first_lecture
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

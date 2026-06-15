@@ -72,33 +72,50 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#0f1117]">
-      <div className="p-4 border-b border-slate-800 bg-slate-900/50">
-        <h3 className="font-semibold text-slate-200">Lecture Chat</h3>
-        <p className="text-xs text-slate-500">Ask questions about the material</p>
+    <div className="flex flex-col h-full bg-background">
+      {/* titlebar */}
+      <div className="relative px-4 pt-3 pb-2.5 border-b border-border bg-card">
+        <div className="absolute left-4 top-[15px] h-2 w-2 rounded-full bg-term-red opacity-85 shadow-[16px_0_0_var(--term-amber),32px_0_0_var(--term-green)]" />
+        <div className="pl-12">
+          <h3 className="term-caret text-sm font-semibold text-foreground">lecture_chat</h3>
+          <p className="text-xs text-muted-foreground">
+            <span className="text-primary">{"// "}</span>query the transcript_rag tutor
+          </p>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-6" ref={scrollRef}>
+        {messages.length === 0 && !loading && (
+          <p className="text-xs text-muted-foreground">
+            <span className="text-primary">{"› "}</span>no messages yet — ask a question to begin
+            <span className="term-cursor align-middle" aria-hidden />
+          </p>
+        )}
+
         {messages.map((msg, i) => (
           <div key={msg.id || i} className={`flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}>
-            <div 
-              className={`max-w-[90%] p-3 rounded-xl text-sm ${
-                msg.role === "user" 
-                  ? "bg-blue-600 text-white rounded-br-none" 
-                  : "bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700"
+            <span className="mb-1 px-1 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+              {msg.role === "user" ? "$ you" : "› tutor"}
+            </span>
+            <div
+              className={`max-w-[90%] px-3 py-2.5 rounded-sm text-sm leading-relaxed border ${
+                msg.role === "user"
+                  ? "border-primary/40 bg-primary/10 text-foreground"
+                  : "border-border bg-card text-foreground"
               }`}
             >
               {msg.content}
             </div>
-            
+
             {msg.role === "assistant" && msg.citations && msg.citations.length > 0 && (
               <div className="mt-2 w-[90%] space-y-2">
+                <span className="term-label text-[10px]">// citations</span>
                 {msg.citations.map((cit, idx) => (
-                  <CitationCard 
-                    key={idx} 
-                    ts_start={cit.ts_start} 
-                    chunk_text={cit.chunk_text} 
-                    concept_id={cit.concept_id} 
+                  <CitationCard
+                    key={idx}
+                    ts_start={cit.ts_start}
+                    chunk_text={cit.chunk_text}
+                    concept_id={cit.concept_id}
                   />
                 ))}
               </div>
@@ -107,27 +124,31 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
         ))}
 
         {loading && (
-          <div className="flex items-start">
-            <div className="max-w-[80%] p-3 rounded-xl rounded-bl-none bg-slate-800 border border-slate-700 flex items-center gap-2">
-              <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce"></span>
-              <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce delay-75"></span>
-              <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce delay-150"></span>
+          <div className="flex flex-col items-start">
+            <span className="mb-1 px-1 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+              › tutor
+            </span>
+            <div className="max-w-[80%] px-3 py-2.5 rounded-sm border border-border bg-card flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="text-primary">{"› "}</span>thinking
+              <span className="term-cursor" aria-hidden />
             </div>
           </div>
         )}
       </div>
 
-      <div className="p-4 border-t border-slate-800 bg-slate-900/50 flex gap-2">
-        <Input 
+      <div className="p-4 border-t border-border bg-card flex gap-2 items-center">
+        <span className="text-primary text-sm select-none">$</span>
+        <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask a question..."
-          className="bg-slate-950 border-slate-800"
+          placeholder="ask_a_question..."
+          className="term-input flex-1"
           disabled={loading}
         />
-        <Button onClick={handleSend} disabled={loading || !input.trim()} className="bg-blue-600 hover:bg-blue-500 shrink-0">
+        <Button onClick={handleSend} disabled={loading || !input.trim()} className="term-btn term-btn-primary shrink-0 h-9 px-3">
           <Send className="w-4 h-4" />
+          <span className="text-xs">send</span>
         </Button>
       </div>
     </div>

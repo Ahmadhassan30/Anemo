@@ -25,24 +25,37 @@ export default function StudentDashboard() {
   if (loading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+        <p className="text-sm text-muted-foreground">
+          <span className="text-primary">$ </span>
+          loading enrolled_lectures
+          <span className="term-cursor align-middle" aria-hidden />
+        </p>
       </div>
     );
   }
 
   if (lectures.length === 0) {
     return (
-      <div className="container max-w-4xl mx-auto py-16 px-4">
-        <div className="flex flex-col items-center justify-center text-center p-12 bg-[#0f1117] border border-slate-800 rounded-2xl shadow-xl">
-          <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mb-6">
-            <Library className="w-10 h-10 text-blue-500" />
+      <div className="container mx-auto max-w-4xl px-4 py-16">
+        <div className="term-window flex flex-col items-center justify-center px-6 pb-12 pt-14 text-center glow-ring">
+          <div className="absolute right-4 top-3 text-[11px] text-muted-foreground">~/student/learning</div>
+          <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-sm border border-border text-primary">
+            <Library className="h-7 w-7" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-100 mb-2">Welcome to LectureOS</h2>
-          <p className="text-slate-400 max-w-md mb-8">
-            You aren't enrolled in any lectures yet. Browse the catalog to find interactive lessons that bring concepts to life.
+          <span className="term-chip mb-5">
+            <span className="h-1.5 w-1.5 rounded-full bg-term-amber" />
+            no_enrollments
+          </span>
+          <h2 className="mb-3 text-2xl font-bold text-foreground">
+            <span className="term-prompt text-muted-foreground" />
+            welcome_to <span className="text-primary glow-text">lectureos</span>
+          </h2>
+          <p className="mb-8 max-w-md text-sm leading-relaxed text-muted-foreground">
+            // no lectures enrolled yet. browse the catalog to find interactive lessons
+            that bring concepts to life.
           </p>
-          <Button asChild className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-8 py-6 h-auto text-lg rounded-xl">
-            <Link href="/student/enroll">Browse Available Lectures</Link>
+          <Button asChild className="term-btn term-btn-primary h-auto px-6 py-3 text-base">
+            <Link href="/student/enroll">$ browse_available_lectures</Link>
           </Button>
         </div>
       </div>
@@ -50,40 +63,47 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto py-12 px-4">
-      <div className="flex items-center justify-between mb-8">
+    <div className="container mx-auto max-w-6xl px-4 py-12">
+      <div className="mb-8 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-100 flex items-center gap-3">
-            <GraduationCap className="w-8 h-8 text-blue-500" />
-            My Learning
+          <span className="term-label">// student</span>
+          <h1 className="mt-2 flex items-center gap-3 text-3xl font-bold text-foreground">
+            <GraduationCap className="h-7 w-7 text-primary" />
+            my_learning
+            <span className="term-cursor align-middle" aria-hidden />
           </h1>
-          <p className="text-slate-400 mt-2">Continue where you left off</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            <span className="text-primary">{"› "}</span>
+            continue where you left off — {lectures.length} enrolled
+          </p>
         </div>
-        <Button asChild variant="outline" className="border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700">
-          <Link href="/student/enroll">Browse Catalog</Link>
+        <Button asChild className="term-btn h-auto px-4 py-2">
+          <Link href="/student/enroll">browse_catalog</Link>
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <hr className="term-rule mb-8" />
+
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {lectures.map((lecture) => (
-          <Card key={lecture.id} className="bg-[#0f1117] border-slate-800 text-slate-200 hover:border-blue-500/50 transition-colors flex flex-col">
-            <CardHeader className="pb-4">
-              <div className="w-full aspect-video bg-slate-900 rounded-lg border border-slate-800 mb-4 flex items-center justify-center relative overflow-hidden group">
-                <PlayCircle className="w-12 h-12 text-slate-600 group-hover:text-blue-500 transition-colors z-10 relative" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f1117] to-transparent z-0 opacity-80" />
+          <Card key={lecture.id} className="term-card flex flex-col p-0 transition-colors hover:border-primary/40">
+            <CardHeader className="p-5 pb-4">
+              <div className="group relative mb-4 flex aspect-video w-full items-center justify-center overflow-hidden rounded-sm border border-border bg-background">
+                <PlayCircle className="relative z-10 h-12 w-12 text-muted-foreground transition-colors group-hover:text-primary" />
+                <span className="absolute left-2 top-2 z-10 text-[10px] text-muted-foreground">{"// preview"}</span>
               </div>
-              <CardTitle className="text-lg line-clamp-2">{lecture.title}</CardTitle>
+              <CardTitle className="term-caret line-clamp-2 text-base font-semibold text-foreground">{lecture.title}</CardTitle>
             </CardHeader>
-            <CardContent className="pb-2 flex-1">
-              <div className="flex items-center gap-2 text-sm text-slate-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                Ready to watch
-              </div>
+            <CardContent className="flex-1 px-5 pb-2">
+              <span className="term-chip">
+                <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
+                ready_to_watch
+              </span>
             </CardContent>
-            <CardFooter className="pt-4 border-t border-slate-800">
-              <Button asChild className="w-full bg-slate-800 hover:bg-blue-600 text-slate-200 hover:text-white border border-slate-700 hover:border-blue-500 transition-all">
+            <CardFooter className="border-t border-border p-5 pt-4">
+              <Button asChild className="term-btn term-btn-primary w-full">
                 <Link href={`/student/lectures/${lecture.id}`}>
-                  Watch Lecture
+                  $ watch_lecture
                 </Link>
               </Button>
             </CardFooter>

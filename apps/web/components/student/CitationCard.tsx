@@ -20,16 +20,21 @@ export function CitationCard({ ts_start, chunk_text, concept_id }: CitationCardP
   };
 
   return (
-    <Card 
+    <Card
       onClick={() => seekTo(ts_start)}
-      className="mt-2 p-3 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 cursor-pointer transition-colors group flex flex-col gap-2 rounded-lg"
+      className="term-panel group mt-2 flex cursor-pointer flex-col gap-2 p-3 transition-colors hover:border-primary/50 hover:bg-secondary/40"
     >
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-400 group-hover:text-blue-300">
-        <Clock className="w-3.5 h-3.5" />
-        {formatTime(ts_start)}
+      <div className="flex items-center justify-between gap-2">
+        <span className="term-chip border-primary/40 text-primary">
+          <Clock className="h-3 w-3" />
+          {formatTime(ts_start)}
+        </span>
+        <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors group-hover:text-primary">
+          seek<span className="term-cursor align-middle" aria-hidden />
+        </span>
       </div>
-      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
-        "{chunk_text}"
+      <p className="term-caret line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+        {chunk_text}
       </p>
     </Card>
   );
