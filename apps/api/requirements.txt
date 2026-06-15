@@ -7,7 +7,6 @@ asyncpg
 alembic
 psycopg2-binary
 pgvector
-google-generativeai
 redis
 celery[redis]
 python-multipart

@@ -135,7 +135,7 @@ class LectureOSPipeline:
             )
             concepts: list[dict] = segmentation_result.get("concepts", [])
 
-            # ── Stage 4 (30→70%): CodeGen — parallelized ─────────────
+            # ── Stage 4 (30→70%): CodeGen — sequential ─────────────
             await self.emit(self._make_event(
                 PipelineEventType.AGENT_STARTED,
                 f"Starting codegen for {len(concepts)} concepts",
@@ -143,60 +143,57 @@ class LectureOSPipeline:
                 agent_name="codegen_agent",
             ))
 
-            sem = asyncio.Semaphore(3)
             codegen_results: list[dict] = []
 
             # Collect the transcript segments per concept for the coder
             segments = transcript.get("segments", [])
 
-            async def _gen_one(concept: dict, idx: int) -> dict:
-                async with sem:
-                    # Gather transcript text that falls within this concept
-                    ts_s = concept.get("ts_start", 0)
-                    ts_e = concept.get("ts_end", 0)
-                    seg_texts = [
-                        s.get("text", "")
-                        for s in segments
-                        if ts_s <= (s.get("start", 0) + s.get("end", 0)) / 2 <= ts_e
-                    ]
-                    transcript_segment = " ".join(seg_texts)
+            for i, concept in enumerate(concepts):
+                logger.info(
+                    f"Processing concept {i+1}/{len(concepts)}: "
+                    f"{concept.get('concept', concept.get('title', ''))}"
+                )
 
-                    # Create a fresh database session for this concurrent task to avoid InterfaceError
-                    from db.session import async_session_maker
-                    async with async_session_maker() as task_db:
+                # Gather transcript text that falls within this concept
+                ts_s = concept.get("ts_start", 0)
+                ts_e = concept.get("ts_end", 0)
+                seg_texts = [
+                    s.get("text", "")
+                    for s in segments
+                    if ts_s <= (s.get("start", 0) + s.get("end", 0)) / 2 <= ts_e
+                ]
+                transcript_segment = " ".join(seg_texts)
+
+                # Create a fresh database session for this task
+                from db.session import async_session_maker
+                async with async_session_maker() as task_db:
+                    try:
                         result = await self.agents["codegen"].execute_with_retry(
                             self.lecture_id,
                             task_db,
                             concept=concept,
                             transcript_segment=transcript_segment,
                         )
+                        codegen_results.append(result)
+                    except Exception as exc:
+                        await self.emit(self._make_event(
+                            PipelineEventType.AGENT_FAILED,
+                            f"codegen_agent failed: {exc}",
+                            50,
+                            agent_name="codegen_agent",
+                            metadata={"error": str(exc)},
+                        ))
+                        raise
 
-                    # Emit a per-concept progress update
-                    pct = 30 + int((idx + 1) / len(concepts) * 40)
-                    await self.emit(self._make_event(
-                        PipelineEventType.PROGRESS_UPDATE,
-                        f"Rendered concept {idx + 1}/{len(concepts)}: "
-                        f"{concept.get('concept', '')}",
-                        pct,
-                        agent_name="codegen_agent",
-                    ))
-                    return result
-
-            tasks = [
-                _gen_one(c, i) for i, c in enumerate(concepts)
-            ]
-
-            try:
-                codegen_results = await asyncio.gather(*tasks)
-            except Exception as exc:
+                # Emit a per-concept progress update
+                pct = 30 + int((i + 1) / len(concepts) * 40)
                 await self.emit(self._make_event(
-                    PipelineEventType.AGENT_FAILED,
-                    f"codegen_agent failed: {exc}",
-                    50,
+                    PipelineEventType.PROGRESS_UPDATE,
+                    f"Rendered concept {i + 1}/{len(concepts)}: "
+                    f"{concept.get('concept', '')}",
+                    pct,
                     agent_name="codegen_agent",
-                    metadata={"error": str(exc)},
                 ))
-                raise
 
             # Merge clip_url back into concepts list for composition
             clip_lookup = {r["concept_id"]: r["clip_url"] for r in codegen_results}
