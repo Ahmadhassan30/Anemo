@@ -3,10 +3,11 @@ import { getBackendBaseUrl } from "@/lib/backend-url";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { path: string[] } },
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
+  const { path } = await params;
   const backendBase = getBackendBaseUrl();
-  const filePath = params.path.join("/");
+  const filePath = path.join("/");
   const url = `${backendBase}/static/${filePath}`;
 
   const res = await fetch(url);
@@ -22,3 +23,4 @@ export async function GET(
 
   return new NextResponse(res.body, { status: res.status, headers });
 }
+
