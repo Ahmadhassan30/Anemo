@@ -82,7 +82,7 @@ async def extract_audio(video_url: str, output_path: str) -> str:
 
 
 async def concat_clips(clip_paths: List[str], output_path: str) -> str:
-    """Concatenate MP4 clips in order using the ffmpeg concat demuxer.
+    """Concatenate MP4 clips in order using the ffmpeg concat filter (re-encoding for safety).
 
     Args:
         clip_paths: Ordered list of local MP4 file paths.
@@ -97,23 +97,20 @@ async def concat_clips(clip_paths: List[str], output_path: str) -> str:
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
 
-    # Write the concat list file next to the output
-    list_file = out.with_suffix(".concat_list.txt")
-    try:
-        lines = "\n".join(
-            f"file '{Path(p).resolve()}'" for p in clip_paths
-        )
-        list_file.write_text(lines, encoding="utf-8")
-
-        stream = (
-            ffmpeg
-            .input(str(list_file), format="concat", safe=0)
-            .output(str(out), c="copy")
-        )
-        await asyncio.to_thread(_run_ffmpeg_sync, stream)
-    finally:
-        list_file.unlink(missing_ok=True)
-
+    inputs = [ffmpeg.input(str(Path(p).resolve())) for p in clip_paths]
+    
+    # Concatenate both video and audio streams
+    joined = ffmpeg.concat(*inputs, v=1, a=1)
+    
+    stream = ffmpeg.output(
+        joined.video,
+        joined.audio,
+        str(out),
+        vcodec="libx264",
+        acodec="aac",
+        pix_fmt="yuv420p",
+    )
+    await asyncio.to_thread(_run_ffmpeg_sync, stream)
     return str(out.resolve())
 
 
@@ -173,7 +170,7 @@ async def burn_captions(
     srt_path: str,
     output_path: str,
 ) -> str:
-    """Burn SRT subtitles directly into the video stream.
+    """Burn SRT subtitles directly into the video stream, keeping the audio stream.
 
     Args:
         video_path: Local path to the source video.
@@ -190,12 +187,13 @@ async def burn_captions(
     # escaped colons; on Linux raw paths work fine.
     srt_escaped = str(Path(srt_path).resolve()).replace("\\", "/").replace(":", "\\:")
 
-    stream = (
-        ffmpeg
-        .input(str(Path(video_path).resolve()))
-        .video
-        .filter("subtitles", srt_escaped)
-        .output(str(out), acodec="copy")
+    input_file = ffmpeg.input(str(Path(video_path).resolve()))
+    stream = ffmpeg.output(
+        input_file.video.filter("subtitles", srt_escaped),
+        input_file.audio,
+        str(out),
+        vcodec="libx264",
+        acodec="copy",
     )
     await asyncio.to_thread(_run_ffmpeg_sync, stream)
     return str(out.resolve())
