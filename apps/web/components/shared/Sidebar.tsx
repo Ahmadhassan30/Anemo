@@ -17,8 +17,8 @@ export function Sidebar({ items = [] }: { items?: SidebarItem[] }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-48 flex-col border-r border-zinc-800 bg-zinc-900">
-      <nav className="flex flex-1 flex-col py-3">
+    <aside className="flex w-60 shrink-0 flex-col border-r border-line bg-surface/60 p-3">
+      <nav className="flex flex-1 flex-col gap-1">
         {items.map((item) => {
           const active = pathname === item.href || pathname?.startsWith(item.href + "/");
           return (
@@ -26,10 +26,8 @@ export function Sidebar({ items = [] }: { items?: SidebarItem[] }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "mx-2 rounded px-3 py-2 text-sm transition-colors duration-150",
-                active
-                  ? "bg-indigo-950 text-indigo-400"
-                  : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                "rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors",
+                active ? "bg-accent/10 text-accent" : "text-subtle hover:bg-fill hover:text-ink"
               )}
             >
               {item.label}
@@ -37,7 +35,7 @@ export function Sidebar({ items = [] }: { items?: SidebarItem[] }) {
           );
         })}
       </nav>
-      <div className="px-4 py-3 font-mono text-[10px] text-zinc-700">v0.1.0</div>
+      <div className="px-3.5 py-2 text-xs text-faint">v0.1.0</div>
     </aside>
   );
 }

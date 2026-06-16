@@ -11,7 +11,7 @@ export function Dialog({ children, className, ...props }: DialogProps) {
   return (
     <div
       role="dialog"
-      className={`rounded border border-zinc-800 bg-zinc-900 p-5 ${className ?? ""}`}
+      className={`rounded-2xl border border-line bg-surface p-6 text-ink shadow-lg ${className ?? ""}`}
       {...props}
     >
       {children}

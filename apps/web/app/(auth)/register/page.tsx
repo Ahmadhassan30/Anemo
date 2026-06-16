@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { TerminalAnimation } from "@/components/TerminalAnimation";
+import { Terminal, AnimatedSpan, TypingAnimation } from "@/components/magicui/terminal";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -52,73 +52,73 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-zinc-950">
-      {/* Left column — brand + tagline + terminal */}
-      <div className="hidden flex-1 flex-col justify-between bg-zinc-950 p-12 lg:flex">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">
-            <span className="text-indigo-400">›</span> LectureOS
-          </h1>
-          <p className="mt-3 max-w-sm text-sm text-zinc-300">
-            Turn lectures into animated explanations. Author once, render
-            everywhere.
+    <div className="grid min-h-screen lg:grid-cols-2">
+      {/* Left — brand + live demo */}
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-[#f5f7fb] via-canvas to-[#eef1f6] p-12 lg:flex">
+        <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
+          <span className="grid h-7 w-7 place-items-center rounded-lg bg-ink text-white">L</span>
+          LectureOS
+        </Link>
+
+        <div className="max-w-md">
+          <h2 className="text-3xl font-semibold leading-tight tracking-tight text-ink">
+            Turn any lecture into an animated course.
+          </h2>
+          <p className="mt-3 text-[15px] leading-relaxed text-subtle">
+            Upload a recording. Watch the pipeline transcribe, segment, animate and narrate it —
+            live, in your terminal.
           </p>
+
+          <Terminal className="mt-8" title="lectureos — pipeline">
+            <TypingAnimation className="text-term-fg">&gt; lectureos render lecture.mp4</TypingAnimation>
+            <AnimatedSpan delay={1400} className="text-term-green">✔ extracting audio</AnimatedSpan>
+            <AnimatedSpan delay={2000} className="text-term-green">✔ transcribing — whisper</AnimatedSpan>
+            <AnimatedSpan delay={2600} className="text-term-green">✔ segmenting concepts — 6 found</AnimatedSpan>
+            <AnimatedSpan delay={3300} className="text-term-blue">▸ rendering manim scenes…</AnimatedSpan>
+            <AnimatedSpan delay={4000} className="text-term-green">✔ composing 1080p60 + narration</AnimatedSpan>
+            <TypingAnimation delay={4700} className="text-term-muted">Done — 00:58 / 60s. Ready to publish.</TypingAnimation>
+          </Terminal>
         </div>
 
-        <div className="my-10">
-          <TerminalAnimation />
-        </div>
-
-        <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-600">
-          ~/lectureos/register
-        </p>
+        <p className="text-xs text-faint">© {new Date().getFullYear()} LectureOS</p>
       </div>
 
-      {/* Right column — register form */}
-      <div className="flex w-full flex-col justify-center border-l border-zinc-800 bg-zinc-900 px-6 py-12 lg:w-[480px] lg:px-12">
-        <div className="mx-auto w-full max-w-sm">
-          <div className="mb-8">
-            <p className="text-[10px] uppercase tracking-widest text-zinc-500">
-              auth / register
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-100">
-              Create account
-            </h2>
-            <p className="mt-2 text-sm text-zinc-500">
-              Publish lectures or follow along — pick a role to begin.
-            </p>
-          </div>
+      {/* Right — register */}
+      <div className="flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm">
+          <Link href="/" className="mb-10 flex items-center gap-2 text-[15px] font-semibold tracking-tight lg:hidden">
+            <span className="grid h-7 w-7 place-items-center rounded-lg bg-ink text-white">L</span>
+            LectureOS
+          </Link>
+
+          <h1 className="text-[28px] font-semibold tracking-tight text-ink">Create account</h1>
+          <p className="mt-1.5 text-[15px] text-subtle">Publish lectures or follow along — pick a role to begin.</p>
 
           {error && (
-            <div className="mb-6 flex items-start gap-3 rounded border border-red-800 bg-red-950 p-3 text-sm text-red-400">
+            <div className="mt-6 flex items-start gap-2 rounded-xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
               <span aria-hidden>✘</span>
-              <p>
-                <span className="font-mono text-zinc-500">err: </span>
-                {error}
-              </p>
+              <p>{error}</p>
             </div>
           )}
 
           {success && (
-            <div className="mb-6 flex items-start gap-3 rounded border border-green-800 bg-green-950 p-3 text-sm text-green-400">
-              <span aria-hidden>✔</span>
+            <div className="mt-6 flex items-start gap-2 rounded-xl border border-positive/20 bg-positive/5 px-4 py-3 text-sm text-positive">
+              <span aria-hidden>✓</span>
               <p>Account created — redirecting to sign in →</p>
             </div>
           )}
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label className="mb-2 block text-[10px] uppercase tracking-widest text-zinc-500">
-                Account type
-              </label>
+          <form className="mt-7 space-y-4" onSubmit={handleSubmit}>
+            <div className="space-y-1.5">
+              <label className="text-[13px] font-medium text-subtle">Account type</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setRole("professor")}
-                  className={`flex items-center justify-center gap-2 rounded border py-2.5 text-sm transition-colors duration-150 ${
+                  className={`flex items-center justify-center gap-2 rounded-xl border py-3 text-sm transition-all duration-200 ${
                     role === "professor"
-                      ? "border-zinc-700 bg-indigo-950 text-indigo-400"
-                      : "border-zinc-800 bg-zinc-800 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
+                      ? "border-accent bg-accent/5 text-accent"
+                      : "border-line bg-surface text-subtle hover:border-line-strong"
                   }`}
                 >
                   <span aria-hidden>{role === "professor" ? "●" : "○"}</span>
@@ -127,10 +127,10 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setRole("student")}
-                  className={`flex items-center justify-center gap-2 rounded border py-2.5 text-sm transition-colors duration-150 ${
+                  className={`flex items-center justify-center gap-2 rounded-xl border py-3 text-sm transition-all duration-200 ${
                     role === "student"
-                      ? "border-zinc-700 bg-indigo-950 text-indigo-400"
-                      : "border-zinc-800 bg-zinc-800 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
+                      ? "border-accent bg-accent/5 text-accent"
+                      : "border-line bg-surface text-subtle hover:border-line-strong"
                   }`}
                 >
                   <span aria-hidden>{role === "student" ? "●" : "○"}</span>
@@ -139,55 +139,44 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div>
-              <label className="mb-2 block text-[10px] uppercase tracking-widest text-zinc-500">
-                Email address
-              </label>
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-[13px] font-medium text-subtle">Email</label>
               <input
+                id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@school.edu"
-                className="w-full rounded border border-zinc-800 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 transition-colors duration-150 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                placeholder="you@university.edu"
+                className="w-full rounded-xl border border-line bg-surface px-4 py-3 text-[15px] text-ink placeholder:text-faint transition-shadow duration-200 focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/12"
               />
             </div>
 
-            <div>
-              <label className="mb-2 block text-[10px] uppercase tracking-widest text-zinc-500">
-                Password
-              </label>
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="text-[13px] font-medium text-subtle">Password</label>
               <input
+                id="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="•••••••• (min 8 chars)"
-                className="w-full rounded border border-zinc-800 bg-zinc-800 px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 transition-colors duration-150 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-xl border border-line bg-surface px-4 py-3 text-[15px] text-ink placeholder:text-faint transition-shadow duration-200 focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/12"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading || success}
-              className="w-full rounded bg-indigo-500 py-2.5 text-sm font-semibold text-zinc-100 transition-colors duration-150 hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 flex h-12 w-full items-center justify-center rounded-full bg-accent text-[15px] font-medium text-white shadow-sm transition-all duration-200 hover:bg-accent-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? (
-                <span className="font-mono">⟳ Creating account...</span>
-              ) : (
-                "Create account"
-              )}
+              {loading ? "Creating account…" : "Create account"}
             </button>
           </form>
 
-          <hr className="my-6 border-zinc-800" />
-
-          <p className="text-center text-sm text-zinc-500">
+          <p className="mt-7 text-center text-sm text-subtle">
             Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-indigo-400 transition-colors duration-150 hover:text-indigo-400"
-            >
+            <Link href="/login" className="font-medium text-accent hover:underline">
               Sign in →
             </Link>
           </p>

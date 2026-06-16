@@ -11,20 +11,25 @@ export type LectureCardProps = {
 export function LectureCard({ title, status }: LectureCardProps) {
   const pill =
     status === "completed"
-      ? "bg-green-950 text-green-400 border-green-800"
+      ? "bg-positive/10 text-positive"
       : status === "running"
-        ? "bg-yellow-950 text-yellow-300 border-yellow-800 animate-pulse"
+        ? "bg-accent/10 text-accent"
         : status === "failed"
-          ? "bg-red-950 text-red-400 border-red-800"
-          : "bg-zinc-800 text-zinc-400 border-zinc-700";
+          ? "bg-danger/10 text-danger"
+          : "bg-fill text-subtle";
 
   return (
-    <article className="cursor-pointer rounded border border-zinc-800 bg-zinc-900 p-5 transition-all duration-150 hover:-translate-y-px hover:border-zinc-700">
+    <article className="cursor-pointer rounded-2xl border border-line bg-surface p-5 shadow-sm transition-all duration-200 hover:shadow">
       <div className="flex items-start justify-between gap-3">
-        <h3 className="truncate font-medium text-zinc-100">{title}</h3>
-        <span className={`pill ${pill}`}>{status ?? "unknown"}</span>
+        <h3 className="truncate font-medium text-ink">{title}</h3>
+        <span className={`pill ${pill}`}>
+          {status === "running" && (
+            <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+          )}
+          {status ?? "unknown"}
+        </span>
       </div>
-      <p className="mt-3 text-[10px] uppercase tracking-widest text-zinc-600">lecture</p>
+      <p className="mt-3 text-[10px] uppercase tracking-widest text-faint">lecture</p>
     </article>
   );
 }

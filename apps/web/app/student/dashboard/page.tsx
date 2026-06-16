@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
 
 export default function StudentDashboard() {
   const { data: session } = useSession();
@@ -21,52 +22,53 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center bg-zinc-950">
-        <p className="font-mono text-sm text-zinc-500">
-          <span className="text-green-400">$ </span>
-          loading...
-        </p>
+      <div className="flex min-h-[60vh] items-center justify-center bg-canvas">
+        <p className="text-sm text-subtle">Loading your lectures…</p>
       </div>
     );
   }
 
   if (lectures.length === 0) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center bg-zinc-950 px-8 py-12 text-center">
-        <p className="mb-6 font-mono text-sm text-zinc-500">$ no enrolled lectures yet</p>
-        <Link
-          href="/student/enroll"
-          className="rounded bg-indigo-500 px-4 py-2 text-sm font-medium text-zinc-100 transition-colors duration-150 hover:bg-indigo-400"
-        >
-          Browse catalog →
-        </Link>
+      <div className="flex min-h-[70vh] flex-col items-center justify-center bg-canvas px-6 py-16 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">No lectures yet</h1>
+        <p className="mt-2 max-w-sm text-[15px] leading-relaxed text-subtle">
+          You haven&apos;t enrolled in any lectures. Browse the catalog to get started.
+        </p>
+        <Button asChild className="mt-7" size="lg">
+          <Link href="/student/enroll">Browse catalog →</Link>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950">
-      <header className="px-8 py-12">
-        <h1 className="text-3xl font-light tracking-tight text-zinc-100">Your lectures</h1>
-        <p className="mt-2 font-mono text-sm text-zinc-500">
-          continue where you left off — {lectures.length} enrolled
-        </p>
-      </header>
+    <div className="min-h-screen bg-canvas">
+      <div className="mx-auto w-full max-w-6xl px-6">
+        <header className="pt-16 pb-10">
+          <h1 className="text-4xl font-semibold tracking-tight text-ink">Your lectures</h1>
+          <p className="mt-2 text-[15px] text-subtle">
+            Continue where you left off — {lectures.length} enrolled
+          </p>
+        </header>
 
-      <div className="grid grid-cols-3 gap-4 px-8 pb-12">
-        {lectures.map((lecture) => (
-          <Link
-            key={lecture.id}
-            href={`/student/lectures/${lecture.id}`}
-            className="flex flex-col rounded border border-zinc-800 bg-zinc-900 p-5 transition-all duration-150 hover:-translate-y-px hover:border-zinc-700"
-          >
-            <h2 className="line-clamp-2 text-base font-semibold tracking-tight text-zinc-100">{lecture.title}</h2>
-            <span className="mt-4 inline-flex w-fit items-center gap-2 rounded border border-zinc-800 bg-zinc-800 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-green-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
-              ready to watch
-            </span>
-          </Link>
-        ))}
+        <div className="grid gap-5 pb-16 sm:grid-cols-2 lg:grid-cols-3">
+          {lectures.map((lecture) => (
+            <Link
+              key={lecture.id}
+              href={`/student/lectures/${lecture.id}`}
+              className="group flex flex-col rounded-2xl border border-line bg-surface p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-md"
+            >
+              <h2 className="line-clamp-2 text-lg font-semibold tracking-tight text-ink">
+                {lecture.title}
+              </h2>
+              <span className="pill mt-5 w-fit bg-positive/10 text-positive">
+                <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-positive" />
+                Ready to watch
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

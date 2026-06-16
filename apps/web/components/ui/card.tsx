@@ -5,7 +5,10 @@ export type CardProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function Card({ children, className, ...props }: CardProps) {
   return (
-    <div className={cn("rounded border border-zinc-800 bg-zinc-900 text-zinc-300", className)} {...props}>
+    <div
+      className={cn("rounded-2xl border border-line bg-surface text-ink shadow-sm", className)}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -13,7 +16,7 @@ export function Card({ children, className, ...props }: CardProps) {
 
 export function CardHeader({ children, className, ...props }: CardProps) {
   return (
-    <div className={cn("flex flex-col space-y-1.5 p-5", className)} {...props}>
+    <div className={cn("flex flex-col space-y-1.5 p-6", className)} {...props}>
       {children}
     </div>
   );
@@ -21,7 +24,7 @@ export function CardHeader({ children, className, ...props }: CardProps) {
 
 export function CardTitle({ children, className, ...props }: CardProps) {
   return (
-    <h3 className={cn("font-semibold tracking-tight text-zinc-100", className)} {...props}>
+    <h3 className={cn("text-lg font-semibold tracking-tight text-ink", className)} {...props}>
       {children}
     </h3>
   );
@@ -29,7 +32,7 @@ export function CardTitle({ children, className, ...props }: CardProps) {
 
 export function CardDescription({ children, className, ...props }: CardProps) {
   return (
-    <p className={cn("text-sm text-zinc-500", className)} {...props}>
+    <p className={cn("text-sm text-subtle", className)} {...props}>
       {children}
     </p>
   );
@@ -37,7 +40,7 @@ export function CardDescription({ children, className, ...props }: CardProps) {
 
 export function CardContent({ children, className, ...props }: CardProps) {
   return (
-    <div className={cn("p-5 pt-0", className)} {...props}>
+    <div className={cn("p-6 pt-0", className)} {...props}>
       {children}
     </div>
   );
@@ -45,7 +48,7 @@ export function CardContent({ children, className, ...props }: CardProps) {
 
 export function CardFooter({ children, className, ...props }: CardProps) {
   return (
-    <div className={cn("flex items-center p-5 pt-0", className)} {...props}>
+    <div className={cn("flex items-center p-6 pt-0", className)} {...props}>
       {children}
     </div>
   );

@@ -21,18 +21,18 @@ export function CitationCard({ ts_start, chunk_text, concept_id }: CitationCardP
   return (
     <Card
       onClick={() => seekTo(ts_start)}
-      className="group mt-2 flex cursor-pointer flex-col gap-2 rounded border border-zinc-800 bg-zinc-950 p-2.5 transition-colors duration-150 hover:border-zinc-700"
+      className="group mt-2 flex cursor-pointer flex-col gap-2 rounded-xl border border-line bg-surface p-3 shadow-sm transition-colors duration-200 hover:bg-fill"
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="flex items-center gap-1.5 font-mono text-xs text-zinc-500">
+        <span className="flex items-center gap-1.5 font-mono text-xs text-accent">
           <span aria-hidden>▸</span>
           {formatTime(ts_start)}
         </span>
-        <span className="text-[10px] uppercase tracking-widest text-zinc-500 transition-colors duration-150 group-hover:text-zinc-300">
+        <span className="text-[10px] uppercase tracking-widest text-faint transition-colors duration-200 group-hover:text-accent">
           seek →
         </span>
       </div>
-      <p className="line-clamp-2 text-xs leading-relaxed text-zinc-400">
+      <p className="line-clamp-2 text-xs leading-relaxed text-subtle">
         {chunk_text}
       </p>
     </Card>

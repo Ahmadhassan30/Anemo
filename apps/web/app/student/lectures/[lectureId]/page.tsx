@@ -56,23 +56,25 @@ export default function StudentLectureView() {
 
   if (loading) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-3 bg-zinc-950">
-        <p className="font-mono text-sm text-zinc-500">
-          <span className="text-indigo-400">$ </span>loading_lecture...
-        </p>
+      <div className="flex h-screen flex-col items-center justify-center gap-3 bg-canvas">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-line border-t-accent" aria-hidden />
+        <p className="text-sm text-subtle">Loading lecture…</p>
       </div>
     );
   }
 
   if (!lecture) {
     return (
-      <div className="flex h-screen items-center justify-center bg-zinc-950 px-4">
-        <div className="max-w-md rounded border border-zinc-800 bg-zinc-900 px-6 py-5 text-center">
-          <p className="font-mono text-sm text-red-400">
-            <span className="text-indigo-400">{"› "}</span>✘ error: lecture_not_found
+      <div className="flex h-screen items-center justify-center bg-canvas px-4">
+        <div className="max-w-md rounded-2xl border border-line bg-surface px-6 py-5 text-center shadow-sm">
+          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-danger/10 text-danger">
+            ✕
+          </div>
+          <p className="mt-3 text-base font-semibold tracking-tight text-ink">
+            Lecture not found
           </p>
-          <p className="mt-2 text-sm text-zinc-300">
-            lecture not found or you are not enrolled.
+          <p className="mt-1.5 text-sm text-subtle">
+            This lecture doesn&apos;t exist or you are not enrolled.
           </p>
         </div>
       </div>
@@ -86,18 +88,18 @@ export default function StudentLectureView() {
     : (lecture.raw_video_url || "");
 
   return (
-    <div className="grid h-screen grid-cols-1 overflow-hidden bg-zinc-950 md:grid-cols-[1fr_380px]">
+    <div className="grid h-screen grid-cols-1 overflow-hidden bg-canvas md:grid-cols-[1fr_400px]">
 
       {/* Mobile Tab Bar (Visible only on small screens) */}
-      <div className="flex shrink-0 border-b border-zinc-800 bg-zinc-900 md:hidden">
-        <button onClick={() => setMobileView("video")} className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs transition-colors duration-150 ${mobileView === "video" ? "border-b-2 border-indigo-500 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}>
-          <span aria-hidden>●</span> video
+      <div className="flex shrink-0 border-b border-line bg-surface md:hidden">
+        <button onClick={() => setMobileView("video")} className={`flex flex-1 items-center justify-center gap-2 py-3.5 text-sm font-medium transition-colors duration-200 ${mobileView === "video" ? "border-b-2 border-accent text-ink" : "text-subtle hover:text-ink"}`}>
+          <span aria-hidden>●</span> Video
         </button>
-        <button onClick={() => setMobileView("notes")} className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs transition-colors duration-150 ${mobileView === "notes" ? "border-b-2 border-indigo-500 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}>
-          <span aria-hidden>≡</span> notes
+        <button onClick={() => setMobileView("notes")} className={`flex flex-1 items-center justify-center gap-2 py-3.5 text-sm font-medium transition-colors duration-200 ${mobileView === "notes" ? "border-b-2 border-accent text-ink" : "text-subtle hover:text-ink"}`}>
+          <span aria-hidden>≡</span> Notes
         </button>
-        <button onClick={() => setMobileView("interactive")} className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs transition-colors duration-150 ${mobileView === "interactive" ? "border-b-2 border-indigo-500 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}>
-          <span aria-hidden>○</span> interactive
+        <button onClick={() => setMobileView("interactive")} className={`flex flex-1 items-center justify-center gap-2 py-3.5 text-sm font-medium transition-colors duration-200 ${mobileView === "interactive" ? "border-b-2 border-accent text-ink" : "text-subtle hover:text-ink"}`}>
+          <span aria-hidden>○</span> Interactive
         </button>
       </div>
 
@@ -109,42 +111,43 @@ export default function StudentLectureView() {
         </div>
 
         {/* Lecture meta + concept tabs */}
-        <div className={`${mobileView === "notes" ? "block" : "hidden"} flex flex-1 flex-col overflow-hidden border-t border-zinc-800 bg-zinc-900 md:flex`}>
-          <div className="flex shrink-0 items-center gap-3 px-4 py-3">
-            <span className={`pill ${lecture.status === "completed" ? "bg-green-950 text-green-400 border-green-800" : "bg-yellow-950 text-yellow-300 border-yellow-800 animate-pulse"}`}>
-              {lecture.status === "completed" ? "✔ " : "⟳ "}{lecture.status}
+        <div className={`${mobileView === "notes" ? "block" : "hidden"} flex flex-1 flex-col overflow-hidden border-t border-line bg-canvas md:flex`}>
+          <div className="flex shrink-0 items-center gap-3 px-5 py-4">
+            <span className={`pill ${lecture.status === "completed" ? "bg-positive/10 text-positive" : "bg-accent/10 text-accent"}`}>
+              {lecture.status !== "completed" && <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />}
+              {lecture.status === "completed" ? "✓ " : ""}{lecture.status}
             </span>
-            <span className="font-mono text-[11px] text-zinc-500">~/lectures/{lectureId}</span>
+            <span className="font-mono text-xs text-faint">~/lectures/{lectureId}</span>
           </div>
 
           {/* Concept tabs — horizontal scroll row */}
-          <div className="flex shrink-0 items-center gap-4 overflow-x-auto border-t border-zinc-800 p-3">
-            <h1 className="whitespace-nowrap font-mono text-xs text-indigo-400 border-b border-indigo-400 pb-0.5">
+          <div className="flex shrink-0 items-center gap-4 overflow-x-auto border-t border-line px-5 py-3">
+            <h1 className="whitespace-nowrap border-b-2 border-accent pb-1 text-sm font-semibold tracking-tight text-ink">
               {lecture.title}
             </h1>
-            <span className="whitespace-nowrap font-mono text-xs text-zinc-500 transition-colors duration-150 hover:text-zinc-300">
-              interactive playback
+            <span className="whitespace-nowrap text-sm text-subtle transition-colors duration-200 hover:text-ink">
+              Interactive playback
             </span>
           </div>
 
           {/* Notes panel content */}
-          <div className="flex-1 overflow-y-auto border-t border-zinc-800">
+          <div className="flex-1 overflow-y-auto border-t border-line">
             <NotesPanel />
           </div>
         </div>
       </div>
 
       {/* RIGHT: Chat / Quiz / Notes */}
-      <div className={`${mobileView === "interactive" ? "block" : "hidden"} flex h-full shrink-0 flex-col border-l border-zinc-800 bg-zinc-900 md:flex`}>
-        <div className="flex shrink-0 border-b border-zinc-800">
+      <div className={`${mobileView === "interactive" ? "block" : "hidden"} flex h-full shrink-0 flex-col border-l border-line bg-surface md:flex`}>
+        <div className="flex shrink-0 border-b border-line px-2">
           <button
-            className={`flex h-10 items-center px-4 text-xs font-medium transition-colors duration-150 ${activeTab === "chat" ? "border-b-2 border-indigo-500 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`flex h-12 items-center px-4 text-sm font-medium transition-colors duration-200 ${activeTab === "chat" ? "border-b-2 border-accent text-ink" : "text-subtle hover:text-ink"}`}
             onClick={() => setActiveTab("chat")}
           >
             Chat
           </button>
           <button
-            className={`flex h-10 items-center px-4 text-xs font-medium transition-colors duration-150 ${activeTab === "quiz" ? "border-b-2 border-indigo-500 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`flex h-12 items-center px-4 text-sm font-medium transition-colors duration-200 ${activeTab === "quiz" ? "border-b-2 border-accent text-ink" : "text-subtle hover:text-ink"}`}
             onClick={() => setActiveTab("quiz")}
           >
             Quiz

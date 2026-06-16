@@ -10,11 +10,11 @@ export const Progress = React.forwardRef<
 >(({ className, value, ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
-    className={cn("relative h-2 w-full overflow-hidden rounded bg-zinc-800", className)}
+    className={cn("relative h-1.5 w-full overflow-hidden rounded-full bg-fill", className)}
     {...props}
   >
     <ProgressPrimitive.Indicator
-      className="h-full w-full flex-1 bg-green-500 transition-all duration-500"
+      className="h-full w-full flex-1 rounded-full bg-accent transition-all duration-500"
       style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
     />
   </ProgressPrimitive.Root>

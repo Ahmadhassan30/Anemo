@@ -9,5 +9,5 @@ export default function StudentLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="min-h-screen bg-zinc-950 text-zinc-300">{children}</div>;
+  return <div className="min-h-screen bg-canvas text-ink">{children}</div>;
 }

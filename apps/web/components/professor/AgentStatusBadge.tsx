@@ -14,11 +14,11 @@ export function AgentStatusBadge({ status, className }: AgentStatusBadgeProps) {
   if (visualStatus === "success") visualStatus = "done";
 
   const styles: Record<string, string> = {
-    pending: "bg-zinc-800 text-zinc-400 border-zinc-700",
-    running: "bg-yellow-950 text-yellow-300 border-yellow-800 animate-pulse",
-    retrying: "bg-yellow-950 text-yellow-300 border-yellow-800 animate-pulse",
-    done: "bg-green-950 text-green-400 border-green-800",
-    failed: "bg-red-950 text-red-400 border-red-800",
+    pending: "bg-fill text-subtle",
+    running: "bg-accent/10 text-accent",
+    retrying: "bg-warning/10 text-warning",
+    done: "bg-positive/10 text-positive",
+    failed: "bg-danger/10 text-danger",
   };
 
   const labels: Record<string, string> = {
@@ -32,5 +32,12 @@ export function AgentStatusBadge({ status, className }: AgentStatusBadgeProps) {
   const style = styles[visualStatus] || styles.pending;
   const label = labels[visualStatus] || visualStatus;
 
-  return <span className={cn("pill", style, className)}>{label}</span>;
+  return (
+    <span className={cn("pill", style, className)}>
+      {visualStatus === "running" && (
+        <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+      )}
+      {label}
+    </span>
+  );
 }

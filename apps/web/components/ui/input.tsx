@@ -1,5 +1,5 @@
 /*
- * Purpose: Input component wrapper — zinc field styling.
+ * Purpose: Input component wrapper — Apple-minimal field.
  */
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         ref={ref}
         className={cn(
-          "w-full rounded bg-zinc-800 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 outline-none transition-colors duration-150 focus:ring-1 focus:ring-indigo-500",
+          "w-full rounded-xl border border-line bg-surface px-4 py-3 text-[15px] text-ink",
+          "placeholder:text-faint transition-shadow duration-200",
+          "focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/12",
           className
         )}
         {...props}

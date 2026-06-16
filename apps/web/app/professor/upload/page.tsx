@@ -70,8 +70,8 @@ export default function UploadWizard() {
   return (
     <div className="mx-auto max-w-2xl px-8 py-16">
       <div className="mb-12">
-        <p className="text-[10px] uppercase tracking-widest text-zinc-500">professor / new lecture</p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-100">Upload lecture</h1>
+        <p className="text-[11px] font-medium uppercase tracking-widest text-faint">professor / new lecture</p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">Upload lecture</h1>
       </div>
 
       {/* Step indicator: 3 dots connected by lines */}
@@ -83,20 +83,28 @@ export default function UploadWizard() {
                 <span
                   className={
                     step > s.n
-                      ? "h-3 w-3 rounded-full bg-green-400 transition-colors duration-150"
+                      ? "h-3 w-3 rounded-full bg-positive transition-all duration-200"
                       : step === s.n
-                      ? "h-3 w-3 rounded-full bg-indigo-500 transition-colors duration-150"
-                      : "h-3 w-3 rounded-full bg-zinc-700 transition-colors duration-150"
+                      ? "h-3 w-3 rounded-full bg-accent ring-4 ring-accent/15 transition-all duration-200"
+                      : "h-3 w-3 rounded-full bg-fill ring-1 ring-line transition-all duration-200"
                   }
                 />
-                <span className="mt-3 text-[10px] uppercase tracking-widest text-zinc-500">{s.label}</span>
+                <span
+                  className={
+                    step >= s.n
+                      ? "mt-3 text-[11px] font-medium uppercase tracking-widest text-ink transition-colors duration-200"
+                      : "mt-3 text-[11px] font-medium uppercase tracking-widest text-faint transition-colors duration-200"
+                  }
+                >
+                  {s.label}
+                </span>
               </div>
               {i < steps.length - 1 && (
                 <div
                   className={
                     step > s.n
-                      ? "mx-2 -mt-6 h-px flex-1 bg-green-400 transition-colors duration-150"
-                      : "mx-2 -mt-6 h-px flex-1 bg-zinc-700 transition-colors duration-150"
+                      ? "mx-3 -mt-6 h-px flex-1 bg-positive transition-colors duration-200"
+                      : "mx-3 -mt-6 h-px flex-1 bg-line transition-colors duration-200"
                   }
                 />
               )}
@@ -105,32 +113,28 @@ export default function UploadWizard() {
         </div>
       </div>
 
-      <Card className="rounded border border-zinc-800 bg-zinc-900 text-zinc-300">
+      <Card>
         {step === 1 && (
           <>
             <CardHeader>
-              <CardTitle className="text-base font-semibold tracking-tight text-zinc-100">Lecture details</CardTitle>
-              <CardDescription className="text-zinc-500">Give your new lecture a descriptive title.</CardDescription>
+              <CardTitle>Lecture details</CardTitle>
+              <CardDescription>Give your new lecture a descriptive title.</CardDescription>
             </CardHeader>
             <CardContent>
-              <label className="mb-2 block text-[10px] uppercase tracking-widest text-zinc-500">title</label>
+              <label className="mb-2 block text-[11px] font-medium uppercase tracking-widest text-faint">title</label>
               <Input
                 placeholder="e.g. Introduction to Calculus"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className="rounded border-zinc-800 bg-zinc-800 text-zinc-100 transition-colors duration-150"
               />
               {error && (
-                <p className="mt-4 text-sm text-red-400">
-                  <span className="text-red-400">✘ </span>{error}
+                <p className="mt-4 text-sm text-danger">
+                  <span className="text-danger">✕ </span>{error}
                 </p>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end border-t border-zinc-800 pt-6">
-              <Button
-                onClick={handleCreate}
-                className="rounded bg-indigo-500 text-zinc-100 transition-colors duration-150 hover:bg-indigo-400"
-              >
+            <CardFooter className="justify-end border-t border-line pt-6">
+              <Button onClick={handleCreate}>
                 Create lecture →
               </Button>
             </CardFooter>
@@ -140,8 +144,8 @@ export default function UploadWizard() {
         {step === 2 && (
           <>
             <CardHeader>
-              <CardTitle className="text-base font-semibold tracking-tight text-zinc-100">Upload video</CardTitle>
-              <CardDescription className="text-zinc-500">Select the raw video file to be processed.</CardDescription>
+              <CardTitle>Upload video</CardTitle>
+              <CardDescription>Select the raw video file to be processed.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <UploadDropzone<OurFileRouter, "lectureVideoUploader">
@@ -159,34 +163,35 @@ export default function UploadWizard() {
                   setError(err.message);
                 }}
                 appearance={{
-                  button: "rounded bg-indigo-500 text-zinc-100 transition-colors duration-150 hover:bg-indigo-400",
-                  container: "rounded border border-zinc-800 bg-zinc-950",
-                  allowedContent: "text-zinc-500"
+                  button: "rounded-full bg-accent text-white transition-colors duration-200 hover:bg-accent-hover",
+                  container: "rounded-2xl border border-line bg-fill",
+                  allowedContent: "text-faint"
                 }}
               />
 
               <div className="my-4 flex items-center">
-                <Separator className="flex-1 bg-zinc-800" />
-                <span className="mx-3 text-[10px] uppercase tracking-widest text-zinc-500">or local dev bypass</span>
-                <Separator className="flex-1 bg-zinc-800" />
+                <Separator className="flex-1 bg-line" />
+                <span className="mx-3 text-[11px] font-medium uppercase tracking-widest text-faint">or local dev bypass</span>
+                <Separator className="flex-1 bg-line" />
               </div>
 
-              <div className="space-y-3 rounded border border-zinc-800 bg-zinc-950 p-4">
-                <p className="font-mono text-xs leading-relaxed text-zinc-500">
-                  <span className="text-indigo-400">$ </span>
+              <div className="space-y-3 rounded-xl border border-line bg-fill p-4">
+                <p className="text-xs leading-relaxed text-subtle">
+                  <span className="text-accent">▸ </span>
                   Bypass the S3 cloud upload. Enter a URL accessible from inside the docker containers (e.g. the seeded dummy video).
                 </p>
                 <div className="flex gap-2">
                   <Input
                     value={mockUrl}
                     onChange={e => setMockUrl(e.target.value)}
-                    className="rounded border-zinc-800 bg-zinc-800 font-mono text-xs text-zinc-100 transition-colors duration-150"
+                    className="font-mono text-xs"
                     placeholder="http://api:8080/dummy.mp4"
                   />
                   <Button
                     type="button"
+                    size="sm"
                     onClick={handleBypassUpload}
-                    className="whitespace-nowrap rounded bg-indigo-500 text-xs text-zinc-100 transition-colors duration-150 hover:bg-indigo-400"
+                    className="whitespace-nowrap"
                   >
                     Bypass and confirm
                   </Button>
@@ -194,17 +199,13 @@ export default function UploadWizard() {
               </div>
 
               {error && (
-                <p className="mt-4 text-sm text-red-400">
-                  <span className="text-red-400">✘ </span>{error}
+                <p className="mt-4 text-sm text-danger">
+                  <span className="text-danger">✕ </span>{error}
                 </p>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end gap-4 border-t border-zinc-800 pt-6">
-              <Button
-                variant="outline"
-                onClick={() => setStep(1)}
-                className="rounded border-zinc-700 bg-transparent text-zinc-300 transition-colors duration-150 hover:bg-zinc-800"
-              >
+            <CardFooter className="justify-end gap-4 border-t border-line pt-6">
+              <Button variant="outline" onClick={() => setStep(1)}>
                 ← Back
               </Button>
             </CardFooter>
@@ -214,31 +215,28 @@ export default function UploadWizard() {
         {step === 3 && (
           <>
             <CardHeader>
-              <CardTitle className="text-base font-semibold tracking-tight text-zinc-100">Launch pipeline</CardTitle>
-              <CardDescription className="text-zinc-500">Video successfully uploaded. Ready to extract concepts and generate animations.</CardDescription>
+              <CardTitle>Launch pipeline</CardTitle>
+              <CardDescription>Video successfully uploaded. Ready to extract concepts and generate animations.</CardDescription>
             </CardHeader>
             <CardContent className="py-8">
-              <div className="space-y-1.5 rounded border border-zinc-800 bg-zinc-950 px-5 py-4 font-mono text-sm leading-relaxed">
-                <p className="text-zinc-100">
-                  <span className="text-indigo-400">$ </span>lectureos confirm --upload
+              <div className="space-y-1.5 rounded-xl border border-line bg-fill px-5 py-4 font-mono text-sm leading-relaxed">
+                <p className="text-ink">
+                  <span className="text-accent">$ </span>lectureos confirm --upload
                 </p>
-                <p className="text-zinc-500">
-                  <span className="text-indigo-400">› </span>video staged ............ ok
+                <p className="text-subtle">
+                  <span className="text-accent">› </span>video staged ............ ok
                 </p>
-                <p className="text-zinc-500">
-                  <span className="text-indigo-400">› </span>awaiting pipeline trigger
+                <p className="text-subtle">
+                  <span className="text-accent">› </span>awaiting pipeline trigger
                 </p>
-                <p className="pt-1 text-green-400">
-                  ✔ ready to run
+                <p className="pt-1 text-positive">
+                  ✓ ready to run
                 </p>
               </div>
             </CardContent>
-            <Separator className="bg-zinc-800" />
+            <Separator className="bg-line" />
             <CardFooter className="pt-6">
-              <Button
-                onClick={handleTrigger}
-                className="w-full rounded bg-indigo-500 text-zinc-100 transition-colors duration-150 hover:bg-indigo-400"
-              >
+              <Button onClick={handleTrigger} className="w-full">
                 Start pipeline →
               </Button>
             </CardFooter>

@@ -65,55 +65,52 @@ export function UploadDropzone({ onFileSelect }: UploadDropzoneProps) {
 
   if (selectedFile) {
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded p-4">
+      <Card className="p-4">
         <div className="flex items-start justify-between gap-4">
           <video
             src={URL.createObjectURL(selectedFile)}
-            className="h-16 w-28 shrink-0 rounded border border-zinc-800 object-cover opacity-70"
+            className="h-16 w-28 shrink-0 rounded-xl border border-line object-cover"
             muted
           />
           <div className="min-w-0 flex-1">
-            <p className="font-mono text-zinc-300 truncate">{selectedFile.name}</p>
-            <p className="text-zinc-500 text-xs font-mono mt-1">
+            <p className="truncate font-medium text-ink">{selectedFile.name}</p>
+            <p className="mt-1 text-xs text-subtle">
               {(selectedFile.size / (1024 * 1024)).toFixed(1)} MB
             </p>
-            <p className="text-green-400 text-xs mt-2">✔ ready to process</p>
+            <p className="mt-2 text-xs font-medium text-positive">✓ ready to process</p>
           </div>
           <button
             onClick={removeFile}
-            className="text-zinc-500 hover:text-red-400 transition-colors duration-150 text-sm"
+            className="text-faint transition-colors duration-200 hover:text-danger"
             aria-label="Remove file"
           >
-            ✘
+            ✕
           </button>
         </div>
-      </div>
+      </Card>
     );
   }
 
   return (
     <Card
-      className={`border-2 border-dashed rounded bg-zinc-900 transition-colors duration-150 h-64 flex flex-col items-center justify-center gap-3 ${
+      className={`flex h-64 flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed bg-fill shadow-none transition-colors duration-200 ${
         dragActive
-          ? "border-indigo-500 bg-indigo-950/20"
-          : "border-zinc-700 hover:border-indigo-500"
+          ? "border-accent bg-accent/5"
+          : "border-line-strong hover:border-accent"
       }`}
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
       onDragOver={handleDrag}
       onDrop={handleDrop}
     >
-      <span className="text-4xl text-zinc-600" aria-hidden>
+      <span className="text-4xl text-faint" aria-hidden>
         ↑
       </span>
-      <p className="text-zinc-300">Drop lecture video here</p>
-      <p className="text-zinc-500 text-sm font-mono">MP4 · MOV · up to 2 GB</p>
+      <p className="text-ink">Drop lecture video here</p>
+      <p className="text-sm text-subtle">MP4 · MOV · up to 2 GB</p>
 
       <label htmlFor="file-upload">
-        <Button
-          className="bg-indigo-500 hover:bg-indigo-400 transition-colors duration-150 rounded text-zinc-100"
-          asChild
-        >
+        <Button asChild>
           <span>Select file</span>
         </Button>
       </label>
@@ -126,8 +123,8 @@ export function UploadDropzone({ onFileSelect }: UploadDropzoneProps) {
       />
 
       {error && (
-        <p className="text-red-400 text-sm mt-2 text-center font-mono">
-          ✘ {error}
+        <p className="mt-2 text-center text-sm text-danger">
+          ✕ {error}
         </p>
       )}
     </Card>

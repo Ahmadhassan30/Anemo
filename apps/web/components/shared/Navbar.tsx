@@ -4,6 +4,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 
 export function Navbar() {
@@ -11,16 +12,21 @@ export function Navbar() {
   const email = session?.user?.email ?? "";
 
   return (
-    <nav className="flex h-12 items-center justify-between border-b border-zinc-800 bg-zinc-900 px-6">
-      <span className="font-mono text-sm font-bold text-zinc-100">LectureOS</span>
-      <div className="flex items-center">
-        {email && <span className="text-xs text-zinc-500">{email}</span>}
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="ml-4 text-xs text-zinc-600 transition-colors duration-150 hover:text-zinc-400"
-        >
-          sign out
-        </button>
+    <nav className="glass sticky top-0 z-50">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+        <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-ink">
+          <span className="grid h-7 w-7 place-items-center rounded-lg bg-ink text-white">L</span>
+          LectureOS
+        </Link>
+        <div className="flex items-center gap-4">
+          {email && <span className="text-sm text-subtle">{email}</span>}
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="text-sm font-medium text-subtle transition-colors hover:text-ink"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
     </nav>
   );

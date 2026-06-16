@@ -9,22 +9,22 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 const BASE =
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]";
 
 const VARIANTS: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  default: "bg-indigo-500 text-white hover:bg-indigo-400",
-  destructive: "border border-red-800 bg-red-950 text-red-400 hover:border-red-700",
-  outline: "border border-zinc-800 text-zinc-300 hover:border-zinc-700 hover:text-zinc-100",
-  secondary: "bg-zinc-800 text-zinc-200 hover:bg-zinc-700",
-  ghost: "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200",
-  link: "text-indigo-400 underline-offset-4 hover:underline",
+  default: "bg-accent text-white shadow-sm hover:bg-accent-hover",
+  destructive: "bg-danger text-white shadow-sm hover:brightness-105",
+  outline: "border border-line bg-surface text-ink hover:bg-fill",
+  secondary: "bg-fill text-ink hover:bg-line",
+  ghost: "text-subtle hover:bg-fill hover:text-ink",
+  link: "text-accent underline-offset-4 hover:underline",
 };
 
 const SIZES: Record<NonNullable<ButtonProps["size"]>, string> = {
-  default: "h-10 px-4 py-2",
-  sm: "h-8 px-3 text-xs",
-  lg: "h-11 px-6",
-  icon: "h-10 w-10",
+  default: "h-11 px-5 text-sm",
+  sm: "h-9 px-4 text-sm",
+  lg: "h-12 px-7 text-base",
+  icon: "h-11 w-11",
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(

@@ -6,17 +6,17 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const VARIANTS: Record<NonNullable<BadgeProps["variant"]>, string> = {
-  default: "border-zinc-700 bg-zinc-800 text-zinc-300",
-  secondary: "border-zinc-800 bg-zinc-900 text-zinc-400",
-  destructive: "border-red-800 bg-red-950 text-red-400",
-  outline: "border-zinc-700 text-zinc-400",
+  default: "bg-accent/10 text-accent",
+  secondary: "bg-fill text-subtle",
+  destructive: "bg-danger/10 text-danger",
+  outline: "border border-line text-subtle",
 };
 
 export function Badge({ className, variant = "default", ...props }: BadgeProps) {
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
         VARIANTS[variant],
         className
       )}
