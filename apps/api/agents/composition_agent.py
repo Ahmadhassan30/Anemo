@@ -56,10 +56,14 @@ class CompositionAgent(BaseAgent):
             for c in ordered_concepts:
                 clip_url = c.get("clip_url")
                 tts_path = c.get("tts_path")
-                assert clip_url, f"Concept {c.get('id')} has no clip_url set"
-                assert tts_path, f"Concept {c.get('id')} has no tts_path — narration missing"
-                assert Path(clip_url).exists(), f"Clip file not found: {clip_url}"
-                assert Path(tts_path).exists(), f"TTS file not found: {tts_path}"
+                # Skip concepts that did not render rather than aborting the whole
+                # video — compose with whatever succeeded.
+                if not clip_url or not Path(str(clip_url)).exists():
+                    logger.warning("Skipping concept %s — no rendered clip (%s)", c.get("id"), clip_url)
+                    continue
+                if not tts_path or not Path(str(tts_path)).exists():
+                    logger.warning("Skipping concept %s — no narration audio (%s)", c.get("id"), tts_path)
+                    continue
 
                 concept_id = c.get("id")
                 out_clip = tmp_dir / f"composed_{concept_id}.mp4"
@@ -84,6 +88,11 @@ class CompositionAgent(BaseAgent):
 
                 composed_clips.append(str(out_clip))
                 files_to_cleanup.append(str(out_clip))
+
+            if not composed_clips:
+                raise RuntimeError(
+                    "No concept clips were rendered — cannot compose a final video"
+                )
 
             composed_path = str(tmp_dir / "composed.mp4")
             await concat_clips(composed_clips, composed_path)

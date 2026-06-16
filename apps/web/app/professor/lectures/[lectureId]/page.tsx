@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { PipelineMonitor } from "@/components/professor/PipelineMonitor";
+import { DownloadButton } from "@/components/professor/DownloadButton";
 
 interface PageProps {
   params: Promise<{
@@ -39,11 +40,6 @@ export default async function LectureDetailPage(props: PageProps) {
     notFound();
   }
 
-  const session = await getServerSession(authOptions);
-  const token = session ? (session as any).accessToken : "";
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost/api/v1";
-  const downloadUrl = `${apiBaseUrl}/lectures/${params.lectureId}/download?token=${token}`;
-
   const isCompleted = lecture.status === "completed";
 
   const statusPill =
@@ -79,15 +75,10 @@ export default async function LectureDetailPage(props: PageProps) {
         <div className="ml-auto flex items-center gap-3">
           <span className={statusPill}>{lecture.status}</span>
           {isCompleted && (
-            <a
-              href={downloadUrl}
-              target="_blank"
-              rel="noreferrer"
-              download
-              className="bg-indigo-500 hover:bg-indigo-400 text-white text-xs px-3 py-1.5 rounded transition-colors duration-150"
-            >
-              ⬇ download
-            </a>
+            <DownloadButton
+              lectureId={params.lectureId}
+              className="bg-indigo-500 hover:bg-indigo-400 text-white text-xs px-3 py-1.5 rounded transition-colors duration-150 disabled:opacity-60"
+            />
           )}
         </div>
       </header>
@@ -177,15 +168,10 @@ export default async function LectureDetailPage(props: PageProps) {
               actions
             </div>
             {isCompleted ? (
-              <a
-                href={downloadUrl}
-                target="_blank"
-                rel="noreferrer"
-                download
-                className="block w-full text-center bg-indigo-500 hover:bg-indigo-400 text-white text-xs px-3 py-1.5 rounded transition-colors duration-150"
-              >
-                ⬇ download
-              </a>
+              <DownloadButton
+                lectureId={params.lectureId}
+                className="block w-full text-center bg-indigo-500 hover:bg-indigo-400 text-white text-xs px-3 py-1.5 rounded transition-colors duration-150 disabled:opacity-60"
+              />
             ) : (
               <span className="block w-full text-center bg-zinc-800 text-zinc-600 text-xs px-3 py-1.5 rounded cursor-not-allowed">
                 ⬇ download

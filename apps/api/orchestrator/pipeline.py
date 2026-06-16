@@ -289,40 +289,71 @@ class LectureOSPipeline:
             )
             final_video_url: str = composition_result.get("final_video_url", "")
 
-            # ── Stage 6 (80→85%): RAG Indexing ───────────────────────
-            await self._run_stage(
-                "rag_indexing", 80, 85,
-                transcript=transcript,
-                concepts=concepts,
-            )
-
-            # ── Stage 7 (85→95%): Publish ────────────────────────────
-            # Fetch the lecture title from DB
+            # ── Mark the video READY as soon as composition succeeds ──
+            #    The rendered video is the product. RAG indexing and YouTube
+            #    publishing are best-effort enhancements — a failure in either
+            #    must NOT invalidate an already-rendered, downloadable video.
             result = await self.db.execute(
                 select(Lecture).where(Lecture.id == self.lecture_id)
             )
             lecture = result.scalar_one_or_none()
             lecture_title = lecture.title if lecture else "Untitled Lecture"
-
-            publish_result = await self._run_stage(
-                "publish", 85, 95,
-                final_video_url=final_video_url,
-                lecture_title=lecture_title,
-                transcript=transcript,
-            )
-
-            # ── Stage 8 (100%): Mark completed ───────────────────────
             if lecture:
                 lecture.status = LectureStatus.completed
                 await self.db.commit()
 
+            youtube_url = ""
+
+            # ── Stage 6 (80→85%): RAG Indexing (best-effort) ─────────
+            try:
+                await self._run_stage(
+                    "rag_indexing", 80, 85,
+                    transcript=transcript,
+                    concepts=concepts,
+                )
+            except Exception as rag_exc:
+                logger.warning(
+                    "RAG indexing failed (non-fatal) for lecture %s: %s",
+                    self.lecture_id, rag_exc,
+                )
+                await self.emit(self._make_event(
+                    PipelineEventType.PROGRESS_UPDATE,
+                    "RAG indexing skipped — study assistant may be unavailable",
+                    85,
+                    agent_name="rag_indexing_agent",
+                    metadata={"warning": str(rag_exc)},
+                ))
+
+            # ── Stage 7 (85→95%): Publish to YouTube (best-effort) ───
+            try:
+                publish_result = await self._run_stage(
+                    "publish", 85, 95,
+                    final_video_url=final_video_url,
+                    lecture_title=lecture_title,
+                    transcript=transcript,
+                )
+                youtube_url = publish_result.get("youtube_url", "")
+            except Exception as pub_exc:
+                logger.warning(
+                    "Publish failed (non-fatal) for lecture %s: %s",
+                    self.lecture_id, pub_exc,
+                )
+                await self.emit(self._make_event(
+                    PipelineEventType.PROGRESS_UPDATE,
+                    "YouTube publish skipped — video is still ready to download",
+                    95,
+                    agent_name="publish_agent",
+                    metadata={"warning": str(pub_exc)},
+                ))
+
+            # ── Stage 8 (100%): Pipeline complete (video is ready) ───
             await self.emit(self._make_event(
                 PipelineEventType.PIPELINE_COMPLETED,
                 "Pipeline completed successfully",
                 100,
                 metadata={
                     "final_video_url": final_video_url,
-                    "youtube_url": publish_result.get("youtube_url", ""),
+                    "youtube_url": youtube_url,
                 },
             ))
 
