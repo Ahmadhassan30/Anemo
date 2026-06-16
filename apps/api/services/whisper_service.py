@@ -176,3 +176,4 @@ class WhisperService:
 # Agent/task code should use this object directly.
 # ---------------------------------------------------------------------------
 whisper_service = WhisperService()
+

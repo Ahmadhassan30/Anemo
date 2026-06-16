@@ -80,8 +80,9 @@ export default function StudentLectureView() {
   }
 
   // Use the local final video if the status is completed, else fallback to raw video
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost/api/v1";
   const videoSrc = lecture.status === "completed"
-    ? `/static/${lectureId}/final.mp4`
+    ? `${apiBaseUrl}/lectures/${lectureId}/video?token=${(session as any)?.accessToken || ""}`
     : (lecture.raw_video_url || "");
 
   return (

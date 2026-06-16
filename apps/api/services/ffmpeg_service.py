@@ -10,6 +10,7 @@ from typing import List
 import ffmpeg
 import httpx
 
+
 logger = logging.getLogger(__name__)
 
 # High-quality H.264 encode tuned for flat-color animation. CRF 18 is visually

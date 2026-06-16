@@ -39,6 +39,11 @@ export default async function LectureDetailPage(props: PageProps) {
     notFound();
   }
 
+  const session = await getServerSession(authOptions);
+  const token = session ? (session as any).accessToken : "";
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost/api/v1";
+  const downloadUrl = `${apiBaseUrl}/lectures/${params.lectureId}/download?token=${token}`;
+
   const isCompleted = lecture.status === "completed";
 
   const statusPill =
@@ -75,7 +80,7 @@ export default async function LectureDetailPage(props: PageProps) {
           <span className={statusPill}>{lecture.status}</span>
           {isCompleted && (
             <a
-              href={`/static/${params.lectureId}/final.mp4`}
+              href={downloadUrl}
               target="_blank"
               rel="noreferrer"
               download
@@ -173,7 +178,7 @@ export default async function LectureDetailPage(props: PageProps) {
             </div>
             {isCompleted ? (
               <a
-                href={`/static/${params.lectureId}/final.mp4`}
+                href={downloadUrl}
                 target="_blank"
                 rel="noreferrer"
                 download

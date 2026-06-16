@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { AgentStatusBadge, type AgentStatus } from "./AgentStatusBadge";
 import { usePipelineStore } from "@/store/pipeline.store";
 import { subscribeToPipeline } from "@/lib/sse-client";
+import { useSession } from "next-auth/react";
 
 const AGENT_ORDER = [
   "ingest_agent",
@@ -34,6 +35,10 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
   const { status, currentAgent, progress, events, youtubeUrl, startMonitoring, updateFromEvent } = usePipelineStore();
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { data: session } = useSession();
+  const token = session ? (session as any).accessToken : "";
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost/api/v1";
+  const downloadUrl = `${apiBaseUrl}/lectures/${lectureId}/download?token=${token}`;
 
   useEffect(() => {
     startMonitoring(lectureId);
@@ -199,7 +204,7 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
         {status === "completed" && (
           <div className="mt-6 space-y-px">
             <a
-              href={`/static/${lectureId}/final.mp4`}
+              href={downloadUrl}
               target="_blank"
               rel="noreferrer"
               download

@@ -9,11 +9,16 @@ import logging
 from pathlib import Path
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import FileResponse
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import jwt, JWTError
+from jose.exceptions import ExpiredSignatureError
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import settings
-from middleware.auth_middleware import get_current_user
+from db.session import get_db
 from models import User
 
 logger = logging.getLogger(__name__)
@@ -21,6 +26,67 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/lectures", tags=["video"])
 
 _NOT_READY = "Video not ready. Pipeline may still be running."
+
+bearer_scheme = HTTPBearer(auto_error=False)
+
+
+async def get_video_user(
+    token: str | None = Query(None, description="Auth token passed via query parameter"),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    """Retrieve user from bearer header or query parameter JWT token."""
+    token_str = None
+    if credentials and credentials.scheme.lower() == "bearer":
+        token_str = credentials.credentials
+    elif token:
+        token_str = token
+
+    if not token_str:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing authentication token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        payload = jwt.decode(token_str, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+    except ExpiredSignatureError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+    except JWTError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+
+    subject = payload.get("sub")
+    if not subject:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token subject",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    try:
+        user_id = UUID(str(subject))
+        statement = select(User).where(User.id == user_id)
+    except ValueError:
+        statement = select(User).where(User.email == subject)
+
+    result = await db.execute(statement)
+    user = result.scalar_one_or_none()
+    if user is None or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
 
 
 def _resolve_video(lecture_id: UUID) -> Path | None:
@@ -45,7 +111,7 @@ def _resolve_video(lecture_id: UUID) -> Path | None:
 @router.get("/{lecture_id}/download")
 async def download_video(
     lecture_id: UUID,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_video_user),
 ) -> FileResponse:
     """Download the final rendered video as a file attachment."""
     path = _resolve_video(lecture_id)
@@ -66,7 +132,7 @@ async def download_video(
 @router.get("/{lecture_id}/video")
 async def stream_video(
     lecture_id: UUID,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_video_user),
 ) -> FileResponse:
     """Serve the final rendered video inline for in-page playback."""
     path = _resolve_video(lecture_id)
@@ -74,3 +140,4 @@ async def stream_video(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_NOT_READY)
 
     return FileResponse(path=str(path), media_type="video/mp4")
+
