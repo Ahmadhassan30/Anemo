@@ -4,6 +4,7 @@ import logging
 from typing import Any, Dict
 
 from sentence_transformers import SentenceTransformer
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from agents.base import BaseAgent
@@ -38,6 +39,11 @@ class RagIndexingAgent(BaseAgent):
     ) -> dict:
         """Embed text chunks per concept and batch insert them to pgvector."""
         logger.info("Starting RAG indexing for lecture %s", lecture_id)
+
+        # Idempotent re-index: drop embeddings from any previous run so retries
+        # or Celery re-deliveries don't accumulate duplicate vectors.
+        await db.execute(delete(Embedding).where(Embedding.lecture_id == lecture_id))
+        await db.commit()
 
         segments = transcript.get("segments", [])
         embeddings_created = 0
@@ -77,12 +83,15 @@ class RagIndexingAgent(BaseAgent):
 
             # 2. Chunk the concept text
             chunks = chunk_text(full_text, max_tokens=200, overlap=20)
-            
-            for chunk in chunks:
-                # 3. Encode chunk via asyncio.to_thread
-                vector = await asyncio.to_thread(model.encode, chunk)
-                
-                # 4. Create Embedding row object
+            if not chunks:
+                continue
+
+            # 3. Batch-encode all chunks for this concept in a single call —
+            #    far faster than per-chunk model.encode inside a loop.
+            vectors = await asyncio.to_thread(model.encode, chunks)
+
+            # 4. Create Embedding row objects
+            for chunk, vector in zip(chunks, vectors):
                 emb = Embedding(
                     lecture_id=lecture_id,
                     concept_id=concept_id,

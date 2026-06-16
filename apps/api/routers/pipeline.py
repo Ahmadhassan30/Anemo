@@ -15,7 +15,7 @@ from db.session import get_db
 from middleware.auth_middleware import get_current_user, require_professor
 from models import Lecture, LectureStatus, User
 from models.agent_run import AgentRun
-from orchestrator.events import subscribe_events
+from orchestrator.events import subscribe_events, get_event_log
 from tasks.pipeline_tasks import run_pipeline_task
 
 logger = logging.getLogger(__name__)
@@ -65,12 +65,14 @@ async def trigger_pipeline(
             detail=f"Pipeline cannot be triggered: lecture status is '{lecture.status.value}'",
         )
 
-    # 5. Dispatch Celery task
-    run_pipeline_task.delay(str(lecture_id))
-
-    # 6. Mark as processing
+    # 5. Mark as processing and COMMIT before dispatch, so the worker (and any
+    #    concurrent trigger hitting the status guard above) sees the new status
+    #    — prevents a duplicate pipeline run on a double-click / race.
     lecture.status = LectureStatus.processing
     await db.commit()
+
+    # 6. Dispatch Celery task
+    run_pipeline_task.delay(str(lecture_id))
 
     return {"message": "Pipeline started", "lecture_id": str(lecture_id)}
 
@@ -112,6 +114,8 @@ async def pipeline_state(
         "lecture_id": str(lecture_id),
         "status": lecture.status.value,
         "youtube_url": lecture.youtube_url,
+        # Full granular event log (buffered in Redis) for terminal replay/polling.
+        "live_events": await get_event_log(str(lecture_id)),
         "agent_runs": [
             {
                 "agent_name": r.agent_name,

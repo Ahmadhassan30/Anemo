@@ -59,15 +59,21 @@ async def enroll_student(
     current_user: User = Depends(require_student),
 ):
     """Create an enrollment record."""
+    # Coerce to UUID so an invalid id is a clean 400, not a DB cast error.
+    try:
+        lecture_uuid = UUID(request.lecture_id)
+    except (ValueError, TypeError, AttributeError):
+        raise HTTPException(status_code=400, detail="Invalid lecture id")
+
     # Verify lecture exists
-    res = await db.execute(select(Lecture).where(Lecture.id == request.lecture_id))
+    res = await db.execute(select(Lecture).where(Lecture.id == lecture_uuid))
     if not res.scalar_one_or_none():
         raise HTTPException(status_code=404, detail="Lecture not found")
 
     # Insert into association table gracefully (do nothing if exists)
     stmt = insert(enrollments).values(
         student_id=current_user.id,
-        lecture_id=request.lecture_id
+        lecture_id=lecture_uuid
     ).on_conflict_do_nothing()
     
     await db.execute(stmt)

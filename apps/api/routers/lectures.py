@@ -136,8 +136,9 @@ async def delete_lecture(
     if not lecture:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lecture not found")
 
-    # Only the owner (professor) can delete it
-    if current_user.role == UserRole.professor and lecture.professor_id != current_user.id:
+    # Only the OWNING professor may delete a lecture. (Previously a student —
+    # any non-professor — bypassed the check and could delete any lecture.)
+    if current_user.role != UserRole.professor or lecture.professor_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to delete this lecture",

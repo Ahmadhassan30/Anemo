@@ -19,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import settings
 from db.session import get_db
-from models import User
+from models import User, Lecture, UserRole, enrollments
 
 logger = logging.getLogger(__name__)
 
@@ -108,12 +108,34 @@ def _resolve_video(lecture_id: UUID) -> Path | None:
     return found[0] if found else None
 
 
+async def _authorize_access(db: AsyncSession, lecture_id: UUID, user: User) -> None:
+    """Only the owning professor or an enrolled student may access a video."""
+    res = await db.execute(select(Lecture).where(Lecture.id == lecture_id))
+    lecture = res.scalar_one_or_none()
+    if lecture is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lecture not found")
+    if user.role == UserRole.professor:
+        if lecture.professor_id != user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your lecture")
+        return
+    enr = await db.execute(
+        select(enrollments).where(
+            enrollments.c.student_id == user.id,
+            enrollments.c.lecture_id == lecture_id,
+        )
+    )
+    if enr.first() is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enrolled in this lecture")
+
+
 @router.get("/{lecture_id}/download")
 async def download_video(
     lecture_id: UUID,
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_video_user),
 ) -> FileResponse:
     """Download the final rendered video as a file attachment."""
+    await _authorize_access(db, lecture_id, current_user)
     path = _resolve_video(lecture_id)
     if path is None:
         logger.info("Download requested but no video found for lecture %s", lecture_id)
@@ -132,9 +154,11 @@ async def download_video(
 @router.get("/{lecture_id}/video")
 async def stream_video(
     lecture_id: UUID,
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_video_user),
 ) -> FileResponse:
     """Serve the final rendered video inline for in-page playback."""
+    await _authorize_access(db, lecture_id, current_user)
     path = _resolve_video(lecture_id)
     if path is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_NOT_READY)

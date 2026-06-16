@@ -107,31 +107,36 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
           AGENT_ORDER.length) * 100
       ));
 
-    // Authoritative DB poll — flips to completed/failed on its own.
+    // Full terminal log: prefer the Redis-buffered granular event log (survives
+    // SSE drops); fall back to the coarse agent-run timeline.
+    const eventsFromState = (st: any): PipelineEvent[] =>
+      st.live_events && st.live_events.length
+        ? (st.live_events as PipelineEvent[])
+        : (st.agent_runs || []).map((r: AgentRunRecord) => runToEvent(r, lectureId));
+
+    const progressFromState = (st: any) => {
+      const fromEvents = (st.live_events || []).reduce(
+        (m: number, e: any) => Math.max(m, e?.progress_pct || 0), 0
+      );
+      return Math.max(fromEvents, progressFromRuns(st.agent_runs || []));
+    };
+
+    // Authoritative poll: replaces the whole terminal log with the buffered
+    // event log every tick, so the view stays current even if SSE is dead, and
+    // flips to completed/failed (unlocking download) on its own.
     const poll = async () => {
       try {
         const st = await api.pipeline.getState(lectureId);
         if (cancelled) return;
         const rs = mapStatus(st.status);
-        const runs = st.agent_runs || [];
         const cur = usePipelineStore.getState();
-        if (rs === "completed" || rs === "failed") {
-          if (cur.status !== rs) {
-            // SSE missed the finish — backfill the authoritative timeline.
-            hydrate({
-              status: rs,
-              progress: rs === "completed" ? 100 : cur.progress,
-              youtubeUrl: st.youtube_url ?? null,
-              events: runs.map((r) => runToEvent(r, lectureId)),
-            });
-          } else {
-            hydrate({ progress: rs === "completed" ? 100 : cur.progress, youtubeUrl: st.youtube_url ?? null });
-          }
-          stop();
-        } else {
-          // Keep status/progress advancing even if the SSE has gone quiet.
-          hydrate({ status: rs, progress: Math.max(cur.progress, progressFromRuns(runs)), youtubeUrl: st.youtube_url ?? null });
-        }
+        hydrate({
+          status: rs,
+          progress: rs === "completed" ? 100 : Math.max(cur.progress, progressFromState(st)),
+          youtubeUrl: st.youtube_url ?? null,
+          events: eventsFromState(st),
+        });
+        if (rs === "completed" || rs === "failed") stop();
       } catch {
         /* transient — the next tick retries */
       }
@@ -142,13 +147,13 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
       try {
         const st = await api.pipeline.getState(lectureId);
         if (cancelled) return;
-        const runs = st.agent_runs || [];
         reconciled = mapStatus(st.status);
+        const runs = st.agent_runs || [];
         hydrate({
           lectureId,
           status: reconciled,
-          events: runs.map((r) => runToEvent(r, lectureId)),
-          progress: reconciled === "completed" ? 100 : progressFromRuns(runs),
+          events: eventsFromState(st),
+          progress: reconciled === "completed" ? 100 : progressFromState(st),
           youtubeUrl: st.youtube_url ?? null,
           currentAgent: reconciled === "running" && runs.length ? runs[runs.length - 1].agent_name : null,
         });
@@ -157,11 +162,11 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
         startMonitoring(lectureId);
       }
       if (cancelled) return;
-      // While work remains: live logs via SSE + a safety poll of the DB truth.
+      // While work remains: snappy SSE + a 2.5s authoritative poll of the buffer.
       if (reconciled === "running" || reconciled === "idle") {
         await subscribe();
         if (cancelled) { stop(); return; }
-        pollId = setInterval(poll, 4000);
+        pollId = setInterval(poll, 2500);
       }
     })();
 

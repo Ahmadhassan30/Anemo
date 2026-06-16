@@ -66,6 +66,12 @@ async def render_scene(
         )
     except asyncio.TimeoutError:
         process.kill()
+        # Reap the killed child so it doesn't linger as a zombie holding
+        # the pipe FDs — without this the event loop leaks subprocesses.
+        try:
+            await process.wait()
+        except Exception:
+            pass
         raise ManimRenderError(
             f"Manim render timed out after 300 seconds for {class_name}"
         )

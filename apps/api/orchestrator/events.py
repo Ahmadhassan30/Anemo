@@ -108,18 +108,42 @@ async def publish_event(event: Dict[str, Any] | PipelineEvent) -> None:
         r = await _get_redis()
 
         if isinstance(event, PipelineEvent):
-            channel = _channel_name(event.lecture_id)
+            lid = event.lecture_id
             payload = event.to_json()
         else:
             # Legacy dict path used by BaseAgent.emit_event
-            lecture_id = event.get("lecture_id", "unknown")
-            channel = _channel_name(lecture_id)
+            lid = event.get("lecture_id", "unknown")
             payload = json.dumps(event, default=_json_serial)
 
-        await r.publish(channel, payload)
+        await r.publish(_channel_name(lid), payload)
+
+        # Also buffer the event in a capped, expiring Redis list so the UI can
+        # REPLAY the full log on load / poll — robust to SSE drops and to many
+        # concurrent viewers (stateless polling instead of N live connections).
+        log_key = f"lecture:{lid}:log"
+        await r.rpush(log_key, payload)
+        await r.ltrim(log_key, -800, -1)
+        await r.expire(log_key, 7200)
     except Exception:
         # Fire-and-forget: never let a pub-sub failure crash the pipeline
         logger.exception("Failed to publish event to Redis")
+
+
+async def get_event_log(lecture_id: str) -> list:
+    """Return the buffered event log (oldest→newest) for replay/polling."""
+    try:
+        r = await _get_redis()
+        raw = await r.lrange(f"lecture:{lecture_id}:log", 0, -1)
+    except Exception:
+        logger.exception("Failed to read event log for %s", lecture_id)
+        return []
+    out = []
+    for item in raw:
+        try:
+            out.append(json.loads(item))
+        except Exception:
+            continue
+    return out
 
 
 # ---------------------------------------------------------------------------

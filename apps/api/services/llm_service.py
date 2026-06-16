@@ -2,6 +2,7 @@
 import asyncio
 import json
 import logging
+import re
 
 from openai import AsyncOpenAI
 from config import settings
@@ -60,7 +61,10 @@ class LLMService:
                             {"role": "user", "content": user},
                         ],
                     )
-                    return response.choices[0].message.content
+                    content = response.choices[0].message.content
+                    if content:
+                        return content
+                    raise RuntimeError("empty completion content")
                 except Exception as e:
                     err_msg = str(e).lower()
                     last_error = e
@@ -102,13 +106,23 @@ class LLMService:
             **kwargs,
         )
         clean = (
-            result.strip()
+            (result or "").strip()
             .removeprefix("```json")
             .removeprefix("```")
             .removesuffix("```")
             .strip()
         )
-        return json.loads(clean)
+        try:
+            return json.loads(clean)
+        except (json.JSONDecodeError, ValueError):
+            # Tolerate prose-wrapped output: extract the first JSON object/array.
+            match = re.search(r"(\{.*\}|\[.*\])", clean, re.DOTALL)
+            if match:
+                try:
+                    return json.loads(match.group(1))
+                except (json.JSONDecodeError, ValueError):
+                    pass
+            raise LLMError(f"LLM did not return valid JSON: {clean[:200]!r}")
 
 
 llm_service = LLMService()

@@ -102,9 +102,19 @@ class BaseAgent(ABC):
         if error:
             msg += f" — {error}"
 
+        # Map internal status → the canonical event_type the UI keys on. Note
+        # "success" → "AGENT_COMPLETED" (NOT "AGENT_SUCCESS"): the frontend marks
+        # an agent's step green only on AGENT_COMPLETED, so this must match.
+        event_type = {
+            "started": "AGENT_STARTED",
+            "success": "AGENT_COMPLETED",
+            "failed": "AGENT_FAILED",
+            "retrying": "AGENT_RETRYING",
+        }.get(status, "PROGRESS_UPDATE")
+
         event: Dict[str, Any] = {
             "type": "agent_status",
-            "event_type": f"AGENT_{status.upper()}" if status in ("started", "failed", "retrying") else "PROGRESS_UPDATE",
+            "event_type": event_type,
             "lecture_id": lecture_id,
             "agent": self.name,
             "agent_name": self.name,

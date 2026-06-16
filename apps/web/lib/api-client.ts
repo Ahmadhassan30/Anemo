@@ -85,6 +85,7 @@ export interface PipelineStateResponse {
   lecture_id: string;
   status: string; // pending | processing | completed | failed
   youtube_url: string | null;
+  live_events?: any[]; // full granular event log buffered in Redis (replay)
   agent_runs: AgentRunRecord[];
 }
 
