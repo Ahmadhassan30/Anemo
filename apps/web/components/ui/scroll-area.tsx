@@ -6,7 +6,7 @@ export const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={`relative overflow-y-auto rounded-sm scroll-smooth [scrollbar-color:var(--term-line)_transparent] ${className || ""}`}
+      className={`relative overflow-y-auto rounded scroll-smooth [scrollbar-color:#3f3f46_transparent] ${className || ""}`}
       {...props}
     >
       {children}

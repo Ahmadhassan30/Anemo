@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, Mail, AlertCircle } from "lucide-react";
+import { TerminalAnimation } from "@/components/TerminalAnimation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -43,101 +43,70 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md">
-        {/* brand line */}
-        <Link href="/" className="mb-6 flex items-center justify-center gap-2 text-sm">
-          <span className="text-primary">{"//"}</span>
-          <span className="font-semibold tracking-wide text-foreground">lecture</span>
-          <span className="font-semibold tracking-wide text-primary glow-text">os</span>
-        </Link>
+    <div className="grid h-screen grid-cols-2 overflow-hidden">
+      {/* LEFT */}
+      <div className="flex flex-col bg-zinc-950 p-12">
+        <div className="font-mono font-bold text-zinc-100">LectureOS</div>
 
-        {/* auth terminal window */}
-        <div className="term-window w-full pt-9 glow-ring">
-          <div className="absolute right-4 top-3 text-[11px] text-muted-foreground">
-            ~/auth/login
-          </div>
-
-          <div className="space-y-7 px-6 pb-7">
-            <div>
-              <h1 className="term-prompt text-lg font-semibold tracking-tight text-foreground">
-                authenticate<span className="term-cursor align-middle" aria-hidden />
-              </h1>
-              <p className="mt-2 text-sm text-muted-foreground">
-                <span className="text-primary">{"› "}</span>
-                sign in to access your dashboard
-              </p>
-            </div>
-
-            {error && (
-              <div className="flex items-start gap-3 rounded-sm border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                <p>
-                  <span className="text-destructive">[error]</span> {error}
-                </p>
-              </div>
-            )}
-
-            <form className="space-y-5" onSubmit={handleSubmit}>
-              <div className="space-y-5">
-                <div>
-                  <label className="term-label mb-2 block">email_address</label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
-                      <Mail className="h-4 w-4" />
-                    </span>
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="professor@demo.com"
-                      className="term-input pl-9"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="term-label mb-2 block">password</label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
-                      <Lock className="h-4 w-4" />
-                    </span>
-                    <input
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="term-input pl-9"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="term-btn term-btn-primary w-full py-3 text-sm"
-              >
-                {loading ? "authenticating..." : "$ sign_in"}
-              </button>
-            </form>
-
-            <hr className="term-rule" />
-
-            <p className="text-center text-xs text-muted-foreground">
-              no account yet?{" "}
-              <Link href="/register" className="term-link">
-                create_account
-              </Link>
-            </p>
-          </div>
+        <div className="flex flex-1 items-center">
+          <p className="max-w-xs text-2xl font-light text-zinc-300">
+            Turn any lecture into an animated course.
+          </p>
         </div>
 
-        <p className="mt-4 text-center text-[11px] text-muted-foreground">
-          <span className="text-primary">{"//"}</span> secured session · credentials provider
-        </p>
+        <div className="h-[40%]">
+          <TerminalAnimation />
+        </div>
+      </div>
+
+      {/* RIGHT */}
+      <div className="flex items-center border-l border-zinc-800 bg-zinc-900">
+        <div className="mx-auto w-full max-w-sm px-8">
+          <h1 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-100">
+            Sign in
+          </h1>
+
+          {error && (
+            <div className="pill mb-6 flex items-start gap-2 border-red-800 bg-red-950 text-red-400">
+              <span aria-hidden>✘</span>
+              <p>{error}</p>
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email"
+              className="w-full rounded border-0 bg-zinc-800 px-4 py-3 text-zinc-100 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-indigo-500"
+            />
+
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="password"
+              className="w-full rounded border-0 bg-zinc-800 px-4 py-3 text-zinc-100 outline-none placeholder:text-zinc-500 focus:ring-1 focus:ring-indigo-500"
+            />
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded bg-indigo-500 py-3 font-medium text-white transition-colors duration-150 hover:bg-indigo-400"
+            >
+              {loading ? "⟳ Signing in..." : "Sign in"}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-zinc-500">
+            <Link href="/register" className="transition-colors duration-150 hover:text-zinc-300">
+              Don&apos;t have an account? Register →
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

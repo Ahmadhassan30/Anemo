@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLectureStore } from "@/store/lecture.store";
-import { Play, Pause, Volume2, VolumeX, Maximize, Settings } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface VideoPlayerProps {
@@ -97,20 +96,19 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
   return (
     <div
       ref={containerRef}
-      className="term-panel group relative flex aspect-video w-full items-center justify-center overflow-hidden bg-background"
+      className="group relative flex aspect-video w-full items-center justify-center overflow-hidden rounded border border-zinc-800 bg-black"
     >
-      {/* faux titlebar / stream status */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between border-b border-border/60 bg-background/70 px-3 py-1.5 text-[11px] backdrop-blur-sm">
-        <span className="text-muted-foreground">
-          <span className="text-primary">{"//"}</span> playback.stream
+      {/* Stream status titlebar */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-3 py-2">
+        <span className="font-mono text-xs text-zinc-500">
+          <span className="text-indigo-400">//</span> playback.stream
         </span>
-        <span className="term-chip border-0 px-0 py-0">
-          <span
-            className={`h-1.5 w-1.5 rounded-full ${
-              isPlaying ? "animate-blink bg-primary" : "bg-muted-foreground"
-            }`}
-          />
-          {isPlaying ? "playing" : "paused"}
+        <span className="pill bg-zinc-800 text-zinc-400 border-zinc-700 font-mono text-[10px]">
+          {isPlaying ? (
+            <span className="text-yellow-300 animate-pulse">● playing</span>
+          ) : (
+            <span className="text-zinc-500">○ paused</span>
+          )}
         </span>
       </div>
 
@@ -124,13 +122,13 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
       />
 
       {/* Custom Controls Container */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-border/60 bg-background/85 p-4 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
+      <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-zinc-800 bg-zinc-900 p-4 opacity-0 transition-colors duration-150 group-hover:opacity-100">
 
         {/* Seek Bar with Chapter Markers */}
-        <div className="group/seek relative mb-4 flex h-1 w-full cursor-pointer items-center rounded-sm bg-border">
+        <div className="group/seek relative mb-4 flex h-1 w-full cursor-pointer items-center rounded bg-zinc-800">
           {/* Progress fill */}
           <div
-            className="absolute left-0 h-full rounded-sm bg-primary shadow-glow"
+            className="absolute left-0 h-full rounded bg-indigo-500"
             style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
           />
           {/* Input range */}
@@ -147,7 +145,7 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
           {duration > 0 && concepts.map((c) => (
             <div
               key={c.id}
-              className="absolute z-10 h-2.5 w-0.5 -translate-y-1/4 cursor-pointer bg-term-amber hover:bg-term-cyan"
+              className="absolute z-10 h-2.5 w-0.5 -translate-y-1/4 cursor-pointer bg-yellow-300 transition-colors duration-150 hover:bg-indigo-400"
               style={{ left: `${(c.ts_start / duration) * 100}%` }}
               title={c.concept}
               onClick={(e) => {
@@ -162,14 +160,14 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
         </div>
 
         {/* Control Buttons */}
-        <div className="flex items-center justify-between text-muted-foreground">
+        <div className="flex items-center justify-between text-zinc-500">
           <div className="flex items-center gap-4">
-            <button onClick={togglePlay} className="transition-colors hover:text-primary">
-              {isPlaying ? <Pause className="h-5 w-5 fill-current" /> : <Play className="h-5 w-5 fill-current" />}
+            <button onClick={togglePlay} className="text-base leading-none transition-colors duration-150 hover:text-zinc-100">
+              {isPlaying ? "❚❚" : "▶"}
             </button>
             <div className="group/vol flex items-center gap-2">
-              <button onClick={toggleMute} className="transition-colors hover:text-primary">
-                {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+              <button onClick={toggleMute} className="text-base leading-none transition-colors duration-150 hover:text-zinc-100">
+                {isMuted ? "🔇" : "🔊"}
               </button>
               <input
                 type="range"
@@ -178,33 +176,33 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
                 step="0.05"
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
-                className="w-0 cursor-pointer accent-term-green opacity-0 transition-all duration-300 group-hover/vol:w-20 group-hover/vol:opacity-100"
+                className="w-0 cursor-pointer accent-indigo-500 opacity-0 transition-all duration-150 group-hover/vol:w-20 group-hover/vol:opacity-100"
               />
             </div>
-            <div className="text-xs tabular-nums text-foreground">
-              <span className="text-primary">{formatTime(currentTime)}</span>
-              <span className="text-muted-foreground"> / {formatTime(duration)}</span>
+            <div className="font-mono text-xs tabular-nums">
+              <span className="text-zinc-300">{formatTime(currentTime)}</span>
+              <span className="text-zinc-500"> / {formatTime(duration)}</span>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="term-chip cursor-pointer font-semibold transition-colors hover:border-primary/60 hover:text-primary">
+                <button className="rounded border border-zinc-700 bg-zinc-800 px-2 py-1 font-mono text-xs text-zinc-300 transition-colors duration-150 hover:border-zinc-600 hover:text-zinc-100">
                   {playbackRate}x
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="term-panel border-border bg-card text-foreground">
+              <DropdownMenuContent align="end" className="rounded border-zinc-800 bg-zinc-900 text-zinc-300">
                 {[0.75, 1, 1.25, 1.5].map((speed) => (
-                  <DropdownMenuItem key={speed} onClick={() => changeSpeed(speed)} className="cursor-pointer text-xs focus:bg-secondary focus:text-primary">
-                    <span className="text-primary">{"› "}</span>{speed}x {speed === 1 && "(normal)"}
+                  <DropdownMenuItem key={speed} onClick={() => changeSpeed(speed)} className="cursor-pointer font-mono text-xs focus:bg-zinc-800 focus:text-zinc-100">
+                    <span className="text-indigo-400">{"› "}</span>{speed}x {speed === 1 && "(normal)"}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <button onClick={handleFullscreen} className="transition-colors hover:text-primary">
-              <Maximize className="h-5 w-5" />
+            <button onClick={handleFullscreen} className="text-base leading-none transition-colors duration-150 hover:text-zinc-100">
+              ⛶
             </button>
           </div>
         </div>

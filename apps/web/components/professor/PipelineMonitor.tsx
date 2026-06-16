@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { AgentStatusBadge, type AgentStatus } from "./AgentStatusBadge";
 import { usePipelineStore } from "@/store/pipeline.store";
 import { subscribeToPipeline } from "@/lib/sse-client";
-import { PlayCircle, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const AGENT_ORDER = [
   "ingest_agent",
@@ -90,153 +87,204 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
   };
 
   return (
-    <Card className="term-panel bg-card border-border text-foreground glow-ring">
-      <CardHeader className="term-rule rounded-none border-0 pb-4 [border-bottom:1px_solid_hsl(var(--border))]">
-        <div className="mb-5 flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-            <PlayCircle className="h-5 w-5 text-primary" />
-            <span className="text-muted-foreground">{"//"}</span>
-            <span className="text-foreground">pipeline_status</span>
-            <span className="term-cursor align-middle" aria-hidden />
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <span className="term-chip">
-              <span
-                className={`h-1.5 w-1.5 rounded-full ${
-                  status === "running"
-                    ? "animate-blink bg-primary"
-                    : status === "failed"
-                    ? "bg-destructive"
-                    : status === "completed"
-                    ? "bg-primary"
-                    : "bg-muted-foreground"
-                }`}
-              />
-              {status || "idle"}
-            </span>
-            {status === "completed" && (
-              <>
-                <Button asChild variant="ghost" className="term-btn h-8 gap-2 px-3 text-xs">
-                  <a href={`/static/${lectureId}/final.mp4`} target="_blank" rel="noreferrer" download>
-                    <PlayCircle className="h-4 w-4 text-primary" />
-                    download_video
-                  </a>
-                </Button>
-                {youtubeUrl && !youtubeUrl.includes("dQw4w9WgXcQ") && (
-                  <Button asChild variant="ghost" className="term-btn h-8 gap-2 px-3 text-xs">
-                    <a href={youtubeUrl} target="_blank" rel="noreferrer">
-                      <ExternalLink className="h-4 w-4 text-accent" />
-                      view_on_youtube
-                    </a>
-                  </Button>
-                )}
-              </>
-            )}
+    <div className="flex h-full bg-zinc-950 text-zinc-300">
+      {/* LEFT SIDEBAR — pipeline + concepts */}
+      <aside className="w-72 shrink-0 overflow-y-auto border-r border-zinc-800 bg-zinc-900 p-3">
+        <div className="mb-3 text-[10px] uppercase tracking-widest text-zinc-500">
+          pipeline
+        </div>
+
+        {/* Progress */}
+        <div className="mb-4">
+          <div className="flex justify-between text-[10px] text-zinc-500">
+            <span>{status || "idle"}</span>
+            <span className="font-mono">{progress}%</span>
+          </div>
+          <div className="mt-2 h-px w-full bg-zinc-800">
+            <div
+              className="h-px bg-green-500 transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="term-label shrink-0">progress</span>
-          <Progress value={progress} className="h-1.5 flex-1 rounded-sm bg-secondary" />
-          <span className="w-12 text-right font-mono text-sm text-primary glow-text">{progress}%</span>
-        </div>
-      </CardHeader>
 
-      <CardContent className="pt-6">
-        {error && (
-          <div className="mb-6 rounded-sm border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-            <span className="term-prompt font-medium" />
-            sse_connection_error: {error}
-          </div>
-        )}
-
-        <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[1.4rem] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-px before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
+        {/* Step list */}
+        <div className="space-y-px">
           {AGENT_ORDER.map((agentKey, index) => {
             const agentStatus = getAgentStatus(agentKey);
             const isActive = agentStatus === "running" || agentStatus === "retrying";
 
-            // Find specific error message if any
             const errorMsg = agentStatus === "failed"
               ? events.find(e => e.agent_name === agentKey && e.event_type === "AGENT_FAILED")?.message
               : null;
 
+            const icon =
+              agentStatus === "done" ? "✔" :
+              agentStatus === "running" || agentStatus === "retrying" ? "⟳" :
+              agentStatus === "failed" ? "✘" :
+              "○";
+
+            const iconColor =
+              agentStatus === "done" ? "text-green-400" :
+              agentStatus === "running" || agentStatus === "retrying" ? "text-yellow-300 animate-pulse" :
+              agentStatus === "failed" ? "text-red-400" :
+              "text-zinc-600";
+
+            const labelColor =
+              agentStatus === "done" ? "text-green-400" :
+              agentStatus === "running" || agentStatus === "retrying" ? "text-yellow-300" :
+              agentStatus === "failed" ? "text-red-400" :
+              "text-zinc-500";
+
             return (
-              <div key={agentKey} className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active`}>
-                {/* Node */}
-                <div className={`flex items-center justify-center w-2.5 h-2.5 rounded-full border-2 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute left-0 md:left-1/2 -translate-x-1/2 -translate-y-4 sm:translate-y-0 transform ${
-                  agentStatus === "done" ? "bg-primary border-primary shadow-glow" :
-                  agentStatus === "running" ? "bg-primary border-primary animate-blink shadow-glow" :
-                  agentStatus === "failed" ? "bg-destructive border-destructive" :
-                  "bg-muted-foreground border-border"
-                }`}></div>
-
-                {/* Content */}
-                <div className={`w-[calc(100%-2rem)] md:w-[calc(50%-2rem)] p-4 rounded-md border transition-colors ${
-                  isActive ? "border-primary/40 bg-secondary/60 glow-ring" :
-                  agentStatus === "failed" ? "border-destructive/40 bg-destructive/[0.04]" :
-                  "border-border bg-card/60"
-                }`}>
-                  <div className="mb-1 flex items-center justify-between gap-2">
-                    <h3 className="term-caret truncate font-semibold text-foreground">{AGENT_LABELS[agentKey]}</h3>
-                    <AgentStatusBadge status={agentStatus} />
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    step {String(index + 1).padStart(2, "0")} / {String(AGENT_ORDER.length).padStart(2, "0")}
-                  </p>
-
-                  {errorMsg && (
-                    <p className="mt-2 break-words text-sm text-destructive">
-                      <span className="text-destructive">{"› "}</span>
-                      {errorMsg}
-                    </p>
-                  )}
-                  {isActive && agentKey === "codegen_agent" && (
-                    <p className="mt-2 text-xs italic text-primary">
-                      <span className="not-italic text-primary">{"› "}</span>
-                      {events.filter(e => e.event_type === "PROGRESS_UPDATE").pop()?.message || "rendering in parallel..."}
-                    </p>
-                  )}
+              <div
+                key={agentKey}
+                className={`flex flex-col gap-1 rounded px-2 py-2 text-xs transition-colors duration-150 ${
+                  isActive ? "bg-zinc-800" : ""
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className={`w-4 shrink-0 text-center font-mono ${iconColor}`}>{icon}</span>
+                  <span className={`flex-1 truncate font-mono ${labelColor}`}>
+                    {AGENT_LABELS[agentKey]}
+                  </span>
+                  <span className="shrink-0 text-[10px] text-zinc-600">
+                    step {index + 1} / 7
+                  </span>
                 </div>
+                {errorMsg && (
+                  <p className="break-words pl-6 text-[11px] text-red-400">
+                    {"› "}{errorMsg}
+                  </p>
+                )}
+                {isActive && agentKey === "codegen_agent" && (
+                  <p className="pl-6 text-[11px] text-yellow-300">
+                    {"› "}
+                    {events.filter(e => e.event_type === "PROGRESS_UPDATE").pop()?.message || "rendering in parallel..."}
+                  </p>
+                )}
               </div>
             );
           })}
         </div>
 
-        {/* Live Event Log Terminal */}
-        <div className="mt-8 overflow-hidden rounded-md border border-border bg-background">
-          <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2 text-xs text-muted-foreground">
-            <span className="flex items-center gap-2">
-              <span className="text-primary">{"//"}</span>
-              terminal_output
-            </span>
-            {status === "running" && (
-              <span className="flex items-center gap-1.5 text-primary">
-                <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
-                live
-              </span>
-            )}
-          </div>
-          <div ref={scrollRef} className="h-48 space-y-1 overflow-y-auto p-4 text-xs text-muted-foreground">
-            {events.length === 0 && (
-              <div className="text-muted-foreground/60">
-                <span className="term-prompt text-primary" />
-                waiting for pipeline to start
-                <span className="term-cursor align-middle" aria-hidden />
-              </div>
-            )}
-            {events.map((e, i) => (
-              <div key={i} className="flex gap-4">
-                <span className="shrink-0 text-muted-foreground/60">
-                  {new Date(e.timestamp || Date.now()).toISOString().substring(11, 19)}
-                </span>
-                <span className={e.event_type && e.event_type.includes("FAILED") ? "text-destructive" : "text-foreground"}>
-                  <span className="text-primary">{"› "}</span>
-                  [{e.agent_name || "SYSTEM"}] {e.message}
-                </span>
-              </div>
-            ))}
-          </div>
+        {/* CONCEPTS section */}
+        <div className="mb-3 mt-6 text-[10px] uppercase tracking-widest text-zinc-500">
+          concepts
         </div>
-      </CardContent>
-    </Card>
+        <div className="space-y-px">
+          {AGENT_ORDER.map((agentKey) => {
+            const agentStatus = getAgentStatus(agentKey);
+            const dotColor =
+              agentStatus === "done" ? "text-green-400" :
+              agentStatus === "running" || agentStatus === "retrying" ? "text-yellow-300 animate-pulse" :
+              agentStatus === "failed" ? "text-red-400" :
+              "text-zinc-600";
+
+            return (
+              <div
+                key={`concept-${agentKey}`}
+                className="flex items-center gap-2 rounded px-2 py-2 text-xs transition-colors duration-150"
+              >
+                <span className={`w-4 shrink-0 text-center font-mono ${dotColor}`}>●</span>
+                <span className="flex-1 truncate font-mono text-zinc-500">
+                  {AGENT_LABELS[agentKey]}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Output links */}
+        {status === "completed" && (
+          <div className="mt-6 space-y-px">
+            <a
+              href={`/static/${lectureId}/final.mp4`}
+              target="_blank"
+              rel="noreferrer"
+              download
+              className="flex items-center gap-2 rounded px-2 py-2 text-xs font-mono text-zinc-300 transition-colors duration-150 hover:bg-zinc-800"
+            >
+              <span className="w-4 shrink-0 text-center text-green-400">⬇</span>
+              download_video
+            </a>
+            {youtubeUrl && !youtubeUrl.includes("dQw4w9WgXcQ") && (
+              <a
+                href={youtubeUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 rounded px-2 py-2 text-xs font-mono text-zinc-300 transition-colors duration-150 hover:bg-zinc-800"
+              >
+                <span className="w-4 shrink-0 text-center text-indigo-400">→</span>
+                view_on_youtube
+              </a>
+            )}
+          </div>
+        )}
+      </aside>
+
+      {/* CENTER TERMINAL */}
+      <div className="flex flex-1 flex-col bg-zinc-950">
+        {/* Terminal chrome */}
+        <div className="flex h-9 shrink-0 items-center gap-1.5 border-b border-zinc-800 bg-zinc-900 px-3">
+          <span className="h-3 w-3 rounded-full bg-red-500/80" />
+          <span className="h-3 w-3 rounded-full bg-yellow-500/80" />
+          <span className="h-3 w-3 rounded-full bg-green-500/80" />
+          <span className="ml-3 font-mono text-[11px] text-zinc-500">
+            lectureos — pipeline/{lectureId.slice(0, 8)} — live
+          </span>
+          <button
+            type="button"
+            className="ml-auto rounded px-2 py-1 font-mono text-[11px] text-zinc-500 transition-colors duration-150 hover:bg-zinc-800 hover:text-zinc-300"
+          >
+            clear
+          </button>
+        </div>
+
+        {/* SSE connection error */}
+        {error && (
+          <div className="border-b border-red-800 bg-red-950 px-4 py-2 font-mono text-xs text-red-400">
+            ✘ sse_connection_error: {error}
+          </div>
+        )}
+
+        {/* Log area */}
+        <div ref={scrollRef} className="flex-1 space-y-0 overflow-y-auto p-4 font-mono text-xs">
+          {events.length === 0 && (
+            <div className="text-zinc-700">$ waiting for pipeline...</div>
+          )}
+          {events.map((e, i) => {
+            const line = `[${e.agent_name || "pipeline"}] ${e.message}`;
+            const ts = new Date(e.timestamp || Date.now()).toISOString().substring(11, 19);
+            const lower = `${e.event_type || ""} ${e.message || ""}`.toLowerCase();
+
+            const lineColor =
+              line.includes("✘") || lower.includes("error") || lower.includes("failed") ? "text-red-400" :
+              line.includes("✔") || lower.includes("completed") || lower.includes("success") ? "text-green-400" :
+              line.includes("⟳") || lower.includes("running") || lower.includes("starting") ? "text-yellow-300" :
+              line.startsWith("[pipeline]") ? "text-zinc-500" :
+              "text-zinc-400";
+
+            return (
+              <div key={i} className={lineColor}>
+                <span className="text-zinc-600">{ts} </span>
+                {line}
+              </div>
+            );
+          })}
+          {status === "running" && (
+            <span className="text-green-400 animate-pulse">█</span>
+          )}
+        </div>
+
+        {/* Status bar */}
+        <div className="flex h-8 shrink-0 items-center gap-6 border-t border-zinc-800 bg-zinc-900 px-4 font-mono text-[10px] text-zinc-600">
+          <span>status: {status || "idle"}</span>
+          <span>progress: {progress}%</span>
+          <span>step: {currentAgent ? AGENT_ORDER.indexOf(currentAgent) + 1 : 0} / 7</span>
+          <span className="ml-auto">id: {lectureId.slice(0, 8)}</span>
+        </div>
+      </div>
+    </div>
   );
 }

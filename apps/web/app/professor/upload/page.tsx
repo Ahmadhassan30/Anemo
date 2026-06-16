@@ -61,60 +61,77 @@ export default function UploadWizard() {
     }
   };
 
+  const steps = [
+    { n: 1 as const, label: "title" },
+    { n: 2 as const, label: "upload" },
+    { n: 3 as const, label: "launch" },
+  ];
+
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-12">
-      <div className="mb-8">
-        <p className="term-label mb-2">{"// professor / new_lecture"}</p>
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            <span className="term-prompt text-primary" />
-            upload_lecture
-            <span className="term-cursor align-middle" aria-hidden />
-          </h1>
-          <div className="flex items-center gap-2 text-xs">
-            <span className={step >= 1 ? "term-chip border-primary/50 text-primary" : "term-chip"}>
-              <span className={step >= 1 ? "h-1.5 w-1.5 rounded-full bg-primary" : "h-1.5 w-1.5 rounded-full bg-muted-foreground/40"} />
-              1_title
-            </span>
-            <span className="text-primary/50">{"──›"}</span>
-            <span className={step >= 2 ? "term-chip border-primary/50 text-primary" : "term-chip"}>
-              <span className={step >= 2 ? "h-1.5 w-1.5 rounded-full bg-primary" : "h-1.5 w-1.5 rounded-full bg-muted-foreground/40"} />
-              2_upload
-            </span>
-            <span className="text-primary/50">{"──›"}</span>
-            <span className={step >= 3 ? "term-chip border-primary/50 text-primary" : "term-chip"}>
-              <span className={step >= 3 ? "h-1.5 w-1.5 rounded-full bg-primary" : "h-1.5 w-1.5 rounded-full bg-muted-foreground/40"} />
-              3_launch
-            </span>
-          </div>
+    <div className="mx-auto max-w-2xl px-8 py-16">
+      <div className="mb-12">
+        <p className="text-[10px] uppercase tracking-widest text-zinc-500">professor / new lecture</p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-100">Upload lecture</h1>
+      </div>
+
+      {/* Step indicator: 3 dots connected by lines */}
+      <div className="mb-12">
+        <div className="flex items-center justify-center">
+          {steps.map((s, i) => (
+            <div key={s.n} className="flex flex-1 items-center last:flex-none">
+              <div className="flex flex-col items-center">
+                <span
+                  className={
+                    step > s.n
+                      ? "h-3 w-3 rounded-full bg-green-400 transition-colors duration-150"
+                      : step === s.n
+                      ? "h-3 w-3 rounded-full bg-indigo-500 transition-colors duration-150"
+                      : "h-3 w-3 rounded-full bg-zinc-700 transition-colors duration-150"
+                  }
+                />
+                <span className="mt-3 text-[10px] uppercase tracking-widest text-zinc-500">{s.label}</span>
+              </div>
+              {i < steps.length - 1 && (
+                <div
+                  className={
+                    step > s.n
+                      ? "mx-2 -mt-6 h-px flex-1 bg-green-400 transition-colors duration-150"
+                      : "mx-2 -mt-6 h-px flex-1 bg-zinc-700 transition-colors duration-150"
+                  }
+                />
+              )}
+            </div>
+          ))}
         </div>
       </div>
 
-      <Card className="term-window pt-9 text-foreground">
-        <div className="absolute right-4 top-3 text-[11px] text-muted-foreground">~/lectureos/upload</div>
+      <Card className="rounded border border-zinc-800 bg-zinc-900 text-zinc-300">
         {step === 1 && (
           <>
             <CardHeader>
-              <CardTitle className="term-caret text-base font-semibold text-foreground">lecture_details</CardTitle>
-              <CardDescription className="text-muted-foreground">Give your new lecture a descriptive title.</CardDescription>
+              <CardTitle className="text-base font-semibold tracking-tight text-zinc-100">Lecture details</CardTitle>
+              <CardDescription className="text-zinc-500">Give your new lecture a descriptive title.</CardDescription>
             </CardHeader>
             <CardContent>
-              <label className="term-label mb-2 block">title</label>
+              <label className="mb-2 block text-[10px] uppercase tracking-widest text-zinc-500">title</label>
               <Input
                 placeholder="e.g. Introduction to Calculus"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className="term-input"
+                className="rounded border-zinc-800 bg-zinc-800 text-zinc-100 transition-colors duration-150"
               />
               {error && (
-                <p className="mt-4 text-sm text-destructive">
-                  <span className="text-destructive">{"› "}</span>{error}
+                <p className="mt-4 text-sm text-red-400">
+                  <span className="text-red-400">✘ </span>{error}
                 </p>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end border-t border-border pt-6">
-              <Button onClick={handleCreate} className="term-btn term-btn-primary">
-                create_lecture
+            <CardFooter className="flex justify-end border-t border-zinc-800 pt-6">
+              <Button
+                onClick={handleCreate}
+                className="rounded bg-indigo-500 text-zinc-100 transition-colors duration-150 hover:bg-indigo-400"
+              >
+                Create lecture →
               </Button>
             </CardFooter>
           </>
@@ -123,8 +140,8 @@ export default function UploadWizard() {
         {step === 2 && (
           <>
             <CardHeader>
-              <CardTitle className="term-caret text-base font-semibold text-foreground">upload_video</CardTitle>
-              <CardDescription className="text-muted-foreground">Select the raw video file to be processed.</CardDescription>
+              <CardTitle className="text-base font-semibold tracking-tight text-zinc-100">Upload video</CardTitle>
+              <CardDescription className="text-zinc-500">Select the raw video file to be processed.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <UploadDropzone<OurFileRouter, "lectureVideoUploader">
@@ -142,48 +159,54 @@ export default function UploadWizard() {
                   setError(err.message);
                 }}
                 appearance={{
-                  button: "term-btn term-btn-primary",
-                  container: "rounded-md border border-border bg-background/40",
-                  allowedContent: "text-muted-foreground"
+                  button: "rounded bg-indigo-500 text-zinc-100 transition-colors duration-150 hover:bg-indigo-400",
+                  container: "rounded border border-zinc-800 bg-zinc-950",
+                  allowedContent: "text-zinc-500"
                 }}
               />
 
               <div className="my-4 flex items-center">
-                <Separator className="flex-1 bg-border" />
-                <span className="mx-3 text-xs uppercase tracking-[0.18em] text-muted-foreground">// or local_dev_bypass</span>
-                <Separator className="flex-1 bg-border" />
+                <Separator className="flex-1 bg-zinc-800" />
+                <span className="mx-3 text-[10px] uppercase tracking-widest text-zinc-500">or local dev bypass</span>
+                <Separator className="flex-1 bg-zinc-800" />
               </div>
 
-              <div className="term-panel space-y-3 p-4">
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                  <span className="text-primary">{"› "}</span>
+              <div className="space-y-3 rounded border border-zinc-800 bg-zinc-950 p-4">
+                <p className="font-mono text-xs leading-relaxed text-zinc-500">
+                  <span className="text-indigo-400">$ </span>
                   Bypass the S3 cloud upload. Enter a URL accessible from inside the docker containers (e.g. the seeded dummy video).
                 </p>
                 <div className="flex gap-2">
                   <Input
                     value={mockUrl}
                     onChange={e => setMockUrl(e.target.value)}
-                    className="term-input text-xs"
+                    className="rounded border-zinc-800 bg-zinc-800 font-mono text-xs text-zinc-100 transition-colors duration-150"
                     placeholder="http://api:8080/dummy.mp4"
                   />
                   <Button
                     type="button"
                     onClick={handleBypassUpload}
-                    className="term-btn term-btn-primary whitespace-nowrap text-xs"
+                    className="whitespace-nowrap rounded bg-indigo-500 text-xs text-zinc-100 transition-colors duration-150 hover:bg-indigo-400"
                   >
-                    bypass_and_confirm
+                    Bypass and confirm
                   </Button>
                 </div>
               </div>
 
               {error && (
-                <p className="mt-4 text-sm text-destructive">
-                  <span className="text-destructive">{"› "}</span>{error}
+                <p className="mt-4 text-sm text-red-400">
+                  <span className="text-red-400">✘ </span>{error}
                 </p>
               )}
             </CardContent>
-            <CardFooter className="flex justify-end gap-4 border-t border-border pt-6">
-              <Button variant="outline" onClick={() => setStep(1)} className="term-btn">back</Button>
+            <CardFooter className="flex justify-end gap-4 border-t border-zinc-800 pt-6">
+              <Button
+                variant="outline"
+                onClick={() => setStep(1)}
+                className="rounded border-zinc-700 bg-transparent text-zinc-300 transition-colors duration-150 hover:bg-zinc-800"
+              >
+                ← Back
+              </Button>
             </CardFooter>
           </>
         )}
@@ -191,29 +214,32 @@ export default function UploadWizard() {
         {step === 3 && (
           <>
             <CardHeader>
-              <CardTitle className="term-caret text-base font-semibold text-foreground">launch_pipeline</CardTitle>
-              <CardDescription className="text-muted-foreground">Video successfully uploaded. Ready to extract concepts and generate animations.</CardDescription>
+              <CardTitle className="text-base font-semibold tracking-tight text-zinc-100">Launch pipeline</CardTitle>
+              <CardDescription className="text-zinc-500">Video successfully uploaded. Ready to extract concepts and generate animations.</CardDescription>
             </CardHeader>
             <CardContent className="py-8">
-              <div className="term-panel space-y-1.5 px-5 py-4 text-sm leading-relaxed">
-                <p className="text-foreground">
-                  <span className="text-primary">$ </span>lectureos confirm --upload
+              <div className="space-y-1.5 rounded border border-zinc-800 bg-zinc-950 px-5 py-4 font-mono text-sm leading-relaxed">
+                <p className="text-zinc-100">
+                  <span className="text-indigo-400">$ </span>lectureos confirm --upload
                 </p>
-                <p className="text-muted-foreground">
-                  <span className="text-primary">{"› "}</span>video staged ............ ok
+                <p className="text-zinc-500">
+                  <span className="text-indigo-400">› </span>video staged ............ ok
                 </p>
-                <p className="text-muted-foreground">
-                  <span className="text-primary">{"› "}</span>awaiting pipeline trigger
+                <p className="text-zinc-500">
+                  <span className="text-indigo-400">› </span>awaiting pipeline trigger
                 </p>
-                <p className="pt-1 text-primary">
-                  ✓ ready to run<span className="term-cursor" aria-hidden />
+                <p className="pt-1 text-green-400">
+                  ✔ ready to run
                 </p>
               </div>
             </CardContent>
-            <Separator className="bg-border" />
-            <CardFooter className="flex justify-end pt-6">
-              <Button onClick={handleTrigger} className="term-btn term-btn-primary w-full sm:w-auto">
-                $ start_pipeline
+            <Separator className="bg-zinc-800" />
+            <CardFooter className="pt-6">
+              <Button
+                onClick={handleTrigger}
+                className="w-full rounded bg-indigo-500 text-zinc-100 transition-colors duration-150 hover:bg-indigo-400"
+              >
+                Start pipeline →
               </Button>
             </CardFooter>
           </>

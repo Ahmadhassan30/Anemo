@@ -5,26 +5,20 @@ import React from "react";
 
 export default function StudentQuizPage() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col px-4 py-12 sm:px-6">
-      <span className="term-chip mb-6 self-start">
-        <span className="h-1.5 w-1.5 animate-blink rounded-full bg-primary" />
-        knowledge_check
-      </span>
-
-      <section className="term-window w-full pt-9 glow-ring">
-        <div className="absolute right-4 top-3 text-[11px] text-muted-foreground">
-          ~/lecture/quiz
-        </div>
-        <div className="space-y-3 px-6 pb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-            <span className="term-prompt text-muted-foreground" />
-            quiz
-            <span className="term-cursor align-middle" aria-hidden />
-          </h1>
-          <p className="term-caret max-w-xl text-sm leading-relaxed text-muted-foreground">
-            test your understanding of the lecture.
-          </p>
-        </div>
+    <main className="flex min-h-screen w-full items-center justify-center bg-zinc-950 px-4 py-12 sm:px-6">
+      <section className="w-full max-w-md rounded border border-zinc-800 bg-zinc-900 p-8 text-center">
+        <span className="text-[10px] uppercase tracking-widest text-zinc-500">
+          knowledge_check
+        </span>
+        <h1 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-100">
+          Quiz
+        </h1>
+        <p className="mt-2 text-sm leading-relaxed text-zinc-300">
+          Test your understanding of the lecture.
+        </p>
+        <p className="mt-6 font-mono text-sm text-zinc-600">
+          $ quiz will appear here
+        </p>
       </section>
     </main>
   );

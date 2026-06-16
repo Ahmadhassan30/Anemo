@@ -5,31 +5,35 @@ import React from "react";
 
 export default function ProfessorSettingsPage() {
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6">
-      <header className="mb-8">
-        <p className="term-label mb-2">{"// professor"}</p>
-        <h1 className="flex items-center text-2xl font-bold tracking-tight text-foreground">
-          <span className="term-prompt text-primary" />
-          settings
-          <span className="term-cursor align-middle" aria-hidden />
-        </h1>
-        <p className="term-caret mt-3 text-sm leading-relaxed text-muted-foreground">
-          connect youtube and manage profile preferences
-        </p>
-      </header>
+    <main className="mx-auto w-full max-w-xl px-8 py-12">
+      <h1 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-100">Settings</h1>
 
-      <section className="term-card">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="term-caret text-sm font-semibold text-foreground">youtube_connection</h2>
-          <span className="term-chip">
-            <span className="h-1.5 w-1.5 rounded-full bg-term-amber" />
-            not_connected
-          </span>
+      <section className="mb-8">
+        <p className="mb-3 text-[10px] uppercase tracking-widest text-zinc-500">YouTube Connection</p>
+        <div className="rounded border border-zinc-800 bg-zinc-900">
+          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3 last:border-0">
+            <span className="text-sm text-zinc-300">Status</span>
+            <span className="pill bg-zinc-800 text-zinc-400 border-zinc-700">○ not_connected</span>
+          </div>
+          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3 last:border-0">
+            <span className="text-sm text-zinc-300">OAuth</span>
+            <span className="font-mono text-sm text-zinc-500">link to publish rendered cuts</span>
+          </div>
         </div>
-        <hr className="term-rule mb-4" />
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          link a youtube account via oauth to publish rendered cuts directly from the pipeline.
-        </p>
+      </section>
+
+      <section className="mb-8">
+        <p className="mb-3 text-[10px] uppercase tracking-widest text-zinc-500">Profile</p>
+        <div className="rounded border border-zinc-800 bg-zinc-900">
+          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3 last:border-0">
+            <span className="text-sm text-zinc-300">Role</span>
+            <span className="font-mono text-sm text-zinc-500">professor</span>
+          </div>
+          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3 last:border-0">
+            <span className="text-sm text-zinc-300">Preferences</span>
+            <span className="font-mono text-sm text-zinc-500">default</span>
+          </div>
+        </div>
       </section>
     </main>
   );

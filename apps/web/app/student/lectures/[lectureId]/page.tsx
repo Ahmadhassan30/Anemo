@@ -9,7 +9,6 @@ import { VideoPlayer } from "@/components/student/VideoPlayer";
 import { NotesPanel } from "@/components/student/NotesPanel";
 import { ChatInterface } from "@/components/student/ChatInterface";
 import { QuizWidget } from "@/components/student/QuizWidget";
-import { MessageSquare, CheckSquare, ListVideo } from "lucide-react";
 
 export default function StudentLectureView() {
   const params = useParams();
@@ -57,11 +56,9 @@ export default function StudentLectureView() {
 
   if (loading) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-3 bg-background">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-border border-t-primary" />
-        <p className="text-sm text-muted-foreground">
-          <span className="text-primary">$ </span>loading_lecture
-          <span className="term-cursor" aria-hidden />
+      <div className="flex h-screen flex-col items-center justify-center gap-3 bg-zinc-950">
+        <p className="font-mono text-sm text-zinc-500">
+          <span className="text-indigo-400">$ </span>loading_lecture...
         </p>
       </div>
     );
@@ -69,12 +66,12 @@ export default function StudentLectureView() {
 
   if (!lecture) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background px-4">
-        <div className="term-panel max-w-md px-6 py-5 text-center">
-          <p className="text-sm text-destructive">
-            <span className="text-primary">{"› "}</span>error: lecture_not_found
+      <div className="flex h-screen items-center justify-center bg-zinc-950 px-4">
+        <div className="max-w-md rounded border border-zinc-800 bg-zinc-900 px-6 py-5 text-center">
+          <p className="font-mono text-sm text-red-400">
+            <span className="text-indigo-400">{"› "}</span>✘ error: lecture_not_found
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-zinc-300">
             lecture not found or you are not enrolled.
           </p>
         </div>
@@ -88,67 +85,72 @@ export default function StudentLectureView() {
     : (lecture.raw_video_url || "");
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] md:flex-row overflow-hidden bg-background">
+    <div className="grid h-screen grid-cols-1 overflow-hidden bg-zinc-950 md:grid-cols-[1fr_380px]">
 
       {/* Mobile Tab Bar (Visible only on small screens) */}
-      <div className="md:hidden flex border-b border-border bg-card shrink-0">
-        <button onClick={() => setMobileView("video")} className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 transition-colors ${mobileView === "video" ? "text-primary border-b-2 border-primary bg-secondary" : "text-muted-foreground hover:text-foreground"}`}>
-          <PlayIcon className="w-4 h-4" /> video
+      <div className="flex shrink-0 border-b border-zinc-800 bg-zinc-900 md:hidden">
+        <button onClick={() => setMobileView("video")} className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs transition-colors duration-150 ${mobileView === "video" ? "border-b-2 border-indigo-500 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}>
+          <span aria-hidden>●</span> video
         </button>
-        <button onClick={() => setMobileView("notes")} className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 transition-colors ${mobileView === "notes" ? "text-primary border-b-2 border-primary bg-secondary" : "text-muted-foreground hover:text-foreground"}`}>
-          <ListVideo className="w-4 h-4" /> notes
+        <button onClick={() => setMobileView("notes")} className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs transition-colors duration-150 ${mobileView === "notes" ? "border-b-2 border-indigo-500 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}>
+          <span aria-hidden>≡</span> notes
         </button>
-        <button onClick={() => setMobileView("interactive")} className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 transition-colors ${mobileView === "interactive" ? "text-primary border-b-2 border-primary bg-secondary" : "text-muted-foreground hover:text-foreground"}`}>
-          <MessageSquare className="w-4 h-4" /> interactive
+        <button onClick={() => setMobileView("interactive")} className={`flex flex-1 items-center justify-center gap-2 py-3 text-xs transition-colors duration-150 ${mobileView === "interactive" ? "border-b-2 border-indigo-500 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}>
+          <span aria-hidden>○</span> interactive
         </button>
       </div>
 
-      {/* Left Column (20%): Notes Panel */}
-      <div className={`${mobileView === "notes" ? "block" : "hidden"} md:block w-full md:w-[20%] h-full shrink-0 overflow-hidden border-r border-border`}>
-        <NotesPanel />
-      </div>
-
-      {/* Center Column (55%): Video Player */}
-      <div className={`${mobileView === "video" ? "block" : "hidden"} md:block w-full md:w-[55%] h-full overflow-y-auto p-4 md:p-6 bg-background`}>
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="term-panel px-5 py-4">
-            <div className="flex items-center gap-2">
-              <span className="term-chip">
-                <span className={`h-1.5 w-1.5 rounded-full ${lecture.status === "completed" ? "bg-primary" : "animate-blink bg-term-amber"}`} />
-                {lecture.status}
-              </span>
-              <span className="text-[11px] text-muted-foreground">~/lectures/{lectureId}</span>
-            </div>
-            <h1 className="mt-3 text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-              <span className="term-prompt text-muted-foreground" />{lecture.title}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              <span className="text-primary">{"› "}</span>interactive lecture playback
-            </p>
-          </div>
-
+      {/* LEFT: Video area + concept tabs */}
+      <div className={`${mobileView === "video" || mobileView === "notes" ? "block" : "hidden"} flex h-full flex-col overflow-hidden md:flex`}>
+        {/* Video area */}
+        <div className={`${mobileView === "video" ? "block" : "hidden"} aspect-video w-full shrink-0 bg-black md:block`}>
           <VideoPlayer src={videoSrc} />
         </div>
+
+        {/* Lecture meta + concept tabs */}
+        <div className={`${mobileView === "notes" ? "block" : "hidden"} flex flex-1 flex-col overflow-hidden border-t border-zinc-800 bg-zinc-900 md:flex`}>
+          <div className="flex shrink-0 items-center gap-3 px-4 py-3">
+            <span className={`pill ${lecture.status === "completed" ? "bg-green-950 text-green-400 border-green-800" : "bg-yellow-950 text-yellow-300 border-yellow-800 animate-pulse"}`}>
+              {lecture.status === "completed" ? "✔ " : "⟳ "}{lecture.status}
+            </span>
+            <span className="font-mono text-[11px] text-zinc-500">~/lectures/{lectureId}</span>
+          </div>
+
+          {/* Concept tabs — horizontal scroll row */}
+          <div className="flex shrink-0 items-center gap-4 overflow-x-auto border-t border-zinc-800 p-3">
+            <h1 className="whitespace-nowrap font-mono text-xs text-indigo-400 border-b border-indigo-400 pb-0.5">
+              {lecture.title}
+            </h1>
+            <span className="whitespace-nowrap font-mono text-xs text-zinc-500 transition-colors duration-150 hover:text-zinc-300">
+              interactive playback
+            </span>
+          </div>
+
+          {/* Notes panel content */}
+          <div className="flex-1 overflow-y-auto border-t border-zinc-800">
+            <NotesPanel />
+          </div>
+        </div>
       </div>
 
-      {/* Right Column (25%): Chat / Quiz */}
-      <div className={`${mobileView === "interactive" ? "block" : "hidden"} md:block w-full md:w-[25%] h-full shrink-0 border-l border-border flex flex-col`}>
-        <div className="flex border-b border-border bg-card shrink-0">
+      {/* RIGHT: Chat / Quiz / Notes */}
+      <div className={`${mobileView === "interactive" ? "block" : "hidden"} flex h-full shrink-0 flex-col border-l border-zinc-800 bg-zinc-900 md:flex`}>
+        <div className="flex shrink-0 border-b border-zinc-800">
           <button
-            className={`flex-1 py-3 flex items-center justify-center gap-2 text-xs transition-colors ${activeTab === "chat" ? "text-primary border-b-2 border-primary bg-secondary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"}`}
+            className={`flex h-10 items-center px-4 text-xs font-medium transition-colors duration-150 ${activeTab === "chat" ? "border-b-2 border-indigo-500 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}
             onClick={() => setActiveTab("chat")}
           >
-            <MessageSquare className="w-4 h-4" /> chat
+            Chat
           </button>
           <button
-            className={`flex-1 py-3 flex items-center justify-center gap-2 text-xs transition-colors ${activeTab === "quiz" ? "text-primary border-b-2 border-primary bg-secondary" : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"}`}
+            className={`flex h-10 items-center px-4 text-xs font-medium transition-colors duration-150 ${activeTab === "quiz" ? "border-b-2 border-indigo-500 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}
             onClick={() => setActiveTab("quiz")}
           >
-            <CheckSquare className="w-4 h-4" /> quiz
+            Quiz
           </button>
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-y-auto">
           {activeTab === "chat" ? (
             <ChatInterface lectureId={lectureId} />
           ) : (
@@ -157,24 +159,5 @@ export default function StudentLectureView() {
         </div>
       </div>
     </div>
-  );
-}
-
-function PlayIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polygon points="6 3 20 12 6 21 6 3" />
-    </svg>
   );
 }

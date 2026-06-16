@@ -1,7 +1,6 @@
 "use client";
 
 import { useLectureStore } from "@/store/lecture.store";
-import { Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 interface CitationCardProps {
@@ -22,18 +21,18 @@ export function CitationCard({ ts_start, chunk_text, concept_id }: CitationCardP
   return (
     <Card
       onClick={() => seekTo(ts_start)}
-      className="term-panel group mt-2 flex cursor-pointer flex-col gap-2 p-3 transition-colors hover:border-primary/50 hover:bg-secondary/40"
+      className="group mt-2 flex cursor-pointer flex-col gap-2 rounded border border-zinc-800 bg-zinc-950 p-2.5 transition-colors duration-150 hover:border-zinc-700"
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="term-chip border-primary/40 text-primary">
-          <Clock className="h-3 w-3" />
+        <span className="flex items-center gap-1.5 font-mono text-xs text-zinc-500">
+          <span aria-hidden>▸</span>
           {formatTime(ts_start)}
         </span>
-        <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground transition-colors group-hover:text-primary">
-          seek<span className="term-cursor align-middle" aria-hidden />
+        <span className="text-[10px] uppercase tracking-widest text-zinc-500 transition-colors duration-150 group-hover:text-zinc-300">
+          seek →
         </span>
       </div>
-      <p className="term-caret line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+      <p className="line-clamp-2 text-xs leading-relaxed text-zinc-400">
         {chunk_text}
       </p>
     </Card>

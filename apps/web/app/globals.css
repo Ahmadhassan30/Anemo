@@ -3,67 +3,33 @@
 @tailwind utilities;
 
 /* ==========================================================================
-   LectureOS — terminal design system
-   A sleek, minimal CRT/terminal aesthetic: monospace, near-black canvas,
-   phosphor-green primary, hairline borders, faint grid + scanline texture.
+   LectureOS — terminal + apple UI
+   Zinc canvas, indigo for primary actions only, monospace reserved for
+   terminal output / IDs / timestamps. Clean: no shadows, no gradients.
    ========================================================================== */
 
 :root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Inter, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", "Cascadia Code",
     "Fira Code", Menlo, Consolas, "Liberation Mono", monospace;
-  --term-bg: #0a0e12;
-  --term-panel: #0f141a;
-  --term-line: #1e2730;
-  --term-ink: #c8d3da;
-  --term-dim: #6b7a85;
-  --term-green: #4ee39a;
-  --term-cyan: #46d4e0;
-  --term-amber: #e8b84b;
-  --term-red: #ff6b6b;
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
-  html {
-    color-scheme: dark;
+  html,
+  body {
+    background-color: #09090b; /* zinc-950 */
+    color: #e4e4e7; /* zinc-200 */
   }
 
   body {
-    @apply min-h-screen text-foreground antialiased;
-    font-family: var(--font-mono);
-    background-color: var(--term-bg);
-    /* top phosphor glow + faint engineering grid */
-    background-image:
-      radial-gradient(1100px 480px at 50% -12%, rgba(78, 227, 154, 0.06), transparent 60%),
-      linear-gradient(rgba(255, 255, 255, 0.016) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.016) 1px, transparent 1px);
-    background-size: auto, 42px 42px, 42px 42px;
-    background-attachment: fixed;
-  }
-
-  /* Subtle scanline overlay — never enough to hurt legibility. */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 60;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(0, 0, 0, 0.16) 0px,
-      rgba(0, 0, 0, 0.16) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-    opacity: 0.22;
+    @apply min-h-screen antialiased;
+    font-family: var(--font-sans);
   }
 
   ::selection {
-    background: rgba(78, 227, 154, 0.28);
-    color: #eafff4;
+    background: rgba(99, 102, 241, 0.3); /* indigo-500/30 */
+    color: #e4e4e7;
   }
 
   ::-webkit-scrollbar {
@@ -71,117 +37,36 @@
     height: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--term-bg);
+    background: #09090b;
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--term-line);
-    border: 2px solid var(--term-bg);
-    border-radius: 0;
+    background: #27272a; /* zinc-800 */
+    border: 2px solid #09090b;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #2b3947;
+    background: #3f3f46; /* zinc-700 */
   }
 }
 
 @layer components {
-  /* Bordered surface — the base "window" of the UI. */
-  .term-panel {
-    @apply relative rounded-md border border-border bg-card;
+  .pill {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border;
   }
-
-  /* A panel with a faux titlebar dot row (use data-title for the label). */
-  .term-window {
-    @apply relative rounded-md border border-border bg-card;
+  .terminal {
+    @apply font-mono text-xs text-green-400 bg-zinc-950;
   }
-  .term-window::before {
-    content: "";
-    position: absolute;
-    top: 11px;
-    left: 14px;
-    width: 8px;
-    height: 8px;
-    border-radius: 9999px;
-    background: var(--term-red);
-    box-shadow: 16px 0 0 var(--term-amber), 32px 0 0 var(--term-green);
-    opacity: 0.85;
-  }
-
-  .term-card {
-    @apply relative rounded-md border border-border bg-card p-5;
-  }
-
-  /* Buttons */
-  .term-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-sm border border-border bg-transparent
-           px-4 py-2 text-sm font-medium text-foreground transition-all
-           hover:border-primary/60 hover:text-primary
-           focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring
-           disabled:pointer-events-none disabled:opacity-50;
-  }
-  .term-btn-primary {
-    @apply border-primary bg-primary text-primary-foreground hover:text-primary-foreground hover:brightness-110;
-    box-shadow: 0 0 22px -8px rgba(78, 227, 154, 0.5);
-  }
-  .term-btn-danger {
-    @apply border-destructive/60 text-destructive hover:border-destructive hover:text-destructive;
-  }
-
-  /* Inputs */
-  .term-input {
-    @apply w-full rounded-sm border border-border bg-background/60 px-3 py-2 text-sm text-foreground
-           placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring;
-    caret-color: var(--term-green);
-  }
-
-  /* Small bracketed status chip */
-  .term-chip {
-    @apply inline-flex items-center gap-1.5 rounded-sm border border-border px-2 py-0.5 text-xs text-muted-foreground;
-  }
-
-  /* Eyebrow / section label, e.g. "// PIPELINE" */
-  .term-label {
-    @apply text-xs uppercase tracking-[0.22em] text-muted-foreground;
-  }
-
-  .term-link {
-    @apply text-primary underline-offset-4 transition-colors hover:underline;
-  }
-
-  /* A "$" shell prompt prefix */
-  .term-prompt::before {
-    content: "$ ";
-    color: var(--term-green);
-  }
-  /* A "›" caret prefix */
-  .term-caret::before {
-    content: "› ";
-    color: var(--term-green);
-  }
-
-  /* Blinking block cursor */
-  .term-cursor {
-    @apply ml-0.5 inline-block h-[1.05em] w-[0.55ch] translate-y-[0.12em] bg-primary;
-    animation: term-blink 1.05s steps(1) infinite;
-  }
-
-  .term-rule {
-    @apply h-px w-full border-0 bg-border;
-  }
-
-  .glow-text {
-    text-shadow: 0 0 16px rgba(78, 227, 154, 0.45);
-  }
-  .glow-ring {
-    box-shadow: 0 0 0 1px rgba(78, 227, 154, 0.25), 0 0 28px -10px rgba(78, 227, 154, 0.45);
+  .fade-in {
+    animation: fadeIn 0.2s ease-in;
   }
 }
 
-@keyframes term-blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-
-@keyframes term-scan {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

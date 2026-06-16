@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, XCircle } from "lucide-react";
 
 interface QuizQuestion {
   id: string;
@@ -84,10 +83,9 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-4">
-        <div className="h-6 w-1/3 animate-pulse rounded-sm border border-border bg-secondary"></div>
-        <div className="h-24 w-full animate-pulse rounded-sm border border-border bg-secondary"></div>
-        <div className="h-24 w-full animate-pulse rounded-sm border border-border bg-secondary"></div>
+      <div className="p-6 space-y-3 font-mono text-sm text-zinc-500">
+        <p>$ loading quiz...</p>
+        <p>$ fetching questions...</p>
       </div>
     );
   }
@@ -95,13 +93,11 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
   if (generating) {
     return (
       <div className="flex h-full flex-col items-center justify-center space-y-4 p-6 text-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary/20 border-t-primary"></div>
-        <p className="font-medium text-foreground">
-          <span className="term-prompt text-primary" />generating_quiz
-          <span className="term-cursor align-middle" aria-hidden />
+        <p className="font-mono text-sm text-yellow-300 animate-pulse">
+          ⟳ generating_quiz...
         </p>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          // agent is analyzing lecture concepts and assembling questions — this may take a moment.
+        <p className="text-sm leading-relaxed text-zinc-500">
+          Agent is analyzing lecture concepts and assembling questions. This may take a moment.
         </p>
       </div>
     );
@@ -109,8 +105,8 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
 
   if (questions.length === 0) {
     return (
-      <div className="p-6 text-center text-sm text-muted-foreground">
-        <span className="text-primary">{"› "}</span>no_quiz_available for this lecture.
+      <div className="p-6 text-center text-sm text-zinc-500">
+        <span className="font-mono text-zinc-600">{"$ "}</span>No quiz available for this lecture.
       </div>
     );
   }
@@ -118,28 +114,27 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
   const resultMap = new Map(results?.results.map(r => [r.quiz_id, r]));
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto bg-background">
-      <div className="sticky top-0 z-10 border-b border-border bg-card/80 p-4 backdrop-blur-md">
-        <h3 className="term-caret font-semibold tracking-wide text-foreground">knowledge_check</h3>
+    <div className="flex h-full flex-col overflow-y-auto bg-zinc-950">
+      <div className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-900 p-4">
+        <h3 className="font-semibold tracking-tight text-zinc-100">Knowledge Check</h3>
         {results ? (
-          <div className="term-chip mt-2 text-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          <div className="pill bg-green-950 text-green-400 border-green-800 mt-2 font-mono">
             score: {results.score} / {results.total}
           </div>
         ) : (
-          <p className="mt-1 text-xs text-muted-foreground">// test your understanding</p>
+          <p className="mt-1 uppercase tracking-widest text-[10px] text-zinc-500">Test your understanding</p>
         )}
       </div>
 
-      <div className="space-y-8 p-4">
+      <div className="space-y-3 p-4">
         {questions.map((q, idx) => {
           const result = resultMap.get(q.id);
           const isAnswered = answers[q.id] !== undefined;
 
           return (
-            <div key={q.id} className="space-y-4">
-              <p className="text-sm font-medium leading-relaxed text-foreground">
-                <span className="mr-2 text-primary">{String(idx + 1).padStart(2, "0")}{" //"}</span>
+            <div key={q.id} className="bg-zinc-950 border border-zinc-800 rounded p-4 mb-3">
+              <p className="text-zinc-200 text-sm font-medium mb-3 leading-relaxed">
+                <span className="mr-2 font-mono text-zinc-500">{String(idx + 1).padStart(2, "0")}</span>
                 {q.question}
               </p>
               <div className="space-y-2">
@@ -150,18 +145,18 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
 
                   const isSelected = answers[q.id] === letter;
 
-                  let stateClass = "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground";
+                  let stateClass = "bg-zinc-900 hover:bg-zinc-800 border-zinc-700 text-zinc-300";
                   if (isSelected) {
-                    stateClass = "border-primary bg-primary/10 text-foreground";
+                    stateClass = "bg-zinc-900 border-indigo-500 text-indigo-300";
                   }
 
                   if (result) {
                     if (isSelected && result.correct) {
-                      stateClass = "border-term-green bg-term-green/10 text-foreground";
+                      stateClass = "bg-green-950 border-green-800 text-green-400";
                     } else if (isSelected && !result.correct) {
-                      stateClass = "border-destructive bg-destructive/10 text-destructive";
+                      stateClass = "bg-red-950 border-red-800 text-red-400";
                     } else {
-                      stateClass = "border-border bg-card text-muted-foreground opacity-50";
+                      stateClass = "bg-zinc-900 border-zinc-800 text-zinc-500 opacity-50";
                     }
                   }
 
@@ -170,17 +165,15 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
                       key={choice}
                       onClick={() => handleSelect(q.id, letter)}
                       disabled={!!results}
-                      className={`flex w-full items-start gap-3 rounded-sm border p-3 text-left text-sm transition-colors ${stateClass}`}
+                      className={`flex w-full items-start gap-3 rounded border px-3 py-2 text-left text-sm transition-colors duration-150 cursor-pointer ${stateClass}`}
                     >
-                      <div className="mt-0.5 shrink-0">
+                      <span className="mt-0.5 shrink-0 font-mono">
                         {result && isSelected ? (
-                          result.correct ? <CheckCircle2 className="h-4 w-4 text-term-green" /> : <XCircle className="h-4 w-4 text-destructive" />
+                          result.correct ? <span className="text-green-400">✔</span> : <span className="text-red-400">✘</span>
                         ) : (
-                          <div className={`flex h-4 w-4 items-center justify-center rounded-sm border ${isSelected ? 'border-primary' : 'border-border'}`}>
-                            {isSelected && <div className="h-2 w-2 rounded-sm bg-primary" />}
-                          </div>
+                          <span className={isSelected ? "text-indigo-400" : "text-zinc-600"}>{isSelected ? "●" : "○"}</span>
                         )}
-                      </div>
+                      </span>
                       <span>{choice}</span>
                     </button>
                   );
@@ -188,11 +181,11 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
               </div>
 
               {result && (
-                <div className={`rounded-sm border p-4 text-sm ${result.correct ? 'border-term-green/30 bg-term-green/10 text-foreground' : 'border-destructive/30 bg-destructive/10 text-destructive'}`}>
+                <div className={`mt-3 rounded border px-3 py-2 text-sm ${result.correct ? 'bg-green-950 border-green-800 text-green-400' : 'bg-red-950 border-red-800 text-red-400'}`}>
                   <p className="mb-1 font-semibold">
-                    <span className="text-primary">{"› "}</span>{result.correct ? 'correct' : 'incorrect'}
+                    {result.correct ? '✔ correct' : '✘ incorrect'}
                   </p>
-                  <p className="leading-relaxed opacity-90">{result.explanation}</p>
+                  <p className="leading-relaxed text-zinc-300">{result.explanation}</p>
                 </div>
               )}
             </div>
@@ -200,13 +193,13 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
         })}
 
         {!results && (
-          <Button
+          <button
             onClick={handleSubmit}
             disabled={Object.keys(answers).length < questions.length}
-            className="term-btn term-btn-primary w-full"
+            className="w-full rounded bg-indigo-500 hover:bg-indigo-400 py-2 text-sm text-white transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            $ submit_quiz
-          </Button>
+            Submit Quiz
+          </button>
         )}
       </div>
     </div>
