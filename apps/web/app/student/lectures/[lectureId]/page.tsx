@@ -81,11 +81,15 @@ export default function StudentLectureView() {
     );
   }
 
-  // Use the local final video if the status is completed, else fallback to raw video
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost/api/v1";
-  const videoSrc = lecture.status === "completed"
-    ? `${apiBaseUrl}/lectures/${lectureId}/video?token=${(session as any)?.accessToken || ""}`
-    : (lecture.raw_video_url || "");
+  // Use the local final video once the pipeline has completed, else fall back
+  // to the raw upload. The /video endpoint is auth-gated and a <video> element
+  // can't send an Authorization header, so the JWT rides along as ?token=.
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+  const token = (session as any)?.accessToken || "";
+  const videoSrc =
+    lecture.status === "completed" && token
+      ? `${apiBaseUrl}/lectures/${lectureId}/video?token=${encodeURIComponent(token)}`
+      : (lecture.raw_video_url || "");
 
   return (
     <div className="grid h-screen grid-cols-1 overflow-hidden bg-canvas md:grid-cols-[1fr_400px]">
@@ -107,7 +111,18 @@ export default function StudentLectureView() {
       <div className={`${mobileView === "video" || mobileView === "notes" ? "block" : "hidden"} flex h-full flex-col overflow-hidden md:flex`}>
         {/* Video area */}
         <div className={`${mobileView === "video" ? "block" : "hidden"} aspect-video w-full shrink-0 bg-black md:block`}>
-          <VideoPlayer src={videoSrc} />
+          {videoSrc ? (
+            <VideoPlayer src={videoSrc} />
+          ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-black text-center">
+              <div className="h-7 w-7 animate-spin rounded-full border-2 border-white/20 border-t-white/70" aria-hidden />
+              <p className="text-sm text-white/70">
+                {lecture.status === "failed"
+                  ? "Generation failed — no video is available."
+                  : "The animated video is still being generated…"}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Lecture meta + concept tabs */}

@@ -1,4 +1,5 @@
 """FastAPI application entrypoint and router registration."""
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -11,6 +12,8 @@ from config import settings
 from db.session import init_db
 from middleware.logging_middleware import LoggingMiddleware
 from routers import auth, chat, lectures, pipeline, students, video, youtube
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -57,5 +60,19 @@ async def health() -> dict[str, str]:
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    # IMPORTANT: a handler registered for the base ``Exception`` runs inside
+    # Starlette's ServerErrorMiddleware, which sits OUTSIDE CORSMiddleware — so
+    # this 500 response never passes back through CORS. Without re-adding the
+    # CORS headers here, the browser reports a misleading
+    # "No 'Access-Control-Allow-Origin' header" error that hides the real 500.
+    logger.exception("Unhandled error on %s %s", request.method, request.url.path)
     detail = str(exc) if settings.APP_ENV == "development" else "Internal server error"
-    return JSONResponse(status_code=500, content={"detail": detail})
+
+    headers: dict[str, str] = {}
+    origin = request.headers.get("origin")
+    if origin and (origin in settings.CORS_ORIGINS or "*" in settings.CORS_ORIGINS):
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Access-Control-Allow-Credentials"] = "true"
+        headers["Vary"] = "Origin"
+
+    return JSONResponse(status_code=500, content={"detail": detail}, headers=headers)

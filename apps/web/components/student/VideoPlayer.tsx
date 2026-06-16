@@ -16,15 +16,26 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
   const [isMuted, setIsMuted] = useState(false);
   const [duration, setDuration] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [loadError, setLoadError] = useState(false);
 
   const { currentTime, setCurrentTime, seekTarget, clearSeek, concepts } = useLectureStore();
 
-  // Handle Play/Pause
+  // Handle Play/Pause. play() returns a promise that REJECTS (e.g. with
+  // NotSupportedError) when the source can't be played — always catch it,
+  // otherwise it surfaces as an uncaught promise rejection in the console.
   const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) videoRef.current.pause();
-      else videoRef.current.play();
-      setIsPlaying(!isPlaying);
+    const v = videoRef.current;
+    if (!v) return;
+    if (isPlaying) {
+      v.pause();
+      setIsPlaying(false);
+    } else {
+      v.play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {
+          setIsPlaying(false);
+          setLoadError(true);
+        });
     }
   };
 
@@ -100,12 +111,24 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
     >
       <video
         ref={videoRef}
-        src={src}
+        src={src || undefined}
         className="h-full w-full object-contain"
         onClick={togglePlay}
-        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+        onLoadedMetadata={(e) => {
+          setDuration(e.currentTarget.duration);
+          setLoadError(false);
+        }}
+        onError={() => setLoadError(true)}
         onEnded={() => setIsPlaying(false)}
       />
+
+      {loadError && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-2 bg-black/80 text-center">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/80">!</div>
+          <p className="text-sm text-white/80">This video couldn&apos;t be loaded.</p>
+          <p className="text-xs text-white/50">It may still be processing, or your session expired — try refreshing.</p>
+        </div>
+      )}
 
       {/* Custom Controls Container */}
       <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/70 to-transparent p-4 pt-10 opacity-0 transition-opacity duration-200 group-hover:opacity-100">

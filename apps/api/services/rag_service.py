@@ -31,22 +31,29 @@ class RAGService:
         # 1. Encode query
         # We run it in a thread to not block the event loop
         query_vector = await asyncio.to_thread(embedder.encode, query)
-        
-        # 2. Run pgvector cosine similarity search
+
+        # pgvector over raw asyncpg needs the vector as its TEXT literal
+        # ("[0.1,0.2,...]"), not a Python list — binding a list raises an
+        # asyncpg encoding error because no vector codec is registered. Build
+        # the literal explicitly and cast it with ::vector.
+        vector_literal = "[" + ",".join(f"{float(x):.8f}" for x in query_vector.tolist()) + "]"
+
+        # 2. Run pgvector cosine similarity search. Cast :lecture_id::uuid so a
+        #    string id compares correctly against the uuid column.
         stmt = text("""
             SELECT chunk_text, ts_start, concept_id,
                    1 - (vector <=> :query_vector::vector) AS similarity
-            FROM embeddings 
-            WHERE lecture_id = :lecture_id
+            FROM embeddings
+            WHERE lecture_id = :lecture_id::uuid
             ORDER BY vector <=> :query_vector::vector
             LIMIT :top_k
         """)
-        
+
         result = await db.execute(
             stmt,
             {
-                "query_vector": query_vector.tolist(),
-                "lecture_id": lecture_id,
+                "query_vector": vector_literal,
+                "lecture_id": str(lecture_id),
                 "top_k": top_k
             }
         )
