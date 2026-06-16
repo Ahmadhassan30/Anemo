@@ -12,8 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from config import settings
 from db.session import get_db
-from middleware.auth_middleware import require_professor
+from middleware.auth_middleware import get_current_user, require_professor
 from models import Lecture, LectureStatus, User
+from models.agent_run import AgentRun
 from orchestrator.events import subscribe_events
 from tasks.pipeline_tasks import run_pipeline_task
 
@@ -72,6 +73,58 @@ async def trigger_pipeline(
     await db.commit()
 
     return {"message": "Pipeline started", "lecture_id": str(lecture_id)}
+
+
+# ---------------------------------------------------------------------------
+# GET /pipeline/{lecture_id}/state  (persisted snapshot for replay)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/{lecture_id}/state")
+async def pipeline_state(
+    lecture_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return the persisted pipeline state + agent-run history.
+
+    The live SSE stream only carries events emitted *after* a client connects,
+    so the UI fetches this on load to rebuild the terminal and learn the TRUE
+    status — e.g. after a refresh once a run already finished (no more "stuck
+    on running / locked download").
+    """
+    result = await db.execute(select(Lecture).where(Lecture.id == lecture_id))
+    lecture = result.scalar_one_or_none()
+    if not lecture:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lecture not found")
+
+    runs_res = await db.execute(
+        select(AgentRun).where(AgentRun.lecture_id == lecture_id).order_by(AgentRun.started_at)
+    )
+    runs = runs_res.scalars().all()
+
+    def _dur(r: AgentRun):
+        if r.started_at and r.finished_at:
+            return round((r.finished_at - r.started_at).total_seconds(), 1)
+        return None
+
+    return {
+        "lecture_id": str(lecture_id),
+        "status": lecture.status.value,
+        "youtube_url": lecture.youtube_url,
+        "agent_runs": [
+            {
+                "agent_name": r.agent_name,
+                "status": r.status.value,
+                "attempt": r.attempt,
+                "error_message": r.error_message,
+                "started_at": r.started_at.isoformat() if r.started_at else None,
+                "finished_at": r.finished_at.isoformat() if r.finished_at else None,
+                "duration_s": _dur(r),
+            }
+            for r in runs
+        ],
+    }
 
 
 # ---------------------------------------------------------------------------

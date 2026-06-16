@@ -11,6 +11,7 @@ interface PipelineState {
 
   startMonitoring: (lectureId: string) => void;
   updateFromEvent: (event: PipelineEvent) => void;
+  hydrate: (snapshot: Partial<PipelineState>) => void;
   reset: () => void;
 }
 
@@ -54,6 +55,10 @@ export const usePipelineStore = create<PipelineState>((set) => ({
         youtubeUrl: nextYoutubeUrl,
       };
     }),
+
+  // Seed the store from a persisted snapshot (replay) WITHOUT resetting to
+  // "running" — used on page load so a finished run isn't shown as restarting.
+  hydrate: (snapshot) => set((state) => ({ ...state, ...snapshot })),
 
   reset: () =>
     set({

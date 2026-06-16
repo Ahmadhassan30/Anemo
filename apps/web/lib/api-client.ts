@@ -71,6 +71,23 @@ export interface CreateLectureResponse {
   title: string;
 }
 
+export interface AgentRunRecord {
+  agent_name: string;
+  status: "started" | "success" | "failed" | "retrying";
+  attempt: number;
+  error_message: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  duration_s: number | null;
+}
+
+export interface PipelineStateResponse {
+  lecture_id: string;
+  status: string; // pending | processing | completed | failed
+  youtube_url: string | null;
+  agent_runs: AgentRunRecord[];
+}
+
 export const api = {
   auth: {
     login: async (email: string, password: string): Promise<TokenResponse> => {
@@ -119,6 +136,9 @@ export const api = {
   pipeline: {
     trigger: async (lectureId: string): Promise<void> => {
       return fetchAPI<void>(`/pipeline/${lectureId}/trigger`, { method: "POST" });
+    },
+    getState: async (lectureId: string): Promise<PipelineStateResponse> => {
+      return fetchAPI<PipelineStateResponse>(`/pipeline/${lectureId}/state`);
     },
     getSseUrl: (lectureId: string): string => {
       return `${API_BASE_URL}/pipeline/${lectureId}/status`;

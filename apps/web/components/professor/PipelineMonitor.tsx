@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePipelineStore } from "@/store/pipeline.store";
-import { subscribeToPipeline } from "@/lib/sse-client";
+import { subscribeToPipeline, type PipelineEvent } from "@/lib/sse-client";
+import { api, type AgentRunRecord } from "@/lib/api-client";
 import { Terminal, AnimatedSpan } from "@/components/magicui/terminal";
 import { DownloadButton } from "@/components/professor/DownloadButton";
 
@@ -28,34 +29,114 @@ const AGENT_LABELS: Record<string, string> = {
 
 type StepStatus = "pending" | "running" | "retrying" | "done" | "failed";
 
+// Map the backend lecture status to the in-memory pipeline status.
+function mapStatus(s: string): "idle" | "running" | "completed" | "failed" {
+  if (s === "completed") return "completed";
+  if (s === "failed") return "failed";
+  if (s === "processing" || s === "pending") return "running";
+  return "idle";
+}
+
+// Convert a persisted AgentRun row into a replayable terminal log line.
+function runToEvent(r: AgentRunRecord, lectureId: string): PipelineEvent {
+  const etype: PipelineEvent["event_type"] =
+    r.status === "started" ? "AGENT_STARTED" :
+    r.status === "success" ? "AGENT_COMPLETED" :
+    r.status === "failed" ? "AGENT_FAILED" : "AGENT_RETRYING";
+  const icon = r.status === "success" ? "✓" : r.status === "failed" ? "✗" : r.status === "retrying" ? "⟳" : "▸";
+  const verb = r.status === "success" ? "completed" : r.status;
+  const dur = r.duration_s != null ? ` in ${r.duration_s.toFixed(1)}s` : "";
+  let message = `${icon} ${r.agent_name} ${verb}${dur}`;
+  if (r.error_message) message += ` — ${r.error_message}`;
+  return {
+    event_type: etype,
+    lecture_id: lectureId,
+    agent_name: r.agent_name,
+    message,
+    progress_pct: 0,
+    timestamp: r.finished_at || r.started_at || new Date().toISOString(),
+    metadata: {},
+  };
+}
+
 interface PipelineMonitorProps {
   lectureId: string;
 }
 
 export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
-  const { status, currentAgent, progress, events, youtubeUrl, startMonitoring, updateFromEvent } =
+  const { status, currentAgent, progress, events, youtubeUrl, startMonitoring, updateFromEvent, hydrate } =
     usePipelineStore();
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // ── Live SSE subscription (unchanged wiring) ──────────────────────────────
+  // ── Reconcile with persisted state, then subscribe live only if running ───
+  // Fixes: stuck "running"/locked download after refresh, and an empty terminal
+  // when the page is opened after events were already emitted (SSE has no replay).
   useEffect(() => {
-    startMonitoring(lectureId);
-    const cleanupPromise = subscribeToPipeline(lectureId, {
+    let cancelled = false;
+    let cleanup: () => void = () => {};
+
+    const handlers = {
       onAgentStarted: updateFromEvent,
       onAgentCompleted: updateFromEvent,
       onAgentFailed: updateFromEvent,
       onPipelineCompleted: updateFromEvent,
       onPipelineFailed: updateFromEvent,
       onProgressUpdate: updateFromEvent,
-    }).catch((err) => {
-      setError(err.message);
-      return () => {};
-    });
-    return () => {
-      cleanupPromise.then((cleanup) => cleanup());
     };
-  }, [lectureId, startMonitoring, updateFromEvent]);
+    const subscribe = async () => {
+      const c = await subscribeToPipeline(lectureId, handlers).catch((err) => {
+        setError(err.message);
+        return () => {};
+      });
+      if (cancelled) {
+        try { c(); } catch {}
+        return;
+      }
+      cleanup = c;
+    };
+
+    (async () => {
+      try {
+        const st = await api.pipeline.getState(lectureId);
+        if (cancelled) return;
+        const runs = st.agent_runs || [];
+        const reconciled = mapStatus(st.status);
+        const doneAgents = new Set(
+          runs.filter((r) => r.status === "success").map((r) => r.agent_name)
+        );
+        const reconciledProgress =
+          reconciled === "completed"
+            ? 100
+            : Math.min(95, Math.round((doneAgents.size / AGENT_ORDER.length) * 100));
+        hydrate({
+          lectureId,
+          status: reconciled,
+          events: runs.map((r) => runToEvent(r, lectureId)),
+          progress: reconciledProgress,
+          youtubeUrl: st.youtube_url ?? null,
+          currentAgent:
+            reconciled === "running" && runs.length ? runs[runs.length - 1].agent_name : null,
+        });
+        // Only attach to the live (replay-less) stream while work remains.
+        if (reconciled === "running" || reconciled === "idle") {
+          await subscribe();
+        }
+      } catch {
+        // No persisted snapshot — fall back to a fresh live monitor.
+        if (cancelled) return;
+        startMonitoring(lectureId);
+        await subscribe();
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      try {
+        cleanup();
+      } catch {}
+    };
+  }, [lectureId, startMonitoring, updateFromEvent, hydrate]);
 
   // Auto-scroll the terminal to the newest line
   useEffect(() => {

@@ -168,6 +168,12 @@ class LectureOSPipeline:
                     audio_path=audio_path,
                 )
                 transcript: dict = transcription_result.get("transcript", {})
+                await self.emit(self._make_event(
+                    PipelineEventType.PROGRESS_UPDATE,
+                    f"Transcribed {len(transcript.get('segments', []))} segments "
+                    f"({transcript.get('duration', 0):.0f}s audio)",
+                    20, agent_name="transcription_agent",
+                ))
 
                 # ── Stage 3 (20→30%): Segmentation ───────────────────────
                 segmentation_result = await self._run_stage(
@@ -175,6 +181,13 @@ class LectureOSPipeline:
                     transcript=transcript,
                 )
                 concepts: list[dict] = segmentation_result.get("concepts", [])
+                _titles = [str(c.get("concept") or c.get("title") or "?") for c in concepts[:4]]
+                await self.emit(self._make_event(
+                    PipelineEventType.PROGRESS_UPDATE,
+                    f"Extracted {len(concepts)} concepts: " + ", ".join(_titles)
+                    + ("…" if len(concepts) > 4 else ""),
+                    30, agent_name="segmentation_agent",
+                ))
 
             # ── Stage 3b: Select concepts + generate narration/TTS ───
             media_dir = Path(f"/tmp/lectures/{self.lecture_id}")
@@ -288,6 +301,12 @@ class LectureOSPipeline:
                 transcript=transcript,
             )
             final_video_url: str = composition_result.get("final_video_url", "")
+            await self.emit(self._make_event(
+                PipelineEventType.PROGRESS_UPDATE,
+                f"Composed final video — {composition_result.get('duration_seconds', 0):.0f}s "
+                f"across {len(video_concepts)} concepts",
+                80, agent_name="composition_agent",
+            ))
 
             # ── Mark the video READY as soon as composition succeeds ──
             #    The rendered video is the product. RAG indexing and YouTube
