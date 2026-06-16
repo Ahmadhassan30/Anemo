@@ -69,12 +69,20 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // ── Reconcile with persisted state, then subscribe live only if running ───
-  // Fixes: stuck "running"/locked download after refresh, and an empty terminal
-  // when the page is opened after events were already emitted (SSE has no replay).
+  // ── Robust reconciliation ────────────────────────────────────────────────
+  // Replay persisted state on load, stream live logs via SSE, AND poll the
+  // DB-backed /state on an interval so the UI self-heals if the (replay-less)
+  // SSE drops mid-render. Fixes "stuck on running / locked download until
+  // refresh" once and for all — completion is detected within a few seconds.
   useEffect(() => {
     let cancelled = false;
-    let cleanup: () => void = () => {};
+    let cleanupSSE: () => void = () => {};
+    let pollId: ReturnType<typeof setInterval> | null = null;
+
+    const stop = () => {
+      if (pollId) { clearInterval(pollId); pollId = null; }
+      try { cleanupSSE(); } catch {}
+    };
 
     const handlers = {
       onAgentStarted: updateFromEvent,
@@ -89,52 +97,77 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
         setError(err.message);
         return () => {};
       });
-      if (cancelled) {
-        try { c(); } catch {}
-        return;
+      if (cancelled) { try { c(); } catch {} return; }
+      cleanupSSE = c;
+    };
+
+    const progressFromRuns = (runs: AgentRunRecord[]) =>
+      Math.min(95, Math.round(
+        (new Set(runs.filter((r) => r.status === "success").map((r) => r.agent_name)).size /
+          AGENT_ORDER.length) * 100
+      ));
+
+    // Authoritative DB poll — flips to completed/failed on its own.
+    const poll = async () => {
+      try {
+        const st = await api.pipeline.getState(lectureId);
+        if (cancelled) return;
+        const rs = mapStatus(st.status);
+        const runs = st.agent_runs || [];
+        const cur = usePipelineStore.getState();
+        if (rs === "completed" || rs === "failed") {
+          if (cur.status !== rs) {
+            // SSE missed the finish — backfill the authoritative timeline.
+            hydrate({
+              status: rs,
+              progress: rs === "completed" ? 100 : cur.progress,
+              youtubeUrl: st.youtube_url ?? null,
+              events: runs.map((r) => runToEvent(r, lectureId)),
+            });
+          } else {
+            hydrate({ progress: rs === "completed" ? 100 : cur.progress, youtubeUrl: st.youtube_url ?? null });
+          }
+          stop();
+        } else {
+          // Keep status/progress advancing even if the SSE has gone quiet.
+          hydrate({ status: rs, progress: Math.max(cur.progress, progressFromRuns(runs)), youtubeUrl: st.youtube_url ?? null });
+        }
+      } catch {
+        /* transient — the next tick retries */
       }
-      cleanup = c;
     };
 
     (async () => {
+      let reconciled: "idle" | "running" | "completed" | "failed" = "running";
       try {
         const st = await api.pipeline.getState(lectureId);
         if (cancelled) return;
         const runs = st.agent_runs || [];
-        const reconciled = mapStatus(st.status);
-        const doneAgents = new Set(
-          runs.filter((r) => r.status === "success").map((r) => r.agent_name)
-        );
-        const reconciledProgress =
-          reconciled === "completed"
-            ? 100
-            : Math.min(95, Math.round((doneAgents.size / AGENT_ORDER.length) * 100));
+        reconciled = mapStatus(st.status);
         hydrate({
           lectureId,
           status: reconciled,
           events: runs.map((r) => runToEvent(r, lectureId)),
-          progress: reconciledProgress,
+          progress: reconciled === "completed" ? 100 : progressFromRuns(runs),
           youtubeUrl: st.youtube_url ?? null,
-          currentAgent:
-            reconciled === "running" && runs.length ? runs[runs.length - 1].agent_name : null,
+          currentAgent: reconciled === "running" && runs.length ? runs[runs.length - 1].agent_name : null,
         });
-        // Only attach to the live (replay-less) stream while work remains.
-        if (reconciled === "running" || reconciled === "idle") {
-          await subscribe();
-        }
       } catch {
-        // No persisted snapshot — fall back to a fresh live monitor.
         if (cancelled) return;
         startMonitoring(lectureId);
+      }
+      if (cancelled) return;
+      // While work remains: live logs via SSE + a safety poll of the DB truth.
+      if (reconciled === "running" || reconciled === "idle") {
         await subscribe();
+        if (cancelled) { stop(); return; }
+        pollId = setInterval(poll, 4000);
       }
     })();
 
     return () => {
       cancelled = true;
-      try {
-        cleanup();
-      } catch {}
+      stop();
     };
   }, [lectureId, startMonitoring, updateFromEvent, hydrate]);
 

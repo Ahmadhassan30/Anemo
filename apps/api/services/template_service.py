@@ -67,6 +67,8 @@ class TemplateService:
             class_name=class_name,
             title=concept_title,
             target_duration=target_duration,
+            # Stable per-concept seed → distinct-but-reproducible visual variety.
+            seed=str(concept.get("id") or class_name),
         )
         logger.info(
             "Generated %s scene for %s (%d chars)",

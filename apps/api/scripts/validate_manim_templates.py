@@ -40,7 +40,8 @@ def _load_templates():
 
 
 _mt = _load_templates()
-TEMPLATES = _mt.TEMPLATES
+VARIANTS = _mt.VARIANTS
+DEFAULT_PARAMS = _mt.DEFAULT_PARAMS
 render_template = _mt.render_template
 
 ADVERSARIAL = {
@@ -75,32 +76,54 @@ ADVERSARIAL = {
 }
 
 
+def _safe_params(vtype: str, cls: str) -> dict:
+    d = dict(DEFAULT_PARAMS[vtype])
+    d.update(class_name=cls, kicker="K", title="T", hold=1.2, pal_index=0, bg_style=0, intro=0)
+    if vtype == "graph_animation":
+        xr, yr = d["x_range"], d["y_range"]
+        d.update(x_min=xr[0], x_max=xr[1], y_min=yr[0], y_max=yr[1])
+    return d
+
+
 def main() -> int:
     failures = []
     cls = "ConceptAbc12345Scene"
-    for vtype in TEMPLATES:
-        for tag, params, dur in (
-            ("defaults", None, 12.0),
-            ("adversarial", ADVERSARIAL[vtype], 55.0),
-        ):
-            code = render_template(vtype, params, cls, 'Tricky "Title"\n2', dur)
+    n = 0
+
+    # 1. Every variant string must compile on its own (guarantees full coverage).
+    for vtype, variants in VARIANTS.items():
+        safe = _safe_params(vtype, cls)
+        for i, variant in enumerate(variants):
             try:
-                compile(code, f"<{vtype}:{tag}>", "exec")
-            except SyntaxError as exc:
-                failures.append(f"{vtype} [{tag}] SYNTAX: {exc}")
-                continue
-            if f"class {cls}(StudioScene)" not in code:
-                failures.append(f"{vtype} [{tag}]: class definition missing")
-            if "exec(" in code.split("class ")[0] or "exec('evil')" in code:
-                failures.append(f"{vtype} [{tag}]: unsafe shape_code leaked through")
-            print(f"  OK  {vtype:18s} [{tag}]  ({len(code)} chars)")
+                compile(variant.format(**safe), f"<variant:{vtype}:{i}>", "exec")
+                n += 1
+            except (SyntaxError, KeyError, IndexError, ValueError) as exc:
+                failures.append(f"{vtype} variant#{i}: {type(exc).__name__}: {exc}")
+        print(f"  OK  {vtype:18s}  ({len(variants)} variant(s))")
+
+    # 2. Fuzz render_template across seeds (variant×palette×backdrop×intro) and
+    #    adversarial params — the full assembly + sanitation path.
+    for vtype in VARIANTS:
+        for seed in range(0, 40):
+            for params in (None, ADVERSARIAL[vtype]):
+                code = render_template(vtype, params, cls, 'Tricky "Title"\n2', 12.0 + seed, seed=str(seed))
+                n += 1
+                try:
+                    compile(code, f"<render:{vtype}:{seed}>", "exec")
+                except SyntaxError as exc:
+                    failures.append(f"{vtype} seed={seed} SYNTAX: {exc}")
+                    continue
+                if f"class {cls}(StudioScene)" not in code:
+                    failures.append(f"{vtype} seed={seed}: class definition missing")
+                if "exec('evil')" in code:
+                    failures.append(f"{vtype} seed={seed}: unsafe shape_code leaked through")
 
     if failures:
         print("\nFAILURES:")
-        for f in failures:
+        for f in failures[:40]:
             print("  ✗", f)
         return 1
-    print(f"\nAll {len(TEMPLATES) * 2} scene variants compiled cleanly.")
+    print(f"\nAll {n} generated scenes compiled cleanly (variants + seeded fuzz).")
     return 0
 
 

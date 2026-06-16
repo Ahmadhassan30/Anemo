@@ -1,16 +1,14 @@
-"""Premium Manim scene templates + safe code assembly.
+"""Premium, varied Manim scene templates + safe code assembly.
 
-Each template subclasses ``StudioScene`` (defined in the inlined ``PREAMBLE``)
-and is paced for a short, punchy explainer beat — no long frozen end-frames.
+Each visual type has SEVERAL compositional variants. A deterministic per-concept
+seed selects the variant plus a palette / backdrop / intro-motion, so two
+concepts (even of the same type) look clearly different, while re-renders of the
+same concept stay stable. All variants subclass ``StudioScene`` (from the inlined
+``PREAMBLE``) and use only well-established Manim CE 0.18 APIs.
 
-``render_template`` is a pure function: given a visual type, extracted params,
-a class name and a target duration, it returns a complete, self-contained Manim
-source file. It performs all sanitation (escaping interpolated text, coercing
-numerics, validating ranges) so the generated source is always syntactically
-valid Python, even when the upstream LLM returns messy values.
-
-This module imports only ``PREAMBLE`` (a string), so it is safe to import for
-offline validation without ``manim`` installed.
+``render_template`` is a pure function and sanitizes every interpolated value, so
+the generated source is always valid Python regardless of upstream LLM output.
+Imports only ``PREAMBLE`` (a string) — safe for offline AST validation.
 """
 from __future__ import annotations
 
@@ -18,144 +16,239 @@ import re
 
 from services.manim_studio import PREAMBLE
 
+_NUM_PALETTES = 6  # keep in sync with PALETTES in manim_studio
+_HEADER = (
+    "\nclass {class_name}(StudioScene):\n"
+    "    PAL_INDEX = {pal_index}\n"
+    "    BG_STYLE = {bg_style}\n"
+    "    INTRO = {intro}\n\n"
+    "    def construct(self):\n"
+    "        p = self.pal\n"
+    '        self.title_block("{kicker}", "{title}")\n'
+)
+
 # ---------------------------------------------------------------------------
-# Scene templates — formatted with sanitized params. The ONLY braces in these
-# strings are ``{placeholder}`` fields; all dicts/sets live in the PREAMBLE.
+# GRAPH — variant A: curve + shaded area under the curve
 # ---------------------------------------------------------------------------
-
-GRAPH_ANIMATION_TEMPLATE = '''
-class {class_name}(StudioScene):
-    accent = C_TEAL
-
-    def construct(self):
-        self.title_block("{kicker}", "{title}")
-
-        axes, labels = studio_axes({x_range}, {y_range}, "{x_label}", "{y_label}")
+GRAPH_AREA = _HEADER + '''
+        axes, labels = studio_axes(p, {x_range}, {y_range}, "{x_label}", "{y_label}")
         plot = VGroup(axes, labels)
-        fit(plot, w=11.5, h=4.4, center=DOWN * 0.4)
-        self.play(Create(axes), FadeIn(labels), run_time=1.8)
+        fit(plot, w=11.4, h=4.3, center=DOWN * 0.45)
+        self.play(Create(axes), FadeIn(labels), run_time=1.6)
 
-        curve = axes.plot(lambda x: max(min(float({formula}), {y_max}), {y_min}),
-                          color=C_BLUE, stroke_width=5)
-        self.play(Create(curve), run_time=2.6, rate_func=smooth)
+        f = lambda x: max(min(float({formula}), {y_max}), {y_min})
+        curve = axes.plot(f, color=self.acc(0), stroke_width=5)
+        self.play(Create(curve), run_time=2.3, rate_func=smooth)
+        try:
+            lo, hi = sorted((float({x_min}), float({highlight_x})))
+            if hi - lo > 0.05:
+                area = axes.get_area(curve, x_range=(lo, hi), color=self.acc(0), opacity=0.28)
+                self.play(FadeIn(area), run_time=1.0)
+        except Exception:
+            pass
 
-        dot = Dot(axes.c2p({highlight_x}, {formula_at_point}), color=C_AMBER, radius=0.13)
-        glow = dot.copy().scale(2.6).set_opacity(0.22)
-        lbl = caption("{point_label}", C_AMBER).scale(0.82)
-        lbl.next_to(dot, UR, buff=0.18)
-        self.play(FadeIn(glow), GrowFromCenter(dot), Write(lbl), run_time=1.4)
+        dot = Dot(axes.c2p({highlight_x}, {formula_at_point}), color=self.acc(3), radius=0.13)
+        lbl = caption("{point_label}", self.acc(3)).scale(0.8)
+        lbl.next_to(dot, UR, buff=0.16)
+        self.play(GrowFromCenter(dot), Write(lbl), run_time=1.2)
 
-        self.lower_third("{explanation}", C_GREEN)
+        self.lower_third("{explanation}", self.acc(2))
         self.outro(focus=curve, hold={hold})
 '''
 
-EQUATION_DISPLAY_TEMPLATE = '''
-class {class_name}(StudioScene):
-    accent = C_VIOLET
+# GRAPH — variant B: Riemann rectangles (integral / accumulation intuition)
+GRAPH_RIEMANN = _HEADER + '''
+        axes, labels = studio_axes(p, {x_range}, {y_range}, "{x_label}", "{y_label}")
+        plot = VGroup(axes, labels)
+        fit(plot, w=11.4, h=4.3, center=DOWN * 0.45)
+        self.play(Create(axes), FadeIn(labels), run_time=1.6)
 
-    def construct(self):
-        self.title_block("{kicker}", "{title}")
+        f = lambda x: max(min(float({formula}), {y_max}), {y_min})
+        curve = axes.plot(f, color=self.acc(0), stroke_width=5)
+        self.play(Create(curve), run_time=2.1, rate_func=smooth)
+        try:
+            rects = axes.get_riemann_rectangles(
+                curve, x_range=[float({x_min}), float({x_max})], dx=0.36,
+                color=[self.acc(1), self.acc(3)], fill_opacity=0.55, stroke_width=0.5,
+            )
+            self.play(Create(rects), run_time=1.9)
+        except Exception:
+            pass
 
-        eq1 = MathTex(r"{equation_main}", color=INK).scale(1.3)
-        eq2 = MathTex(r"{equation_step1}", color=C_BLUE)
-        eq3 = MathTex(r"{equation_step2}", color=C_GREEN)
+        dot = Dot(axes.c2p({highlight_x}, {formula_at_point}), color=self.acc(3), radius=0.12)
+        self.play(GrowFromCenter(dot), run_time=0.7)
+        self.lower_third("{explanation}", self.acc(2))
+        self.outro(focus=curve, hold={hold})
+'''
+
+# GRAPH — variant C: a dot + vertical tracking line sweeping the curve (3b1b)
+GRAPH_TRACE = _HEADER + '''
+        axes, labels = studio_axes(p, {x_range}, {y_range}, "{x_label}", "{y_label}")
+        plot = VGroup(axes, labels)
+        fit(plot, w=11.4, h=4.3, center=DOWN * 0.45)
+        self.play(Create(axes), FadeIn(labels), run_time=1.4)
+
+        f = lambda x: max(min(float({formula}), {y_max}), {y_min})
+        curve = axes.plot(f, color=self.acc(0), stroke_width=5)
+        self.play(Create(curve), run_time=1.8, rate_func=smooth)
+
+        t = ValueTracker(float({x_min}))
+        dot = always_redraw(lambda: Dot(axes.c2p(t.get_value(), f(t.get_value())),
+                                        color=self.acc(3), radius=0.12))
+        vline = always_redraw(lambda: axes.get_vertical_line(
+            axes.c2p(t.get_value(), f(t.get_value())), color=self.acc(1), stroke_width=2))
+        self.add(vline, dot)
+        self.play(t.animate.set_value(float({x_max})), run_time=3.0, rate_func=linear)
+
+        self.lower_third("{explanation}", self.acc(2))
+        self.outro(focus=curve, hold={hold})
+'''
+
+# ---------------------------------------------------------------------------
+# EQUATION — variant A: stepwise derivation with arrows
+# ---------------------------------------------------------------------------
+EQUATION_STEPS = _HEADER + '''
+        eq1 = MathTex(r"{equation_main}", color=p["ink"]).scale(1.3)
+        eq2 = MathTex(r"{equation_step1}", color=self.acc(0))
+        eq3 = MathTex(r"{equation_step2}", color=self.acc(2))
         steps = VGroup(eq1, eq2, eq3).arrange(DOWN, buff=0.75)
         fit(steps, w=10.5, h=4.0, center=DOWN * 0.15)
-
-        a1 = Arrow(eq1.get_bottom(), eq2.get_top(), buff=0.1, color=C_AMBER, stroke_width=3)
-        a2 = Arrow(eq2.get_bottom(), eq3.get_top(), buff=0.1, color=C_AMBER, stroke_width=3)
-
-        self.play(Write(eq1), run_time=1.7)
-        self.play(GrowArrow(a1), run_time=0.6)
-        self.play(Write(eq2), run_time=1.5)
-        self.play(GrowArrow(a2), run_time=0.6)
-        self.play(Write(eq3), run_time=1.5)
-
-        box = SurroundingRectangle(eq3, color=C_GREEN, buff=0.22)
-        self.play(Create(box), run_time=1.0)
-
-        self.lower_third("{explanation}", C_TEAL)
+        a1 = Arrow(eq1.get_bottom(), eq2.get_top(), buff=0.1, color=self.acc(3), stroke_width=3)
+        a2 = Arrow(eq2.get_bottom(), eq3.get_top(), buff=0.1, color=self.acc(3), stroke_width=3)
+        self.play(Write(eq1), run_time=1.6)
+        self.play(GrowArrow(a1), run_time=0.5)
+        self.play(Write(eq2), run_time=1.4)
+        self.play(GrowArrow(a2), run_time=0.5)
+        self.play(Write(eq3), run_time=1.4)
+        box = SurroundingRectangle(eq3, color=self.acc(2), buff=0.22)
+        self.play(Create(box), run_time=0.9)
+        self.lower_third("{explanation}", self.acc(1))
         self.outro(focus=box, hold={hold})
 '''
 
-DIAGRAM_FLOW_TEMPLATE = '''
-class {class_name}(StudioScene):
-    accent = C_BLUE
+# EQUATION — variant B: transform one form into the next
+EQUATION_TRANSFORM = _HEADER + '''
+        eq1 = MathTex(r"{equation_main}", color=p["ink"]).scale(1.3)
+        fit(eq1, w=10.0, h=2.0, center=UP * 0.7)
+        self.play(Write(eq1), run_time=1.8)
+        eq2 = MathTex(r"{equation_step1}", color=self.acc(0)).scale(1.15).move_to(DOWN * 0.1)
+        self.play(TransformFromCopy(eq1, eq2), run_time=1.6)
+        eq3 = MathTex(r"{equation_step2}", color=self.acc(2)).scale(1.15)
+        eq3.next_to(eq2, DOWN, buff=0.6)
+        self.play(TransformFromCopy(eq2, eq3), run_time=1.6)
+        box = SurroundingRectangle(eq3, color=self.acc(2), buff=0.22)
+        self.play(Create(box), run_time=0.8)
+        self.lower_third("{explanation}", self.acc(3))
+        self.outro(focus=box, hold={hold})
+'''
 
-    def construct(self):
-        self.title_block("{kicker}", "{title}")
-
+# ---------------------------------------------------------------------------
+# DIAGRAM — variant A: left-to-right pipeline
+# ---------------------------------------------------------------------------
+DIAGRAM_ROW = _HEADER + '''
         labels = ["{step1}", "{step2}", "{step3}", "{step4}"]
-        palette = [C_BLUE, C_TEAL, C_VIOLET, C_GREEN]
-        nodes = VGroup(*[chip(lbl, palette[i]) for i, lbl in enumerate(labels)])
+        nodes = VGroup(*[chip(lbl, self.acc(i), p["ink"]) for i, lbl in enumerate(labels)])
         nodes.arrange(RIGHT, buff=0.7)
         fit(nodes, w=12.6, h=2.4, center=UP * 0.1)
-
         arrows = VGroup()
         for i in range(len(nodes) - 1):
             arrows.add(Arrow(nodes[i].get_right(), nodes[i + 1].get_left(),
-                             buff=0.12, color=MUTED, stroke_width=3))
-
+                             buff=0.12, color=p["muted"], stroke_width=3))
         for i, node in enumerate(nodes):
-            self.play(DrawBorderThenFill(node[0]), Write(node[1]), run_time=0.8)
+            self.play(DrawBorderThenFill(node[0]), Write(node[1]), run_time=0.7)
             if i < len(arrows):
-                self.play(GrowArrow(arrows[i]), run_time=0.5)
-
-        self.play(Indicate(nodes[-1], color=C_GREEN, scale_factor=1.08), run_time=0.9)
-        self.lower_third("{description}", C_TEAL)
+                self.play(GrowArrow(arrows[i]), run_time=0.45)
+        self.play(Indicate(nodes[-1], color=self.acc(2), scale_factor=1.08), run_time=0.8)
+        self.lower_third("{description}", self.acc(1))
         self.outro(hold={hold})
 '''
 
-TEXT_BULLETS_TEMPLATE = '''
-class {class_name}(StudioScene):
-    accent = C_AMBER
+# DIAGRAM — variant B: circular cycle with curved arrows
+DIAGRAM_CYCLE = _HEADER + '''
+        labels = ["{step1}", "{step2}", "{step3}", "{step4}"]
+        n = len(labels)
+        R = 2.25
+        nodes = VGroup()
+        for i, lbl in enumerate(labels):
+            ang = PI / 2 - i * TAU / n
+            c = chip(lbl, self.acc(i), p["ink"], w=2.5, h=1.0)
+            c.move_to([R * np.cos(ang), R * np.sin(ang) - 0.25, 0])
+            nodes.add(c)
+        for node in nodes:
+            self.play(DrawBorderThenFill(node[0]), Write(node[1]), run_time=0.6)
+        arrows = VGroup()
+        for i in range(n):
+            a = nodes[i].get_center()
+            b = nodes[(i + 1) % n].get_center()
+            arrows.add(CurvedArrow(a + (b - a) * 0.3, b + (a - b) * 0.3,
+                                   color=p["muted"], angle=-0.55, stroke_width=3))
+        self.play(LaggedStart(*[Create(x) for x in arrows], lag_ratio=0.3, run_time=2.0))
+        self.lower_third("{description}", self.acc(2))
+        self.outro(hold={hold})
+'''
 
-    def construct(self):
-        self.title_block("{kicker}", "{title}")
-
+# ---------------------------------------------------------------------------
+# BULLETS — variant A: marked list
+# ---------------------------------------------------------------------------
+BULLETS_LIST = _HEADER + '''
         items = ["{bullet1}", "{bullet2}", "{bullet3}", "{bullet4}"]
-        palette = [C_BLUE, C_TEAL, C_VIOLET, C_GREEN]
         rows = VGroup()
         for i, text in enumerate(items):
             marker = RoundedRectangle(width=0.16, height=0.44, corner_radius=0.06,
-                                      stroke_width=0, fill_color=palette[i], fill_opacity=1)
-            label = Text(text, font_size=28, color=INK)
+                                      stroke_width=0, fill_color=self.acc(i), fill_opacity=1)
+            label = Text(text, font_size=28, color=p["ink"])
             if label.width > 10.4:
                 label.scale_to_fit_width(10.4)
             rows.add(VGroup(marker, label).arrange(RIGHT, buff=0.32))
         rows.arrange(DOWN, aligned_edge=LEFT, buff=0.45)
         fit(rows, w=12.0, h=4.2, center=DOWN * 0.25)
-
         self.play(LaggedStart(*[FadeIn(r, shift=RIGHT * 0.3) for r in rows],
-                              lag_ratio=0.5, run_time=3.4))
-
-        self.lower_third("{summary}", C_GREEN)
+                              lag_ratio=0.5, run_time=3.2))
+        self.lower_third("{summary}", self.acc(2))
         self.outro(focus=rows[0], hold={hold})
 '''
 
-CODE_WALKTHROUGH_TEMPLATE = '''
-class {class_name}(StudioScene):
-    accent = C_GREEN
+# BULLETS — variant B: 2x2 numbered cards
+BULLETS_CARDS = _HEADER + '''
+        items = ["{bullet1}", "{bullet2}", "{bullet3}", "{bullet4}"]
+        cards = VGroup()
+        for i, text in enumerate(items):
+            card = RoundedRectangle(width=5.6, height=1.7, corner_radius=0.16,
+                                    stroke_color=self.acc(i), stroke_width=2,
+                                    fill_color=self.acc(i), fill_opacity=0.09)
+            num = Text(str(i + 1), font_size=26, color=self.acc(i), weight=BOLD)
+            lab = Text(text, font_size=22, color=p["ink"])
+            if lab.width > 4.1:
+                lab.scale_to_fit_width(4.1)
+            inner = VGroup(num, lab).arrange(RIGHT, buff=0.3).move_to(card.get_center())
+            cards.add(VGroup(card, inner))
+        cards.arrange_in_grid(rows=2, cols=2, buff=0.4)
+        fit(cards, w=12.0, h=4.4, center=DOWN * 0.25)
+        self.play(LaggedStart(*[FadeIn(c, scale=0.85) for c in cards],
+                              lag_ratio=0.4, run_time=2.8))
+        self.lower_third("{summary}", self.acc(2))
+        self.outro(focus=cards[0], hold={hold})
+'''
 
-    def construct(self):
-        self.title_block("{kicker}", "{title}")
-
+# ---------------------------------------------------------------------------
+# CODE — IDE panel with highlighted line + annotation
+# ---------------------------------------------------------------------------
+CODE_PANEL = _HEADER + '''
         lines = [
-            ("{line1}", C_TEAL),
-            ("{line2}", INK),
-            ("{line3}", C_AMBER),
-            ("{line4}", INK),
-            ("{line5}", C_GREEN),
+            ("{line1}", self.acc(1)),
+            ("{line2}", p["ink"]),
+            ("{line3}", self.acc(3)),
+            ("{line4}", p["ink"]),
+            ("{line5}", self.acc(2)),
         ]
-        panel, rows = code_panel(lines)
+        panel, rows = code_panel(p, lines)
         fit(panel, w=11.2, h=4.9, center=DOWN * 0.2)
         self.play(FadeIn(panel[0]), FadeIn(panel[1]), run_time=0.9)
         self.play(LaggedStart(*[FadeIn(r, shift=RIGHT * 0.25) for r in rows],
                               lag_ratio=0.55, run_time=3.0))
-
-        hl = SurroundingRectangle(rows[{highlight_line}], color=C_CORAL, buff=0.12)
+        hl = SurroundingRectangle(rows[{highlight_line}], color=self.acc(4), buff=0.12)
         self.play(Create(hl), run_time=0.9)
-        ann = caption("{annotation}", C_CORAL).scale(0.82)
+        ann = caption("{annotation}", self.acc(4)).scale(0.82)
         if ann.width > 12.0:
             ann.scale_to_fit_width(12.0)
         ann.next_to(panel, DOWN, buff=0.25)
@@ -163,42 +256,52 @@ class {class_name}(StudioScene):
         self.outro(focus=hl, hold={hold})
 '''
 
-GEOMETRIC_PROOF_TEMPLATE = '''
-class {class_name}(StudioScene):
-    accent = C_CORAL
-
-    def construct(self):
-        self.title_block("{kicker}", "{title}")
-
+# ---------------------------------------------------------------------------
+# GEOMETRY — variant A: shape + formula linked by an arrow
+# ---------------------------------------------------------------------------
+GEOMETRY_LINK = _HEADER + '''
         shape = {shape_code}
-        shape.set_stroke(C_BLUE, 3).set_fill(C_BLUE, 0.16)
-        shape.scale(1.05).move_to(LEFT * 3.2 + DOWN * 0.3)
-        slabel = caption("{shape_label}", C_BLUE).scale(0.9)
+        shape.set_stroke(self.acc(0), 3).set_fill(self.acc(0), 0.16)
+        shape.scale(1.15).move_to(LEFT * 3.0 + DOWN * 0.2)
+        slabel = caption("{shape_label}", self.acc(0)).scale(0.9)
         slabel.next_to(shape, DOWN, buff=0.3)
-
-        self.play(DrawBorderThenFill(shape), run_time=1.8)
-        self.play(Write(slabel), run_time=0.9)
-
-        formula = MathTex(r"{key_formula}", color=C_GREEN).scale(1.2)
+        self.play(DrawBorderThenFill(shape), run_time=1.6)
+        self.play(Write(slabel), run_time=0.8)
+        formula = MathTex(r"{key_formula}", color=self.acc(2)).scale(1.2)
         formula.move_to(RIGHT * 3.0 + UP * 0.4)
-        arrow = Arrow(shape.get_right(), formula.get_left(), buff=0.3, color=C_AMBER, stroke_width=3)
+        arrow = Arrow(shape.get_right(), formula.get_left(), buff=0.3, color=self.acc(3), stroke_width=3)
         self.play(GrowArrow(arrow), run_time=0.8)
-        self.play(Write(formula), run_time=1.8)
-
-        box = SurroundingRectangle(formula, color=C_GREEN, buff=0.22)
-        self.play(Create(box), run_time=0.9)
-
-        self.lower_third("{proof_step}", C_TEAL)
+        self.play(Write(formula), run_time=1.6)
+        box = SurroundingRectangle(formula, color=self.acc(2), buff=0.22)
+        self.play(Create(box), run_time=0.8)
+        self.lower_third("{proof_step}", self.acc(1))
         self.outro(focus=formula, hold={hold})
 '''
 
-TEMPLATES = {
-    "graph_animation": GRAPH_ANIMATION_TEMPLATE,
-    "equation_display": EQUATION_DISPLAY_TEMPLATE,
-    "diagram_flow": DIAGRAM_FLOW_TEMPLATE,
-    "text_bullets": TEXT_BULLETS_TEMPLATE,
-    "code_walkthrough": CODE_WALKTHROUGH_TEMPLATE,
-    "geometric_proof": GEOMETRIC_PROOF_TEMPLATE,
+# GEOMETRY — variant B: shape with a brace measurement + formula below
+GEOMETRY_BRACE = _HEADER + '''
+        shape = {shape_code}
+        shape.set_stroke(self.acc(0), 3).set_fill(self.acc(0), 0.16)
+        shape.scale(1.25).move_to(UP * 0.5)
+        self.play(DrawBorderThenFill(shape), run_time=1.6)
+        brace = Brace(shape, DOWN, color=p["muted"])
+        blabel = caption("{shape_label}", self.acc(0)).scale(0.8)
+        blabel.next_to(brace, DOWN, buff=0.15)
+        self.play(GrowFromCenter(brace), Write(blabel), run_time=1.0)
+        formula = MathTex(r"{key_formula}", color=self.acc(2)).scale(1.2)
+        formula.to_edge(DOWN, buff=1.1)
+        self.play(Write(formula), run_time=1.5)
+        self.lower_third("{proof_step}", self.acc(1))
+        self.outro(focus=formula, hold={hold})
+'''
+
+VARIANTS = {
+    "graph_animation": [GRAPH_AREA, GRAPH_RIEMANN, GRAPH_TRACE],
+    "equation_display": [EQUATION_STEPS, EQUATION_TRANSFORM],
+    "diagram_flow": [DIAGRAM_ROW, DIAGRAM_CYCLE],
+    "text_bullets": [BULLETS_LIST, BULLETS_CARDS],
+    "code_walkthrough": [CODE_PANEL],
+    "geometric_proof": [GEOMETRY_LINK, GEOMETRY_BRACE],
 }
 
 KICKERS = {
@@ -376,6 +479,8 @@ DEFAULT_PARAMS = {
 
 _MATH_FIELDS = {"equation_main", "equation_step1", "equation_step2", "key_formula"}
 _RAW_FIELDS = {"shape_code", "formula", "class_name", "kicker"}
+_NUM_FIELDS = {"pal_index", "bg_style", "intro", "hold", "highlight_line",
+               "y_min", "y_max", "x_min", "x_max", "highlight_x", "formula_at_point"}
 _TEXT_MAXLEN = {"title": 64}
 _DEFAULT_MAXLEN = 90
 
@@ -383,7 +488,6 @@ _ALLOWED_SHAPES = ("Circle", "Square", "Triangle", "Rectangle", "RegularPolygon"
 
 
 def _clean_text(value: str, maxlen: int) -> str:
-    """Escape a value so it is safe inside a double-quoted Python string literal."""
     s = str(value).replace("\\", "\\\\").replace('"', "'")
     s = re.sub(r"\s+", " ", s).strip()
     if len(s) > maxlen:
@@ -392,7 +496,6 @@ def _clean_text(value: str, maxlen: int) -> str:
 
 
 def _clean_math(value: str) -> str:
-    """Keep LaTeX backslashes; only neutralize quotes/newlines."""
     s = str(value).replace('"', "'").replace("\n", " ").replace("\r", " ").strip()
     return s or "x"
 
@@ -405,7 +508,6 @@ def _coerce_float(value, fallback: float) -> float:
 
 
 def _sanitize(visual_type: str, merged: dict, defaults: dict) -> None:
-    """In-place: coerce numerics, validate ranges, escape interpolated text."""
     if visual_type == "graph_animation":
         for key in ("x_range", "y_range"):
             val = merged.get(key)
@@ -415,10 +517,10 @@ def _sanitize(visual_type: str, merged: dict, defaults: dict) -> None:
             else:
                 merged[key] = list(val)
         xr, yr = merged["x_range"], merged["y_range"]
+        merged["x_min"], merged["x_max"] = xr[0], xr[1]
         merged["y_min"], merged["y_max"] = yr[0], yr[1]
         hx = _coerce_float(merged.get("highlight_x"), defaults["highlight_x"])
         fp = _coerce_float(merged.get("formula_at_point"), defaults["formula_at_point"])
-        # Keep the highlighted point inside the visible axes box.
         merged["highlight_x"] = min(max(hx, xr[0]), xr[1])
         merged["formula_at_point"] = min(max(fp, yr[0]), yr[1])
 
@@ -435,9 +537,8 @@ def _sanitize(visual_type: str, merged: dict, defaults: dict) -> None:
         if not code.startswith(_ALLOWED_SHAPES) or '"' in code or "\n" in code:
             merged["shape_code"] = defaults["shape_code"]
 
-    # Escape every remaining string value destined for a "..." literal.
     for key, val in list(merged.items()):
-        if key in _RAW_FIELDS or key in ("x_range", "y_range", "highlight_line"):
+        if key in _RAW_FIELDS or key in _NUM_FIELDS or key in ("x_range", "y_range"):
             continue
         if key in _MATH_FIELDS:
             merged[key] = _clean_math(val)
@@ -446,8 +547,14 @@ def _sanitize(visual_type: str, merged: dict, defaults: dict) -> None:
 
 
 def _hold_for(target_duration: float) -> float:
-    """A short breathing beat at the end — never the old multi-second freeze."""
     return round(min(max(float(target_duration) * 0.12, 0.8), 2.2), 1)
+
+
+def _seed_int(seed: str) -> int:
+    h = 2166136261
+    for ch in str(seed):
+        h = (h * 16777619 + ord(ch)) & 0xFFFFFFFF
+    return h
 
 
 def render_template(
@@ -456,26 +563,42 @@ def render_template(
     class_name: str,
     title: str,
     target_duration: float = 45.0,
+    seed: str | None = None,
 ) -> str:
-    """Assemble a complete, syntactically-valid Manim scene file."""
-    template = TEMPLATES.get(visual_type) or TEMPLATES["text_bullets"]
+    """Assemble a complete, syntactically-valid Manim scene file.
+
+    A deterministic seed picks the compositional variant + palette + backdrop +
+    intro motion, so different concepts look distinct while re-renders are stable.
+    """
+    variants = VARIANTS.get(visual_type) or VARIANTS["text_bullets"]
     defaults = DEFAULT_PARAMS.get(visual_type) or DEFAULT_PARAMS["text_bullets"]
+
+    si = _seed_int(seed or class_name)
+    template = variants[si % len(variants)]
 
     merged = {**defaults, **(params or {})}
     merged["class_name"] = class_name
     merged["title"] = title or "Key Concept"
     merged["kicker"] = KICKERS.get(visual_type, "Concept")
     merged["hold"] = _hold_for(target_duration)
+    merged["pal_index"] = (si // 7) % _NUM_PALETTES
+    merged["bg_style"] = (si // 13) % 4
+    merged["intro"] = (si // 17) % 3
     _sanitize(visual_type, merged, defaults)
 
     try:
-        body = template.format(**merged)
+        return PREAMBLE + "\n\n" + template.format(**merged)
     except (KeyError, ValueError, IndexError):
-        safe = {**defaults, "class_name": class_name,
-                "title": _clean_text(title or "Key Concept", 64),
-                "kicker": KICKERS.get(visual_type, "Concept"),
-                "hold": merged["hold"]}
-        _sanitize(visual_type, safe, defaults)
-        body = template.format(**safe)
-
-    return PREAMBLE + "\n\n" + body
+        # Ultimate fallback: the simplest, guaranteed-valid bullet list.
+        safe = {
+            **DEFAULT_PARAMS["text_bullets"],
+            "class_name": class_name,
+            "title": _clean_text(title or "Key Concept", 64),
+            "kicker": KICKERS.get(visual_type, "Concept"),
+            "hold": merged["hold"],
+            "pal_index": merged["pal_index"],
+            "bg_style": merged["bg_style"],
+            "intro": merged["intro"],
+        }
+        _sanitize("text_bullets", safe, DEFAULT_PARAMS["text_bullets"])
+        return PREAMBLE + "\n\n" + BULLETS_LIST.format(**safe)
