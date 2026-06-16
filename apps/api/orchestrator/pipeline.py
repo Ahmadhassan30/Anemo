@@ -265,6 +265,12 @@ class LectureOSPipeline:
                     logger.error(
                         f"Concept {i+1} failed, continuing: {e}"
                     )
+                    # Recover the shared session from any aborted transaction so
+                    # the next concept / stage doesn't hit PendingRollbackError.
+                    try:
+                        await self.db.rollback()
+                    except Exception:
+                        pass
                     codegen_results.append({
                         "concept_id": str(concept.get("id", "")),
                         "clip_url": None,
@@ -335,6 +341,10 @@ class LectureOSPipeline:
                     "RAG indexing failed (non-fatal) for lecture %s: %s",
                     self.lecture_id, rag_exc,
                 )
+                try:
+                    await self.db.rollback()
+                except Exception:
+                    pass
                 await self.emit(self._make_event(
                     PipelineEventType.PROGRESS_UPDATE,
                     "RAG indexing skipped — study assistant may be unavailable",
@@ -357,6 +367,10 @@ class LectureOSPipeline:
                     "Publish failed (non-fatal) for lecture %s: %s",
                     self.lecture_id, pub_exc,
                 )
+                try:
+                    await self.db.rollback()
+                except Exception:
+                    pass
                 await self.emit(self._make_event(
                     PipelineEventType.PROGRESS_UPDATE,
                     "YouTube publish skipped — video is still ready to download",

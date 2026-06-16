@@ -75,6 +75,10 @@ class BaseAgent(ABC):
                 await asyncio.sleep(2 ** attempt)
                 attempt += 1
 
+        # Defensive: the loop must return on success or raise on final failure.
+        # This guarantees callers never receive None (which they would .get()).
+        raise RuntimeError(f"Agent {self.name} exhausted retries without a result")
+
     async def emit_event(
         self,
         lecture_id: str,

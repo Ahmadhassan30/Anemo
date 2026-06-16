@@ -35,37 +35,45 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
   const [results, setResults] = useState<QuizSubmissionResult | null>(null);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let cancelled = false;
+    let attempts = 0;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const MAX_ATTEMPTS = 18; // ~90s, then give up gracefully
 
     const fetchQuiz = async () => {
       try {
         const res = await api.students.getQuiz(lectureId);
-        if (res && res.status === "generating") {
+        if (cancelled) return;
+        if (res && (res as any).status === "generating") {
+          attempts += 1;
           setGenerating(true);
           setLoading(false);
+          if (attempts >= MAX_ATTEMPTS) {
+            setGenerating(false);
+            setQuestions([]); // → "No quiz available" state
+            return;
+          }
+          timer = setTimeout(fetchQuiz, 5000);
         } else {
-          setQuestions(res);
+          setQuestions(Array.isArray(res) ? res : []);
           setGenerating(false);
           setLoading(false);
-          if (interval) clearInterval(interval);
         }
       } catch (e) {
+        if (cancelled) return;
         console.error("Failed to fetch quiz", e);
+        setGenerating(false);
         setLoading(false);
-        if (interval) clearInterval(interval);
       }
     };
 
     fetchQuiz();
 
-    if (generating) {
-      interval = setInterval(fetchQuiz, 5000);
-    }
-
     return () => {
-      if (interval) clearInterval(interval);
+      cancelled = true;
+      if (timer) clearTimeout(timer);
     };
-  }, [lectureId, generating]);
+  }, [lectureId]);
 
   const handleSelect = (questionId: string, choiceLetter: string) => {
     if (results) return; // Prevent changing answers after submission

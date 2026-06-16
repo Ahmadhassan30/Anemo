@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from db.session import get_db
 from middleware.auth_middleware import get_current_user, require_professor
@@ -50,18 +51,51 @@ async def create_lecture(
     return LectureCreateResponse(lecture_id=lecture.id, title=lecture.title)
 
 
-@router.get("/{lecture_id}", response_model=LectureRead)
+@router.get("/{lecture_id}")
 async def get_lecture(
     lecture_id: UUID,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> Lecture:
-    """Fetch a lecture by its ID."""
-    result = await db.execute(select(Lecture).where(Lecture.id == lecture_id))
+):
+    """Fetch a lecture (with its concepts) by its ID.
+
+    Concepts are eager-loaded and returned so the student viewer can render
+    chapter markers / citation-seek and the professor can see the concept list.
+    (The old LectureRead response_model silently dropped concepts.)
+    """
+    result = await db.execute(
+        select(Lecture)
+        .options(selectinload(Lecture.concepts))
+        .where(Lecture.id == lecture_id)
+    )
     lecture = result.scalar_one_or_none()
     if not lecture:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lecture not found")
-    return lecture
+
+    def _enum(v):
+        return v.value if hasattr(v, "value") else (str(v) if v is not None else None)
+
+    return {
+        "id": str(lecture.id),
+        "title": lecture.title,
+        "status": _enum(lecture.status),
+        "raw_video_url": lecture.raw_video_url,
+        "youtube_url": lecture.youtube_url,
+        "created_at": lecture.created_at.isoformat() if lecture.created_at else None,
+        "concepts": [
+            {
+                "id": str(c.id),
+                "concept": c.title,
+                "title": c.title,
+                "ts_start": c.ts_start,
+                "ts_end": c.ts_end,
+                "visual_type": c.visual_type,
+                "render_status": _enum(c.render_status),
+                "clip_url": c.clip_url,
+            }
+            for c in sorted(lecture.concepts, key=lambda x: x.ts_start)
+        ],
+    }
 
 
 @router.post("/{lecture_id}/confirm-upload", response_model=LectureRead)

@@ -53,8 +53,16 @@ export const authOptions: NextAuthOptions = {
       return session;
     }
   },
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "jwt"
-  }
+    strategy: "jwt",
+    // Match the backend JWT lifetime (JWT_EXPIRE_MINUTES = 1 day) so the
+    // next-auth session and the API access token expire together — avoids a
+    // "still logged in" cookie whose embedded token is already 401'ing.
+    maxAge: 60 * 60 * 24,
+  },
+  pages: {
+    signIn: "/login",
+  },
 };
 

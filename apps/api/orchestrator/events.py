@@ -1,4 +1,5 @@
 """Event bus: PipelineEvent dataclass, enum, and Redis pub-sub bridge."""
+import asyncio
 import enum
 import json
 import logging
@@ -13,15 +14,23 @@ from config import settings
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Lazy Redis connection (created once on first use)
+# Redis connection, keyed by event loop.
+# redis.asyncio binds its connection pool to the loop that created it. Each
+# Celery task runs in a FRESH event loop (asyncio.new_event_loop), so a single
+# cached client would be bound to a closed loop on the 2nd+ task — every
+# publish() would then fail silently and the SSE/live terminal would show
+# nothing. We therefore (re)create the client whenever the running loop changes.
 # ---------------------------------------------------------------------------
 _redis: Optional[aioredis.Redis] = None
+_redis_loop: Optional[asyncio.AbstractEventLoop] = None
 
 
 async def _get_redis() -> aioredis.Redis:
-    global _redis
-    if _redis is None:
+    global _redis, _redis_loop
+    loop = asyncio.get_running_loop()
+    if _redis is None or _redis_loop is not loop:
         _redis = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
+        _redis_loop = loop
     return _redis
 
 
