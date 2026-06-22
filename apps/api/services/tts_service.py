@@ -15,20 +15,20 @@ DEFAULT_VOICE = "en-US-GuyNeural"
 def _write_silence(out: Path, seconds: float = 2.0) -> None:
     """Write a short silent MP3 placeholder via ffmpeg.
 
-    Used when TTS times out/fails so the pipeline can still sync the scene
-    instead of stalling. Falls back to an empty file if ffmpeg is unavailable.
+    Used when TTS times out/fails so the pipeline can still proceed. RAISES if a
+    valid (non-empty) file can't be produced — callers must never treat a broken
+    placeholder as success (a 0-byte mp3 crashes the downstream ffprobe).
     """
-    try:
-        import ffmpeg  # local import; ffmpeg-python is already a dependency
-        (
-            ffmpeg
-            .input(f"anullsrc=r=24000:cl=mono", f="lavfi", t=seconds)
-            .output(str(out), acodec="libmp3lame", **{"qscale:a": 9})
-            .overwrite_output()
-            .run(quiet=True)
-        )
-    except Exception:
-        out.write_bytes(b"")
+    import ffmpeg  # ffmpeg-python is already a dependency
+    (
+        ffmpeg
+        .input("anullsrc=r=24000:cl=mono", f="lavfi", t=seconds)
+        .output(str(out), acodec="libmp3lame", **{"qscale:a": 9})
+        .overwrite_output()
+        .run(quiet=True)
+    )
+    if not out.exists() or out.stat().st_size == 0:
+        raise RuntimeError("silent-placeholder generation produced an empty file")
 
 
 async def synthesize_speech(
@@ -55,10 +55,13 @@ async def synthesize_speech(
     communicate = edge_tts.Communicate(text=text.strip(), voice=voice)
     try:
         await asyncio.wait_for(communicate.save(str(out)), timeout=settings.TTS_TIMEOUT)
-    except (asyncio.TimeoutError, Exception) as e:
-        logger.warning("TTS failed/timed out (%s); using silent placeholder for %s", e, out)
-        _write_silence(out)
-        return str(out.resolve())
+    except Exception as e:
+        logger.warning("TTS failed/timed out (%s); writing silent placeholder for %s", e, out)
+        _write_silence(out)  # raises if it cannot produce a valid file
+
+    # Never return a missing/empty file as success — the caller probes it next.
+    if not out.exists() or out.stat().st_size == 0:
+        raise RuntimeError(f"TTS produced no usable audio for {out}")
 
     logger.info("TTS saved: %s (%d bytes)", out, out.stat().st_size)
     return str(out.resolve())

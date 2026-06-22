@@ -447,9 +447,12 @@ def normalize_caption_segments(
             if start >= max_end:
                 break
             end = min(end, max_end)
-        if end <= start:
+        # Compare AFTER rounding so a sub-millisecond clamp can't emit a
+        # zero/negative-duration cue (start==end) into the ASS file.
+        r_start, r_end = round(start, 3), round(end, 3)
+        if r_end <= r_start:
             continue
-        cleaned.append({"start": round(start, 3), "end": round(end, 3), "text": seg["text"]})
+        cleaned.append({"start": r_start, "end": r_end, "text": seg["text"]})
         prev_end = end
     return cleaned
 

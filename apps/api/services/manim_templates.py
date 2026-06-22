@@ -548,7 +548,10 @@ def _sanitize(visual_type: str, merged: dict, defaults: dict) -> None:
             continue
         if key in _MATH_FIELDS:
             merged[key] = _clean_math(val)
-        elif isinstance(val, str):
+        else:
+            # Coerce NON-string text values too (e.g. an LLM returning a list):
+            # _clean_text str()-ifies and quote-escapes, so a stray type can
+            # never turn the generated scene into a Python SyntaxError.
             merged[key] = _clean_text(val, _TEXT_MAXLEN.get(key, _DEFAULT_MAXLEN))
 
 

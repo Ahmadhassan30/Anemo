@@ -257,17 +257,27 @@ class LectureOSPipeline:
                 segment = self._get_segment(concept, transcript)
                 per = float(concept.get("target_duration", MIN_CONCEPT_SECONDS))
                 target_seconds = max(int(round(per)), 5)
-                script = await narration_service.generate_script(
-                    concept, segment, target_seconds=target_seconds,
-                )
-                tts_path = await tts_service.synthesize(
-                    script,
-                    str(media_dir / f"tts_{concept['id']}.mp3"),
-                )
-                duration = get_audio_duration(tts_path)
+                concept["title"] = concept.get("concept") or concept.get("title", "")
+                try:
+                    script = await narration_service.generate_script(
+                        concept, segment, target_seconds=target_seconds,
+                    )
+                    tts_path = await tts_service.synthesize(
+                        script,
+                        str(media_dir / f"tts_{concept['id']}.mp3"),
+                    )
+                    duration = get_audio_duration(tts_path)
+                except Exception as e:
+                    # A single flaky narration must NOT abort the whole pipeline.
+                    # Without a tts_path this concept is simply skipped at
+                    # composition (which requires both a clip and narration).
+                    logger.warning(
+                        "Narration/TTS failed for concept '%s' — skipping it: %s",
+                        concept["title"], e,
+                    )
+                    continue
                 concept["narration_script"] = script
                 concept["tts_path"] = tts_path
-                concept["title"] = concept.get("concept") or concept.get("title", "")
                 logger.info(
                     "Narration ready for '%s': %.1fs (budget %.1fs)",
                     concept["title"], duration, per,
