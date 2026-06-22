@@ -24,12 +24,18 @@ from services.ffmpeg_service import get_audio_duration
 
 logger = logging.getLogger(__name__)
 
-# Final video is hard-capped to ~1 minute. We pick the most important concepts,
-# split the budget across them, and pace narration/animation to fit.
-MAX_VIDEO_CONCEPTS = 6
-TOTAL_VIDEO_BUDGET = 58.0  # seconds; headroom under the 60s hard cap
-MIN_CONCEPT_SECONDS = 6.0
-HARD_VIDEO_CAP = 60.0
+# Output duration SCALES WITH the input lecture, capped for render reliability.
+# We pick a duration-proportional number of concepts, split a duration-scaled
+# budget across them (weighted by how long each concept is discussed), and pace
+# narration/animation to fit. See the concept-selection block in run().
+SECONDS_PER_CONCEPT = 40.0       # ~1 animated scene per 40s of lecture
+MIN_VIDEO_CONCEPTS = 3
+MAX_VIDEO_CONCEPTS = 16          # render ceiling so long lectures stay feasible
+DURATION_RATIO = 0.30            # output ≈ 30% of input length…
+MIN_TOTAL_BUDGET = 30.0          # …but at least 30s…
+MAX_TOTAL_BUDGET = 480.0         # …and at most ~8 minutes.
+MIN_CONCEPT_SECONDS = 5.0
+MAX_CONCEPT_SECONDS = 20.0
 
 
 class LectureOSPipeline:
@@ -193,23 +199,51 @@ class LectureOSPipeline:
             media_dir = Path(f"/tmp/lectures/{self.lecture_id}")
             media_dir.mkdir(parents=True, exist_ok=True)
 
-            # Keep the full concept set for RAG/chapters, but cap the *video*
-            # to the first N concepts so the final cut stays under ~1 minute.
+            # Keep the full concept set for RAG/chapters, but select a
+            # duration-proportional slice for the *video* so the output length
+            # tracks the input lecture (capped at MAX_TOTAL_BUDGET).
             ordered_concepts = sorted(concepts, key=lambda c: c.get("ts_start", 0.0))
-            video_concepts = ordered_concepts[:MAX_VIDEO_CONCEPTS]
-            if len(ordered_concepts) > len(video_concepts):
-                logger.info(
-                    "Video capped to %d/%d concepts to fit the %.0fs budget",
-                    len(video_concepts), len(ordered_concepts), TOTAL_VIDEO_BUDGET,
+
+            # How long is the source lecture?  Prefer the transcript's reported
+            # duration, else the last segment's end, else a safe default.
+            input_duration = float(transcript.get("duration") or 0.0)
+            if input_duration <= 0.0:
+                _segs = transcript.get("segments") or []
+                input_duration = max(
+                    (float(s.get("end", 0.0)) for s in _segs), default=0.0
                 )
-            per_concept = max(
-                TOTAL_VIDEO_BUDGET / max(len(video_concepts), 1),
-                MIN_CONCEPT_SECONDS,
+            if input_duration <= 0.0:
+                input_duration = 180.0
+
+            num_render = max(
+                MIN_VIDEO_CONCEPTS,
+                min(MAX_VIDEO_CONCEPTS, round(input_duration / SECONDS_PER_CONCEPT)),
             )
-            target_seconds = max(int(round(per_concept)), 6)
+            num_render = min(num_render, len(ordered_concepts))
+            video_concepts = ordered_concepts[:num_render]
+
+            total_budget = min(
+                max(input_duration * DURATION_RATIO, MIN_TOTAL_BUDGET),
+                MAX_TOTAL_BUDGET,
+            )
+
+            # Weight each concept's screen time by how long it is discussed in
+            # the lecture, then clamp to a sane per-scene range.
+            _spans = [
+                max(float(c.get("ts_end", 0.0)) - float(c.get("ts_start", 0.0)), 1.0)
+                for c in video_concepts
+            ]
+            _span_sum = sum(_spans) or 1.0
+            for i, concept in enumerate(video_concepts):
+                weighted = total_budget * (_spans[i] / _span_sum)
+                per = min(max(weighted, MIN_CONCEPT_SECONDS), MAX_CONCEPT_SECONDS)
+                concept["target_duration"] = per
+                concept["variety_index"] = i  # CONTRACT: de-dupes visuals downstream
+
             logger.info(
-                "Per-concept budget: %.1fs (%d concepts, target_seconds=%d)",
-                per_concept, len(video_concepts), target_seconds,
+                "Video plan: input=%.0fs → %d/%d concepts, total budget %.0fs (cap %.0fs)",
+                input_duration, len(video_concepts), len(ordered_concepts),
+                total_budget, MAX_TOTAL_BUDGET,
             )
 
             await self.emit(self._make_event(
@@ -221,6 +255,8 @@ class LectureOSPipeline:
 
             for concept in video_concepts:
                 segment = self._get_segment(concept, transcript)
+                per = float(concept.get("target_duration", MIN_CONCEPT_SECONDS))
+                target_seconds = max(int(round(per)), 5)
                 script = await narration_service.generate_script(
                     concept, segment, target_seconds=target_seconds,
                 )
@@ -231,11 +267,10 @@ class LectureOSPipeline:
                 duration = get_audio_duration(tts_path)
                 concept["narration_script"] = script
                 concept["tts_path"] = tts_path
-                concept["target_duration"] = per_concept
                 concept["title"] = concept.get("concept") or concept.get("title", "")
                 logger.info(
                     "Narration ready for '%s': %.1fs (budget %.1fs)",
-                    concept["title"], duration, per_concept,
+                    concept["title"], duration, per,
                 )
 
             # ── Stage 4 (30→70%): CodeGen — sequential ─────────────

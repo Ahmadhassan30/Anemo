@@ -14,10 +14,12 @@ from services.ffmpeg_service import (
     get_audio_duration,
     generate_ass_from_segments,
     build_caption_cues,
+    normalize_caption_segments,
 )
 
-# Final cut hard cap (seconds) — keeps every produced video at or under a minute.
-MAX_FINAL_SECONDS = 60.0
+# Safety ceiling (seconds). Output length now TRACKS the input lecture via the
+# pipeline's per-concept budgets; this only bounds pathological runaways.
+MAX_FINAL_SECONDS = 600.0
 from services.uploadthing_service import get_final_video_url, get_final_video_path
 import shutil
 from utils.audio import cleanup_temp_files
@@ -68,11 +70,19 @@ class CompositionAgent(BaseAgent):
                 concept_id = c.get("id")
                 out_clip = tmp_dir / f"composed_{concept_id}.mp4"
 
-                await sync_video_to_audio(
-                    video_path=clip_url,
-                    audio_path=tts_path,
-                    output_path=str(out_clip),
-                )
+                # Resilience: one bad clip must not abort the whole video.
+                try:
+                    await sync_video_to_audio(
+                        video_path=clip_url,
+                        audio_path=tts_path,
+                        output_path=str(out_clip),
+                    )
+                except Exception as e:
+                    logger.warning(
+                        "Skipping concept %s — audio/video sync failed: %s",
+                        concept_id, e,
+                    )
+                    continue
 
                 clip_duration = get_audio_duration(tts_path)
                 narration = c.get("narration_script", "")
@@ -99,6 +109,11 @@ class CompositionAgent(BaseAgent):
             files_to_cleanup.append(composed_path)
 
             ass_path = str(tmp_dir / "subtitles.ass")
+            # Guarantee strictly sequential, non-overlapping cues so captions
+            # never overwrite each other (clamped to the real timeline end).
+            caption_segments = normalize_caption_segments(
+                caption_segments, max_end=timeline_offset,
+            )
             generate_ass_from_segments(caption_segments, ass_path)
             files_to_cleanup.append(ass_path)
 

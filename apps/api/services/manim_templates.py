@@ -16,7 +16,9 @@ import re
 
 from services.manim_studio import PREAMBLE
 
-_NUM_PALETTES = 6  # keep in sync with PALETTES in manim_studio
+_NUM_PALETTES = 9   # keep in sync with PALETTES in manim_studio
+_NUM_BG_STYLES = 4  # keep in sync with make_backdrop styles in manim_studio
+_NUM_INTROS = 3     # keep in sync with title_block intro motions in manim_studio
 _HEADER = (
     "\nclass {class_name}(StudioScene):\n"
     "    PAL_INDEX = {pal_index}\n"
@@ -335,6 +337,8 @@ Return ONLY valid JSON, no markdown:
   "explanation": "one crisp sentence, max 9 words"
 }}
 formula must be a valid Python expression in x (e.g. x**2, np.sin(x)).
+Pick the formula/labels that match the relationship described in the transcript;
+only use x**2 if the lecture is genuinely about a quadratic.
 x_range and y_range must each be a list of exactly 3 numbers [min, max, step].
 """
 
@@ -351,6 +355,8 @@ Return ONLY valid JSON, no markdown:
   "explanation": "one crisp sentence, max 9 words"
 }}
 Use real LaTeX math relevant to the concept. Keep each line short.
+Derive the equations from the transcript; do NOT output E = mc^2 unless the
+lecture is actually about mass-energy equivalence.
 """
 
 DIAGRAM_PARAMS_PROMPT = """
@@ -564,26 +570,43 @@ def render_template(
     title: str,
     target_duration: float = 45.0,
     seed: str | None = None,
+    variety_index: int | None = None,
 ) -> str:
     """Assemble a complete, syntactically-valid Manim scene file.
 
-    A deterministic seed picks the compositional variant + palette + backdrop +
-    intro motion, so different concepts look distinct while re-renders are stable.
+    Picks the compositional variant + palette + backdrop + intro motion so
+    different concepts look distinct while re-renders stay stable.
+
+    When the orchestrator supplies a 0-based ``variety_index`` (the concept's
+    position in the lecture), selection is SPREAD by index so consecutive
+    concepts never collide on the same look — the old ``si//7``/``si//13``/
+    ``si//17`` cycles collided badly within a 4-16 concept lecture, which is
+    why every video looked the same. Falls back to a well-distributed hash.
     """
     variants = VARIANTS.get(visual_type) or VARIANTS["text_bullets"]
     defaults = DEFAULT_PARAMS.get(visual_type) or DEFAULT_PARAMS["text_bullets"]
 
     si = _seed_int(seed or class_name)
-    template = variants[si % len(variants)]
+    if variety_index is not None:
+        vi = int(variety_index)
+        template = variants[vi % len(variants)]
+        pal_index = vi % _NUM_PALETTES
+        bg_style = (vi * 3 + 1) % _NUM_BG_STYLES
+        intro = (vi * 2) % _NUM_INTROS
+    else:
+        template = variants[si % len(variants)]
+        pal_index = si % _NUM_PALETTES
+        bg_style = (si // 9) % _NUM_BG_STYLES
+        intro = (si // 11) % _NUM_INTROS
 
     merged = {**defaults, **(params or {})}
     merged["class_name"] = class_name
     merged["title"] = title or "Key Concept"
     merged["kicker"] = KICKERS.get(visual_type, "Concept")
     merged["hold"] = _hold_for(target_duration)
-    merged["pal_index"] = (si // 7) % _NUM_PALETTES
-    merged["bg_style"] = (si // 13) % 4
-    merged["intro"] = (si // 17) % 3
+    merged["pal_index"] = pal_index
+    merged["bg_style"] = bg_style
+    merged["intro"] = intro
     _sanitize(visual_type, merged, defaults)
 
     try:

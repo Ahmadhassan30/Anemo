@@ -32,6 +32,34 @@ def _sanitize_class_name(concept_id: str) -> str:
     return f"Concept{titled}Scene"
 
 
+_VALID_VISUAL_TYPES = {
+    "graph_animation", "equation_display", "diagram_flow",
+    "text_bullets", "code_walkthrough", "geometric_proof",
+}
+
+# (visual_type, keyword triggers) — ordered most-specific first.
+_VISUAL_TYPE_RULES = [
+    ("code_walkthrough", ("code", "algorithm", "loop", "def ", "syntax", "program", "snippet")),
+    ("geometric_proof", ("prove", "theorem", "triangle", "circle", "angle", "geometry", "polygon", "radius")),
+    ("equation_display", ("equation", "derive", "formula", "solve", "integral", "derivative", "proof")),
+    ("graph_animation", ("plot", "curve", "graph", "function", "growth", "slope", "rate")),
+    ("diagram_flow", ("process", "flow", "pipeline", "stage", "step", "cycle", "workflow", "system")),
+]
+
+
+def _infer_visual_type(concept: Dict[str, Any]) -> str:
+    """Pick a visual_type from the concept text when none/invalid was assigned.
+
+    Avoids defaulting everything to the most generic template and keeps the
+    chosen visual at least topically plausible for the concept.
+    """
+    text = " ".join(str(concept.get(k, "")) for k in ("concept", "title", "summary")).lower()
+    for vt, keys in _VISUAL_TYPE_RULES:
+        if any(k in text for k in keys):
+            return vt
+    return "text_bullets"
+
+
 class CodeGenAgent(BaseAgent):
     """Generate Manim scenes with template-based codegen + param extraction."""
 
@@ -54,7 +82,14 @@ class CodeGenAgent(BaseAgent):
         concept_id = str(concept.get("id", ""))
         concept_title = concept.get("title", "unknown")
         try:
-            visual_type = concept.get("visual_type", "text_bullets")
+            visual_type = concept.get("visual_type")
+            if visual_type not in _VALID_VISUAL_TYPES:
+                inferred = _infer_visual_type(concept)
+                logger.info(
+                    "[%s] visual_type %r missing/invalid → inferred %r",
+                    self.name, visual_type, inferred,
+                )
+                visual_type = inferred
             class_name = _sanitize_class_name(concept_id)
 
             logger.debug(
@@ -87,6 +122,7 @@ class CodeGenAgent(BaseAgent):
                     class_name=class_name,
                     output_dir=output_dir,
                     concept_id=concept_id,
+                    target_duration=float(concept.get("target_duration", 45.0)),
                 )
             except ManimRenderError as e:
                 # On render failure, fall back to text_bullets template

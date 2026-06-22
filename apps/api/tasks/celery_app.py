@@ -22,6 +22,10 @@ celery_app.conf.update(
     task_track_started=True,
     task_acks_late=True,
     worker_prefetch_multiplier=1,  # one task at a time per worker
+    # Whole-pipeline time limits so a stuck render can't pin a worker forever.
+    # Scaled for longer (input-matched) videos with more scenes.
+    task_soft_time_limit=settings.CELERY_SOFT_TIME_LIMIT,
+    task_time_limit=settings.CELERY_HARD_TIME_LIMIT,
 )
 
 

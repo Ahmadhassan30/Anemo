@@ -39,10 +39,13 @@ class SegmentationAgent(BaseAgent):
         
         formatted_transcript = "\n".join(formatted_lines)
 
-        # 2. Call llm_service.chat_json
+        # 2. Call llm_service.chat_json — scale the requested concept count to
+        #    the lecture length (~1 concept per 40s), clamped to a sane range.
+        target_concepts = max(4, min(20, round(float(duration or 0.0) / 40.0)))
         user_prompt = SEGMENTATION_USER.format(
             duration=duration,
-            transcript=formatted_transcript
+            transcript=formatted_transcript,
+            target_concepts=target_concepts,
         )
         
         logger.info("Calling LLM to extract concepts for lecture %s", lecture_id)
@@ -65,8 +68,8 @@ class SegmentationAgent(BaseAgent):
         else:
             raise LLMError(f"Expected a JSON array, got {type(llm_response)}")
 
-        if not (4 <= len(items) <= 10):
-            raise LLMError(f"LLM returned {len(items)} concepts, expected between 4 and 10.")
+        if not (3 <= len(items) <= 20):
+            raise LLMError(f"LLM returned {len(items)} concepts, expected between 3 and 20.")
 
         required_fields = {"concept", "ts_start", "ts_end", "visual_type", "summary"}
         

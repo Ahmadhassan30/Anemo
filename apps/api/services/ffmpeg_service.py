@@ -399,12 +399,59 @@ def generate_srt_from_segments(
 
 
 def _ass_time(seconds: float) -> str:
-    """Format seconds as ASS timestamp H:MM:SS.cc (centiseconds)."""
-    seconds = max(float(seconds), 0.0)
-    h = int(seconds // 3600)
-    m = int((seconds % 3600) // 60)
-    s = seconds % 60
-    return f"{h:d}:{m:02d}:{int(s):02d}.{int(round((s - int(s)) * 100)):02d}"
+    """Format seconds as ASS timestamp H:MM:SS.cc (centiseconds).
+
+    Computed in integer centiseconds with proper rollover. The old
+    ``int(round(frac * 100))`` produced ``100`` when the fraction was >= .995
+    (e.g. 3.999 -> "0:00:03.100"), an out-of-range centisecond field that
+    libass misparses — making captions overlap/linger on screen.
+    """
+    total_cs = int(round(max(float(seconds), 0.0) * 100))
+    h = total_cs // 360000
+    m = (total_cs % 360000) // 6000
+    s = (total_cs % 6000) // 100
+    cs = total_cs % 100
+    return f"{h:d}:{m:02d}:{s:02d}.{cs:02d}"
+
+
+def normalize_caption_segments(
+    segments: list[dict],
+    min_gap: float = 0.04,
+    min_dur: float = 0.6,
+    max_end: float | None = None,
+) -> list[dict]:
+    """Force caption cues into a strictly sequential, non-overlapping timeline.
+
+    Upstream cues are timed per-concept off accumulated TTS durations, so tiny
+    float drift at concept boundaries can leave two dialogue lines sharing a
+    window — which renders as captions overwriting each other. This sorts by
+    start and guarantees ``prev.end + min_gap <= cur.start`` and a minimum
+    on-screen duration, clamping the final cue to ``max_end`` when given.
+    """
+    cleaned: list[dict] = []
+    ordered = sorted(
+        (s for s in segments if str(s.get("text", "")).strip()),
+        key=lambda s: float(s.get("start", 0.0)),
+    )
+    prev_end = 0.0
+    for i, seg in enumerate(ordered):
+        start = max(float(seg.get("start", 0.0)), prev_end + min_gap)
+        end = max(float(seg.get("end", 0.0)), start + min_dur)
+        # Don't run into the next cue's start.
+        if i + 1 < len(ordered):
+            next_start = float(ordered[i + 1].get("start", 0.0))
+            if next_start > start:
+                end = min(end, next_start - min_gap)
+            end = max(end, start + min(min_dur, max(next_start - start - min_gap, 0.1)))
+        if max_end is not None:
+            if start >= max_end:
+                break
+            end = min(end, max_end)
+        if end <= start:
+            continue
+        cleaned.append({"start": round(start, 3), "end": round(end, 3), "text": seg["text"]})
+        prev_end = end
+    return cleaned
 
 
 def _ass_text(text: str) -> str:

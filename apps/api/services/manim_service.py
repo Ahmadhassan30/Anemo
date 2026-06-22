@@ -4,6 +4,8 @@ import glob
 import logging
 from pathlib import Path
 
+from config import settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -12,11 +14,25 @@ class ManimRenderError(Exception):
     pass
 
 
+def _render_timeout(target_duration: float | None) -> float:
+    """Scale the render timeout with the scene's output length.
+
+    Longer scenes legitimately take longer to render, so a flat 300s broke for
+    longer videos. Clamp to [BASE, MAX].
+    """
+    base = float(settings.MANIM_RENDER_TIMEOUT_BASE)
+    if not target_duration or target_duration <= 0:
+        return base
+    scaled = base + float(target_duration) * float(settings.MANIM_RENDER_TIMEOUT_PER_SEC)
+    return max(base, min(scaled, float(settings.MANIM_RENDER_TIMEOUT_MAX)))
+
+
 async def render_scene(
     manim_code: str,
     class_name: str,
     output_dir: str,
     concept_id: str,
+    target_duration: float | None = None,
 ) -> str:
     """Write Manim code to a file and render it, returning the output MP4 path.
 
@@ -59,10 +75,12 @@ async def render_scene(
         stderr=asyncio.subprocess.PIPE,
     )
 
-    # 3. Communicate with a 5-minute timeout
+    # 3. Communicate with a duration-scaled timeout
+    render_timeout = _render_timeout(target_duration)
+    logger.info("Manim render timeout for %s: %.0fs", class_name, render_timeout)
     try:
         stdout, stderr = await asyncio.wait_for(
-            process.communicate(), timeout=300
+            process.communicate(), timeout=render_timeout
         )
     except asyncio.TimeoutError:
         process.kill()
@@ -73,7 +91,7 @@ async def render_scene(
         except Exception:
             pass
         raise ManimRenderError(
-            f"Manim render timed out after 300 seconds for {class_name}"
+            f"Manim render timed out after {render_timeout:.0f} seconds for {class_name}"
         )
 
     # 4. Check return code

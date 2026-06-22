@@ -1,9 +1,23 @@
 """LLM prompt templates for pipeline agents."""
 
 SEGMENTATION_SYSTEM = """
-You are an expert instructional designer. Given a lecture transcript with 
-timestamps, segment it into discrete teachable concepts. Each concept should 
-cover one clear idea that can be explained in 2-5 minutes.
+You are an expert instructional designer. Given a lecture transcript with
+timestamps, segment it into discrete teachable concepts. Each concept should
+cover one clear idea.
+
+GROUND every concept in the transcript: the title and summary must reflect what
+is actually said. Do NOT invent topics, examples, or formulas that are not
+present in the transcript.
+
+Choose visual_type by what the transcript ACTUALLY CONTAINS, using this rubric:
+- "graph_animation": a function, curve, trend, or quantitative relationship is described
+- "equation_display": an explicit equation or a step-by-step derivation appears
+- "diagram_flow": a process, sequence, pipeline, or system of stages is described
+- "code_walkthrough": real code, an algorithm, or pseudocode is shown
+- "geometric_proof": shapes, geometry, or spatial relationships are central
+- "text_bullets": definitions, lists, or qualitative ideas (use as the DEFAULT)
+Only pick graph/equation/code/geometry when the transcript genuinely contains
+that kind of content; otherwise prefer diagram_flow or text_bullets.
 
 Return ONLY a valid JSON array. No explanation, no markdown, no preamble.
 Schema for each item:
@@ -11,8 +25,8 @@ Schema for each item:
   "concept": "Short descriptive title (max 8 words)",
   "ts_start": <float seconds>,
   "ts_end": <float seconds>,
-  "visual_type": <one of: "graph_animation", "equation_display", 
-                  "diagram_flow", "text_bullets", "code_walkthrough", 
+  "visual_type": <one of: "graph_animation", "equation_display",
+                  "diagram_flow", "text_bullets", "code_walkthrough",
                   "geometric_proof">,
   "summary": "2-3 sentence description of what this concept covers"
 }
@@ -23,9 +37,10 @@ Lecture duration: {duration} seconds
 Transcript:
 {transcript}
 
-Return 4-10 concept segments covering the full lecture.
-Each concept should cover ONE clear idea. For short lectures, still return
-4-6 concepts — we will expand each with dedicated narration and animation.
+Return about {target_concepts} concept segments in chronological order, covering
+the FULL lecture (use more concepts for longer lectures, fewer for short ones).
+Each concept = ONE clear idea grounded in the transcript, non-overlapping in
+time. We expand each with dedicated narration and animation.
 """
 
 # ---------------------------------------------------------------------------

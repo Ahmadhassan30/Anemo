@@ -12,6 +12,9 @@ logger = logging.getLogger(__name__)
 _groq_client = AsyncOpenAI(
     api_key=settings.GROQ_API_KEY,
     base_url="https://api.groq.com/openai/v1",
+    # Bound every request so a hung Groq call can't stall the pipeline; on
+    # timeout we fall through to the next model in the retry loop below.
+    timeout=settings.LLM_CALL_TIMEOUT,
 )
 
 

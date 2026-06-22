@@ -19,6 +19,15 @@ class Settings(BaseSettings):
     MAX_RENDER_RETRIES: int = 5
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 
+    # ── Timeout / robustness policy (longer videos => more, bigger scenes) ──
+    LLM_CALL_TIMEOUT: float = 45.0          # per LLM request, seconds
+    TTS_TIMEOUT: float = 60.0               # per narration synthesis, seconds
+    MANIM_RENDER_TIMEOUT_BASE: float = 180.0    # floor for any scene render
+    MANIM_RENDER_TIMEOUT_MAX: float = 420.0     # ceiling for any scene render
+    MANIM_RENDER_TIMEOUT_PER_SEC: float = 8.0   # extra render-budget per output-second
+    CELERY_SOFT_TIME_LIMIT: int = 3600          # whole pipeline, soft (s)
+    CELERY_HARD_TIME_LIMIT: int = 4200          # whole pipeline, hard (s)
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

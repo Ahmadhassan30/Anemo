@@ -34,6 +34,12 @@ PALETTES = [
          muted="#8a8a93", grid="#20202a", acc=["#7aa2ff", "#c0c4cc", "#ffd166", "#ff7b72", "#46d27f"]),
     dict(name="indigo", deep="#070a14", bg="#0c1020", surf="#161c34", ink="#eaf0ff",
          muted="#8893b5", grid="#18203a", acc=["#7c8cff", "#3fe0b0", "#ff9ad5", "#ffd166", "#6fb1ff"]),
+    dict(name="sunset", deep="#140a07", bg="#1f0f0a", surf="#33201a", ink="#fff0e8",
+         muted="#c79a86", grid="#341f17", acc=["#ff7a4d", "#ffb24d", "#ff5a8a", "#ffd36b", "#7ad1ff"]),
+    dict(name="cyan", deep="#040f14", bg="#071a22", surf="#0e2e3a", ink="#e7fbff",
+         muted="#7fb3c0", grid="#0f3340", acc=["#22d3ee", "#38bdf8", "#5eead4", "#a3e635", "#fcd34d"]),
+    dict(name="neon", deep="#0a0410", bg="#120821", surf="#221038", ink="#f6ecff",
+         muted="#a18bc4", grid="#251243", acc=["#f72585", "#9d4edd", "#4cc9f0", "#4361ee", "#ff8fab"]),
 ]
 
 config.background_color = PALETTES[0]["bg"]
