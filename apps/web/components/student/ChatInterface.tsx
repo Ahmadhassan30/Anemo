@@ -22,13 +22,28 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [enrollError, setEnrollError] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Load history
-    api.chat.history(lectureId).then((data) => {
-      setMessages(data);
-    }).catch(console.error);
+    setHistoryLoading(true);
+    setEnrollError(false);
+    api.chat.history(lectureId)
+      .then((data) => {
+        setMessages(data);
+      })
+      .catch((e: any) => {
+        if (
+          e?.message?.includes("403") ||
+          e?.message?.toLowerCase().includes("not enrolled") ||
+          e?.message?.toLowerCase().includes("forbidden")
+        ) {
+          setEnrollError(true);
+        }
+        console.error(e);
+      })
+      .finally(() => setHistoryLoading(false));
   }, [lectureId]);
 
   useEffect(() => {
@@ -70,6 +85,27 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
     }
   };
 
+  // ── render: error states ─────────────────────────────────────────────────
+  if (enrollError) {
+    return (
+      <Card className="flex flex-col h-full overflow-hidden">
+        <div className="px-6 py-4 border-b border-line">
+          <h3 className="text-base font-semibold tracking-tight text-ink">Lecture chat</h3>
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-danger/10 text-danger text-lg">
+            ⚠
+          </div>
+          <p className="text-sm font-medium text-ink">Not enrolled</p>
+          <p className="text-xs leading-relaxed text-subtle max-w-xs">
+            You need to enroll in this lecture first to use the chatbot.
+          </p>
+        </div>
+      </Card>
+    );
+  }
+
+  // ── render: main ──────────────────────────────────────────────────────────
   return (
     <Card className="flex flex-col h-full overflow-hidden">
       {/* titlebar */}
@@ -81,7 +117,11 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-canvas" ref={scrollRef}>
-        {messages.length === 0 && !loading && (
+        {historyLoading && (
+          <p className="text-sm text-faint">Loading chat history…</p>
+        )}
+
+        {!historyLoading && messages.length === 0 && !loading && (
           <p className="text-sm text-faint">
             No messages yet — ask a question to begin.
           </p>
@@ -138,11 +178,11 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
           onKeyDown={handleKeyDown}
           placeholder="Ask a question…"
           className="flex-1"
-          disabled={loading}
+          disabled={loading || historyLoading}
         />
         <Button
           onClick={handleSend}
-          disabled={loading || !input.trim()}
+          disabled={loading || !input.trim() || historyLoading}
           size="icon"
           aria-label="Send"
         >

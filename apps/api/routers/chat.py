@@ -52,8 +52,18 @@ async def chat(
             detail="You are not enrolled in this lecture."
         )
 
-    # 3. Call RAG service
-    rag_response = await rag_service.answer(request.question, str(lecture_uuid), db)
+    # 3. Call RAG service — gracefully handle lectures with no embeddings yet
+    try:
+        rag_response = await rag_service.answer(request.question, str(lecture_uuid), db)
+    except Exception as e:
+        logger.warning("RAG service error for lecture %s: %s", lecture_uuid, e)
+        rag_response = {
+            "answer": (
+                "I'm sorry, I can't answer questions about this lecture yet. "
+                "The AI is still processing the content — please try again once the pipeline completes."
+            ),
+            "citations": []
+        }
     
     answer_text = rag_response.get("answer", "")
     raw_citations = rag_response.get("citations", [])

@@ -55,6 +55,8 @@ export interface LectureResponse {
   created_at: string;
 }
 
+// The backend /lectures endpoint returns a plain array, NOT a paginated wrapper.
+// We keep the LectureListResponse type for reference but use the actual array.
 export interface LectureListResponse {
   items: LectureResponse[];
   total: number;
@@ -112,8 +114,9 @@ export const api = {
     },
   },
   lectures: {
-    list: async (page = 1, limit = 10): Promise<LectureListResponse> => {
-      return fetchAPI<LectureListResponse>(`/lectures?page=${page}&limit=${limit}`);
+    // Backend returns a plain LectureResponse[] array (not paginated wrapper)
+    list: async (): Promise<LectureResponse[]> => {
+      return fetchAPI<LectureResponse[]>(`/lectures`);
     },
     create: async (title: string): Promise<CreateLectureResponse> => {
       return fetchAPI<CreateLectureResponse>("/lectures", {
@@ -163,6 +166,9 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ answers }),
       });
+    },
+    getSummary: async (lectureId: string): Promise<any> => {
+      return fetchAPI<any>(`/students/lectures/${lectureId}/summary`);
     },
   },
   chat: {

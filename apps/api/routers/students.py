@@ -5,14 +5,14 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from db.session import get_db
 from middleware.auth_middleware import require_student
-from models import Lecture, User, enrollments, Quiz
+from models import Lecture, User, enrollments, Quiz, Concept
 from tasks.quiz_tasks import generate_quiz_task
 
 logger = logging.getLogger(__name__)
@@ -48,6 +48,7 @@ async def get_enrolled_lectures(
             "title": lec.title,
             "status": lec.status.value,
             "youtube_url": lec.youtube_url,
+            "created_at": lec.created_at.isoformat() if lec.created_at else None,
         } for lec in lectures
     ]
 
@@ -82,6 +83,59 @@ async def enroll_student(
     return {"message": "Enrolled successfully", "lecture_id": request.lecture_id}
 
 
+@router.get("/lectures/{lecture_id}/summary")
+async def get_lecture_summary(
+    lecture_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_student),
+):
+    """Return a summary of a lecture's concepts for the student view.
+    
+    Returns concept list with timestamps so the student's notes panel
+    and video chapter navigation can display topic breakdowns.
+    """
+    # Verify enrollment
+    enroll_stmt = select(enrollments).where(
+        enrollments.c.student_id == current_user.id,
+        enrollments.c.lecture_id == lecture_id
+    )
+    if not (await db.execute(enroll_stmt)).first():
+        raise HTTPException(status_code=403, detail="Not enrolled in this lecture.")
+
+    # Load lecture + concepts
+    result = await db.execute(
+        select(Lecture)
+        .options(selectinload(Lecture.concepts))
+        .where(Lecture.id == lecture_id)
+    )
+    lecture = result.scalar_one_or_none()
+    if not lecture:
+        raise HTTPException(status_code=404, detail="Lecture not found")
+
+    def _enum(v):
+        return v.value if hasattr(v, "value") else (str(v) if v is not None else None)
+
+    concepts = sorted(lecture.concepts, key=lambda x: x.ts_start)
+    
+    return {
+        "lecture_id": str(lecture.id),
+        "title": lecture.title,
+        "status": _enum(lecture.status),
+        "concept_count": len(concepts),
+        "concepts": [
+            {
+                "id": str(c.id),
+                "title": c.title,
+                "concept": c.title,
+                "ts_start": c.ts_start,
+                "ts_end": c.ts_end,
+                "visual_type": c.visual_type,
+            }
+            for c in concepts
+        ],
+    }
+
+
 @router.get("/lectures/{lecture_id}/quiz")
 async def get_quiz(
     lecture_id: UUID,
@@ -102,13 +156,22 @@ async def get_quiz(
     quizzes = result.scalars().all()
 
     if not quizzes:
-        # Trigger Celery task
-        logger.info("No quizzes found for lecture %s. Triggering generation...", lecture_id)
-        generate_quiz_task.delay(str(lecture_id))
-        return {
-            "status": "generating", 
-            "message": "Quiz is being prepared"
-        }
+        # Only trigger quiz generation if the lecture is completed (has concepts/transcript)
+        lecture_res = await db.execute(select(Lecture).where(Lecture.id == lecture_id))
+        lecture = lecture_res.scalar_one_or_none()
+        
+        if lecture and lecture.status.value == "completed":
+            logger.info("No quizzes found for lecture %s. Triggering generation...", lecture_id)
+            generate_quiz_task.delay(str(lecture_id))
+            return {
+                "status": "generating", 
+                "message": "Quiz is being prepared — please check back in a moment."
+            }
+        else:
+            return {
+                "status": "unavailable",
+                "message": "Quiz will be available once the lecture pipeline completes."
+            }
 
     return [
         {

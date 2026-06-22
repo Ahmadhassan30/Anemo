@@ -17,15 +17,15 @@ export default function EnrollPage() {
 
   useEffect(() => {
     Promise.all([
-      api.lectures.list(1, 100),
-      api.students.getEnrolledLectures()
+      api.lectures.list(),
+      api.students.getEnrolledLectures().catch(() => [] as any[]),
     ])
     .then(([allLecs, enrolled]) => {
-      // Only show completed lectures available for enrollment
-      const completed = allLecs.items.filter(l => l.status === "completed");
-      setAvailableLectures(completed);
+      // allLecs is now a plain array — show all lectures that aren't failed
+      const available = allLecs.filter(l => l.status !== "failed");
+      setAvailableLectures(available);
 
-      const eIds = new Set(enrolled.map(e => e.id));
+      const eIds = new Set<string>(enrolled.map((e: any) => e.id as string));
       setEnrolledIds(eIds);
     })
     .catch(console.error)
@@ -48,6 +48,19 @@ export default function EnrollPage() {
   const filteredLectures = availableLectures.filter(l =>
     l.title.toLowerCase().includes(search.toLowerCase())
   );
+
+  const getStatusPill = (status: string) => {
+    switch (status) {
+      case "completed":
+        return { label: "Ready", cls: "bg-positive/10 text-positive" };
+      case "processing":
+        return { label: "Processing", cls: "bg-accent/10 text-accent" };
+      case "pending":
+        return { label: "Pending", cls: "bg-fill text-subtle" };
+      default:
+        return { label: status, cls: "bg-fill text-subtle" };
+    }
+  };
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -79,29 +92,28 @@ export default function EnrollPage() {
           </div>
         ) : filteredLectures.length === 0 ? (
           <div className="rounded-2xl border border-line bg-surface p-16 text-center text-sm text-subtle shadow-sm">
-            {search ? "No lectures match your search." : "No completed lectures are available right now."}
+            {search ? "No lectures match your search." : "No lectures are available right now."}
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {filteredLectures.map(lecture => {
               const isEnrolled = enrolledIds.has(lecture.id);
+              const { label, cls } = getStatusPill(lecture.status);
               return (
                 <Card key={lecture.id} className="flex flex-col transition-all duration-200 hover:shadow-md hover:border-line-strong">
                   <CardHeader>
-                    <span
-                      className={`pill mb-3 w-fit ${
-                        isEnrolled ? "bg-positive/10 text-positive" : "bg-accent/10 text-accent"
-                      }`}
-                    >
-                      {isEnrolled ? (
-                        <>✓ Enrolled</>
-                      ) : (
-                        <>
-                          <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
-                          Available
-                        </>
-                      )}
-                    </span>
+                    <div className="mb-3 flex items-center gap-2">
+                      <span className={`pill w-fit ${isEnrolled ? "bg-positive/10 text-positive" : cls}`}>
+                        {isEnrolled ? (
+                          <>✓ Enrolled</>
+                        ) : (
+                          <>
+                            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-current" aria-hidden />
+                            {label}
+                          </>
+                        )}
+                      </span>
+                    </div>
                     <CardTitle className="line-clamp-2 text-base leading-snug">
                       {lecture.title}
                     </CardTitle>

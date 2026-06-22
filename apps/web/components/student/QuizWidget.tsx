@@ -31,6 +31,8 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
+  const [unavailableMsg, setUnavailableMsg] = useState("");
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [results, setResults] = useState<QuizSubmissionResult | null>(null);
 
@@ -44,19 +46,26 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
       try {
         const res = await api.students.getQuiz(lectureId);
         if (cancelled) return;
-        if (res && (res as any).status === "generating") {
+        const resStatus = (res as any)?.status;
+        if (resStatus === "generating") {
           attempts += 1;
           setGenerating(true);
           setLoading(false);
           if (attempts >= MAX_ATTEMPTS) {
             setGenerating(false);
-            setQuestions([]); // → "No quiz available" state
+            setQuestions([]);
             return;
           }
           timer = setTimeout(fetchQuiz, 5000);
+        } else if (resStatus === "unavailable") {
+          setUnavailable(true);
+          setUnavailableMsg((res as any).message || "Quiz not yet available.");
+          setGenerating(false);
+          setLoading(false);
         } else {
           setQuestions(Array.isArray(res) ? res : []);
           setGenerating(false);
+          setUnavailable(false);
           setLoading(false);
         }
       } catch (e) {
@@ -108,6 +117,16 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
         <p className="max-w-sm text-sm leading-relaxed text-subtle">
           Agent is analyzing lecture concepts and assembling questions. This may take a moment.
         </p>
+      </div>
+    );
+  }
+
+  if (unavailable) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-fill text-lg text-subtle">⏳</div>
+        <p className="text-sm font-medium text-ink">Quiz not ready yet</p>
+        <p className="max-w-xs text-sm leading-relaxed text-subtle">{unavailableMsg}</p>
       </div>
     );
   }
