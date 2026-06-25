@@ -64,30 +64,35 @@ Below are visual frames of the 3Blue1Brown-style animations produced by the Lect
 LectureOS is structured as a robust monorepo built for high throughput and long-running GPU/CPU-intensive rendering tasks.
 
 ### System Topography
-```
-                                 +--------------------+
-                                 |  Nginx Controller  |
-                                 |     (Port 80)      |
-                                 +---------+----------+
-                                           |
-                    +----------------------+----------------------+
-                    | (Static & SSR)                              | (API & SSE Requests)
-                    v                                             v
-        +-----------+-----------+                     +-----------+-----------+
-        |  Next.js Frontend     |                     |     FastAPI Server    |
-        |  (Port 3000 / Web)    |                     |     (Port 8000 / API) |
-        +-----------------------+                     +-----+-----------+-----+
-                                                            |           |
-                                      +---------------------+           +---------------------+
-                                      | (Celery Tasks)                                        |
-                                      v                                                       v
-                            +---------+---------+                                   +---------+---------+
-                            |   Celery Worker   |                                   |  Postgres Database|
-                            | (Manim + Whisper) |                                   |    (pgvector)     |
-                            +---------+---------+                                   +---------+---------+
-                                                      |                                                       ^
-                                      +--------------------> [ Redis Cache ] -----------------+
-                                                             (Task Broker)
+```mermaid
+graph TD
+    Client[Client Browser] -->|HTTP / SSE / WebSockets| Nginx[Nginx Reverse Proxy - Port 80]
+    
+    subgraph Frontend Portal
+        Nginx -->|Route: /*| NextJS[Next.js App Router - Port 3000]
+    end
+
+    subgraph API Services
+        Nginx -->|Route: /api/v1/*| FastAPI[FastAPI Server - Port 8000]
+        FastAPI -->|Auth / Metadata| Postgres[(PostgreSQL Database + pgvector)]
+    end
+
+    subgraph Asynchronous Workers
+        FastAPI -->|Trigger Pipeline Tasks| Redis[Redis Task Broker - Port 6379]
+        Redis -->|Fetch Task| Celery[Celery Worker Cluster]
+        Celery -->|Transcribe Urdu-English| Whisper[Whisper large-v3]
+        Celery -->|Render Vector Scenes| Manim[Manim Engine]
+        Celery -->|Extract concept embeddings| pgvector[(pgvector Store)]
+        Celery -->|Write compiled clips| Output[Shared Storage - /tmp/manim_output]
+    end
+
+    style NextJS fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff
+    style FastAPI fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#fff
+    style Celery fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#fff
+    style Postgres fill:#0f172a,stroke:#6366f1,stroke-width:2px,color:#fff
+    style pgvector fill:#0f172a,stroke:#6366f1,stroke-width:2px,color:#fff
+    style Nginx fill:#020617,stroke:#475569,stroke-width:1px,color:#94a3b8
+    style Redis fill:#020617,stroke:#f43f5e,stroke-width:1px,color:#94a3b8
 ```
 
 ### Multi-Agent Orchestration Pipeline
