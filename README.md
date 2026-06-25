@@ -1,4 +1,4 @@
-# <p align="center">LectureOS</p>
+# <p align="center">💻 LectureOS</p>
 ### <p align="center">Agentic AI Framework for Lecture-to-Animation Transformation</p>
 
 <p align="center">
@@ -13,7 +13,7 @@
 
 ---
 
-## Overview
+## 📖 Overview
 
 LectureOS is an agentic AI SaaS platform designed to automatically transform raw, spoken lecture recordings from professors into high-fidelity, visually rich, 3Blue1Brown-style educational animations. 
 
@@ -21,7 +21,7 @@ By utilizing an advanced pipeline of 8 specialized, autonomous AI agents—cover
 
 ---
 
-## Demo
+## 🎬 Demo
 
 Watch the video preview below, or open the [Demo Video file (finalvideo.mp4)](./finalvideo.mp4) directly:
 
@@ -33,7 +33,7 @@ Watch the video preview below, or open the [Demo Video file (finalvideo.mp4)](./
 
 ---
 
-## Portals and Feature Set
+## ⚙️ Portals and Feature Set
 
 ### Professor Dashboard
 * **One-Click Video Uploads:** Upload raw lecture footage directly to CDN storage via UploadThing.
@@ -48,7 +48,7 @@ Watch the video preview below, or open the [Demo Video file (finalvideo.mp4)](./
 
 ---
 
-## System Architecture and Flow
+## 🏗️ System Architecture and Flow
 
 LectureOS is structured as a robust monorepo built for high throughput and long-running GPU/CPU-intensive rendering tasks.
 
@@ -96,7 +96,7 @@ graph TD
 
 ---
 
-## The Multi-Agent Pipeline
+## 🤖 The Multi-Agent Pipeline
 
 Every stage of video generation is managed by an autonomous agent configured with error handling and robust retry logic:
 
@@ -111,7 +111,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 | Layer | Technology | Purpose / Rationale |
 |---|---|---|
@@ -128,7 +128,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## Repository Structure
+## 📂 Repository Structure
 
 ```text
 ├── apps
@@ -152,7 +152,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 * **Git**
@@ -203,7 +203,7 @@ Use these pre-seeded accounts to log in:
 
 ---
 
-## Operational Commands
+## 🔧 Operational Commands
 
 Manage your application stack using root `pnpm` wrappers:
 
@@ -228,7 +228,7 @@ pnpm stop
 
 ---
 
-## Troubleshooting
+## 💡 Troubleshooting
 
 * **Port 80 Conflict (Windows):** Open `services.msc` and stop the "World Wide Web Publishing Service". Alternatively, map Nginx to port `8080:80` inside `infra/docker-compose.yml`.
 * **First-Run Whisper Delay:** The `large-v3` transcription model (~3GB) downloads inside the worker container during its first run. You can monitor this progress via `pnpm logs:worker`. For faster local testing, set `WHISPER_MODEL_SIZE=base` in `apps/api/.env`.
@@ -236,5 +236,5 @@ pnpm stop
 
 ---
 
-## License
+## 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
