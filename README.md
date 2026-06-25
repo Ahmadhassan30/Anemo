@@ -1,4 +1,4 @@
-# <p align="center">💻 LectureOS</p>
+# <p align="center"><img src="https://api.iconify.design/lucide:layers.svg?color=%236366f1" width="36" height="36" align="absmiddle" /> LectureOS</p>
 ### <p align="center">Agentic AI Framework for Lecture-to-Animation Transformation</p>
 
 <p align="center">
@@ -14,14 +14,15 @@
 
 ---
 
-## 📖 Overview
+## <img src="https://api.iconify.design/lucide:book-open.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Overview
 
 LectureOS is an agentic AI SaaS platform designed to automatically transform raw, spoken lecture recordings from professors into high-fidelity, visually rich, 3Blue1Brown-style educational animations. 
 
 By utilizing an advanced pipeline of 8 specialized, autonomous AI agents—covering ingestion, multi-lingual transcription, conceptual segmentation, parameter-based code generation, animation rendering, voice synchronization, RAG indexing, and publishing—the system generates educational videos. The output is complete with synchronized audio, burned subtitles, and matching animated visual elements rendered using Manim.
 
 > [!IMPORTANT]
-> **🚀 Core Engineering Breakthrough: Zero Generative Video Models Used**
+> **Core Engineering Breakthrough: Zero Generative Video Models Used**
+> 
 > Unlike traditional AI video generation tools (like Runway, Sora, or Stable Video Diffusion) which are extremely expensive, slow, and prone to visual hallucinations, **LectureOS uses zero video generation models**. 
 > 
 > Instead, it works by programmatically composing, styling, and rendering mathematical vectors and scenes using the **Manim Community Edition** engine from structural concepts extracted by **Groq** LLMs. This key invention guarantees:
@@ -31,7 +32,7 @@ By utilizing an advanced pipeline of 8 specialized, autonomous AI agents—cover
 
 ---
 
-## 🎬 Animation Gallery
+## <img src="https://api.iconify.design/lucide:play.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Animation Gallery
 
 Below are visual frames of the 3Blue1Brown-style animations produced by the LectureOS multi-agent orchestration pipeline:
 
@@ -43,7 +44,7 @@ Below are visual frames of the 3Blue1Brown-style animations produced by the Lect
 
 ---
 
-## ⚙️ Portals and Feature Set
+## <img src="https://api.iconify.design/lucide:layout-template.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Portals and Feature Set
 
 ### Professor Dashboard
 * **One-Click Video Uploads:** Upload raw lecture footage directly to CDN storage via UploadThing.
@@ -58,7 +59,7 @@ Below are visual frames of the 3Blue1Brown-style animations produced by the Lect
 
 ---
 
-## 🏗️ System Architecture and Flow
+## <img src="https://api.iconify.design/lucide:network.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> System Architecture and Flow
 
 LectureOS is structured as a robust monorepo built for high throughput and long-running GPU/CPU-intensive rendering tasks.
 
@@ -106,7 +107,7 @@ graph TD
 
 ---
 
-## 🤖 The Multi-Agent Pipeline
+## <img src="https://api.iconify.design/lucide:cpu.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> The Multi-Agent Pipeline
 
 Every stage of video generation is managed by an autonomous agent configured with error handling and robust retry logic:
 
@@ -121,7 +122,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## 🛠️ Technology Stack
+## <img src="https://api.iconify.design/lucide:layers.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Technology Stack
 
 | Layer | Technology | Purpose / Rationale |
 |---|---|---|
@@ -138,7 +139,40 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## 📂 Repository Structure
+## <img src="https://api.iconify.design/lucide:star.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Why LectureOS? (Engineering Highlights)
+
+If you are a recruiter or engineering manager, here is a breakdown of the complex distributed system challenges solved in this repository:
+
+* **Asynchronous Task Orchestration:** Video rendering (Manim) and audio transcription (Whisper) are heavy, blocking CPU/GPU workloads. The platform offloads these tasks to a distributed **Celery** worker pool backed by a **Redis** message broker, decoupling client-server communications.
+* **Real-Time Data Streaming:** Instead of periodic polling, the backend streams live agent events and pipeline execution states to the professor's dashboard using a lightweight **Server-Sent Events (SSE)** connection over Nginx (configured with `proxy_buffering off` for minimal latency).
+* **Self-Healing LLM Pipelines:** The Manim generation agent uses a feedback loop. If the rendering engine throws a compile error, the agent automatically extracts the traceback, feeds it back into the LLM context, and retries code generation (up to 5 attempts) before falling back to a safe layout.
+* **Hybrid Vector Database:** Unifies relational database operations (user accounts, lecture metadata, auditing) with semantic search capabilities using **PostgreSQL + pgvector** to serve the student's RAG chatbot with timestamp citations.
+* **Monorepo Tooling:** Structured with **Turborepo** to orchestrate dependencies, shared types, and compilation cache between the FastAPI backend and Next.js frontend, ensuring rapid build caches and strong type safety.
+
+---
+
+## <img src="https://api.iconify.design/lucide:git-pull-request.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Roadmap & Contributing
+
+We welcome open-source contributions to LectureOS! Here is what we are planning next, and how you can get involved:
+
+### Project Roadmap
+
+- [ ] **Dynamic PPTX Ingestion:** Allow parsing slides directly into context vectors to augment the animation generation agent.
+- [ ] **Voice Cloning (TTS):** Integrate local voice models (like Coqui or Bark) to synthesize custom professor narration profiles.
+- [ ] **Interactive Manim Canvas:** Create a web-based inspector to manually edit generated Manim code in the browser with live reload.
+- [ ] **Academic Multi-Language Support:** Expand beyond Urdu-English code-switching to Spanish, Hindi, and Portuguese academic dialects.
+
+### How to Contribute
+
+1. **Fork** the repository and clone it locally.
+2. Create a branch: `git checkout -b feature/amazing-feature`.
+3. Check the code formatting and linter: `pnpm lint`.
+4. Run tests: `pnpm test` (FastAPI router checks & agent unit tests).
+5. Submit a **Pull Request** with clear description notes of your implementation.
+
+---
+
+## <img src="https://api.iconify.design/lucide:folder-tree.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Repository Structure
 
 ```text
 ├── apps
@@ -162,40 +196,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## ⭐ Why LectureOS? (Engineering Highlights)
-
-If you are a recruiter or engineering manager, here is a breakdown of the complex distributed system challenges solved in this repository:
-
-* **Asynchronous Task Orchestration:** Video rendering (Manim) and audio transcription (Whisper) are heavy, blocking CPU/GPU workloads. The platform offloads these tasks to a distributed **Celery** worker pool backed by a **Redis** message broker, decoupling client-server communications.
-* **Real-Time Data Streaming:** Instead of periodic polling, the backend streams live agent events and pipeline execution states to the professor's dashboard using a lightweight **Server-Sent Events (SSE)** connection over Nginx (configured with `proxy_buffering off` for minimal latency).
-* **Self-Healing LLM Pipelines:** The Manim generation agent uses a feedback loop. If the rendering engine throws a compile error, the agent automatically extracts the traceback, feeds it back into the LLM context, and retries code generation (up to 5 attempts) before falling back to a safe layout.
-* **Hybrid Vector Database:** Unifies relational database operations (user accounts, lecture metadata, auditing) with semantic search capabilities using **PostgreSQL + pgvector** to serve the student's RAG chatbot with timestamp citations.
-* **Monorepo Tooling:** Structured with **Turborepo** to orchestrate dependencies, shared types, and compilation cache between the FastAPI backend and Next.js frontend, ensuring rapid build caches and strong type safety.
-
----
-
-## ⚡ Roadmap & Contributing
-
-We welcome open-source contributions to LectureOS! Here is what we are planning next, and how you can get involved:
-
-### Project Roadmap
-
-- [ ] **Dynamic PPTX Ingestion:** Allow parsing slides directly into context vectors to augment the animation generation agent.
-- [ ] **Voice Cloning (TTS):** Integrate local voice models (like Coqui or Bark) to synthesize custom professor narration profiles.
-- [ ] **Interactive Manim Canvas:** Create a web-based inspector to manually edit generated Manim code in the browser with live reload.
-- [ ] **Academic Multi-Language Support:** Expand beyond Urdu-English code-switching to Spanish, Hindi, and Portuguese academic dialects.
-
-### How to Contribute
-
-1. **Fork** the repository and clone it locally.
-2. Create a branch: `git checkout -b feature/amazing-feature`.
-3. Check the code formatting and linter: `pnpm lint`.
-4. Run tests: `pnpm test` (FastAPI router checks & agent unit tests).
-5. Submit a **Pull Request** with clear description notes of your implementation.
-
----
-
-## 🚀 Getting Started
+## <img src="https://api.iconify.design/lucide:terminal.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Getting Started
 
 ### Prerequisites
 * **Git**
@@ -246,7 +247,7 @@ Use these pre-seeded accounts to log in:
 
 ---
 
-## 🔧 Operational Commands
+## <img src="https://api.iconify.design/lucide:wrench.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Operational Commands
 
 Manage your application stack using root `pnpm` wrappers:
 
@@ -271,7 +272,7 @@ pnpm stop
 
 ---
 
-## 💡 Troubleshooting
+## <img src="https://api.iconify.design/lucide:life-buoy.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Troubleshooting
 
 * **Port 80 Conflict (Windows):** Open `services.msc` and stop the "World Wide Web Publishing Service". Alternatively, map Nginx to port `8080:80` inside `infra/docker-compose.yml`.
 * **First-Run Whisper Delay:** The `large-v3` transcription model (~3GB) downloads inside the worker container during its first run. You can monitor this progress via `pnpm logs:worker`. For faster local testing, set `WHISPER_MODEL_SIZE=base` in `apps/api/.env`.
@@ -279,5 +280,5 @@ pnpm stop
 
 ---
 
-## 📄 License
+## <img src="https://api.iconify.design/lucide:file-text.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> License
 This project is licensed under the MIT License - see the LICENSE file for details.
