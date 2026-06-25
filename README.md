@@ -1,5 +1,5 @@
-# <p align="center">🎥 LectureOS</p>
-### <p align="center">Agentic AI Framework for Lecture-to-Animation transformation</p>
+# <p align="center">LectureOS</p>
+### <p align="center">Agentic AI Framework for Lecture-to-Animation Transformation</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" />
@@ -13,40 +13,42 @@
 
 ---
 
-## 🌟 Overview
+## Overview
 
-**LectureOS** is a state-of-the-art agentic AI SaaS platform designed to automatically transform raw, spoken lecture recordings from professors into high-fidelity, visually rich, **3Blue1Brown-style educational animations**. 
+LectureOS is an agentic AI SaaS platform designed to automatically transform raw, spoken lecture recordings from professors into high-fidelity, visually rich, 3Blue1Brown-style educational animations. 
 
-By utilizing an advanced pipeline of 8 specialized, autonomous AI agents—covering ingestion, multi-lingual transcription, conceptual segmentation, parameter-based code generation, animation rendering, voice synchronization, RAG indexing, and publishing—the system generates stunning educational videos. The output is complete with synchronized audio, burned subtitles, and matching animated visual elements rendered using **Manim**.
+By utilizing an advanced pipeline of 8 specialized, autonomous AI agents—covering ingestion, multi-lingual transcription, conceptual segmentation, parameter-based code generation, animation rendering, voice synchronization, RAG indexing, and publishing—the system generates educational videos. The output is complete with synchronized audio, burned subtitles, and matching animated visual elements rendered using Manim.
 
 ---
 
-## 🎬 Demo
+## Demo
 
-Watch how LectureOS automatically extracts topics and generates corresponding 3Blue1Brown-style mathematical animations, complete with localized subtitles and synchronized narration:
+Watch the video preview below, or open the [Demo Video file (finalvideo.mp4)](./finalvideo.mp4) directly:
 
 <p align="center">
-  <video src="./finalvideo.mp4" width="100%" controls autoplay loop muted></video>
+  <video src="./finalvideo.mp4" width="100%" height="auto" controls autoplay loop muted>
+    Your browser does not support the video tag. You can view the video file directly: <a href="./finalvideo.mp4">finalvideo.mp4</a>
+  </video>
 </p>
 
 ---
 
-## 🎯 Portals & Feature Set
+## Portals and Feature Set
 
-### 👨‍🏫 Professor Dashboard
-* **One-Click Video Uploads:** Upload raw lecture footage directly to CDN storage via [UploadThing](https://uploadthing.com/).
+### Professor Dashboard
+* **One-Click Video Uploads:** Upload raw lecture footage directly to CDN storage via UploadThing.
 * **Real-time Pipeline Tracking:** Monitor the progress of the agentic pipeline using a live Server-Sent Events (SSE) stream.
 * **Auto-Publishing:** Connect a YouTube account via OAuth2 for hands-free video deployment complete with auto-generated chapters and SEO tags.
 * **Analytics & Management:** Audit history of past runs, retry failed render scenes, and track processing metrics.
 
-### 🧑‍🎓 Student Study Hub
+### Student Study Hub
 * **Concept-Synced Video Player:** Interactive custom-controlled HTML5 media player mapped directly to conceptual chapters.
 * **Interactive AI Quizzes:** Dynamically generated multiple-choice tests created by LLMs based on the lecture contents.
 * **RAG Study Assistant:** A localized Retrieval-Augmented Generation (RAG) chatbot grounded in the professor's exact words. Provides answers backed by clickable timestamp citations.
 
 ---
 
-## 🏗️ Architecture & Flow
+## System Architecture and Flow
 
 LectureOS is structured as a robust monorepo built for high throughput and long-running GPU/CPU-intensive rendering tasks.
 
@@ -72,7 +74,7 @@ LectureOS is structured as a robust monorepo built for high throughput and long-
                             |   Celery Worker   |                                   |  Postgres Database|
                             | (Manim + Whisper) |                                   |    (pgvector)     |
                             +---------+---------+                                   +---------+---------+
-                                      |                                                       ^
+                                                      |                                                       ^
                                       +--------------------> [ Redis Cache ] -----------------+
                                                              (Task Broker)
 ```
@@ -94,7 +96,7 @@ graph TD
 
 ---
 
-## 🤖 Deep Dive: The 8-Agent Pipeline
+## The Multi-Agent Pipeline
 
 Every stage of video generation is managed by an autonomous agent configured with error handling and robust retry logic:
 
@@ -109,7 +111,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 | Layer | Technology | Purpose / Rationale |
 |---|---|---|
@@ -126,7 +128,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 ├── apps
@@ -150,9 +152,9 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### 📋 Prerequisites
+### Prerequisites
 * **Git**
 * **Docker & Docker Compose** (v2.0 or higher)
 * **Node.js 20+** & **pnpm 9+** (if working on local packages/frontend scripts)
@@ -160,7 +162,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 > [!WARNING]  
 > **Windows Users:** Please execute all `pnpm` and shell script setup commands within a **WSL2 terminal** (Ubuntu/Debian) to ensure script compatibility.
 
-### 🛠️ Quick Installation
+### Quick Installation
 
 1. **Clone the repository:**
    ```bash
@@ -190,7 +192,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
    ```
    Access http://localhost in your browser to view the application!
 
-### 🔑 Demo Accounts
+### Demo Accounts
 
 Use these pre-seeded accounts to log in:
 
@@ -201,7 +203,7 @@ Use these pre-seeded accounts to log in:
 
 ---
 
-## 🛠️ Operational Commands
+## Operational Commands
 
 Manage your application stack using root `pnpm` wrappers:
 
@@ -226,7 +228,7 @@ pnpm stop
 
 ---
 
-## 💡 Troubleshooting
+## Troubleshooting
 
 * **Port 80 Conflict (Windows):** Open `services.msc` and stop the "World Wide Web Publishing Service". Alternatively, map Nginx to port `8080:80` inside `infra/docker-compose.yml`.
 * **First-Run Whisper Delay:** The `large-v3` transcription model (~3GB) downloads inside the worker container during its first run. You can monitor this progress via `pnpm logs:worker`. For faster local testing, set `WHISPER_MODEL_SIZE=base` in `apps/api/.env`.
@@ -234,5 +236,5 @@ pnpm stop
 
 ---
 
-## 📄 License
+## License
 This project is licensed under the MIT License - see the LICENSE file for details.
