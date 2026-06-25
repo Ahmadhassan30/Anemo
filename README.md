@@ -21,15 +21,18 @@ By utilizing an advanced pipeline of 8 specialized, autonomous AI agents—cover
 
 ---
 
-## <img src="https://api.iconify.design/lucide:play.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Demo
+## <img src="https://api.iconify.design/lucide:play.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Animation Gallery
 
-Watch the video preview below, or open the [Demo Video file (finalvideo.mp4)](./finalvideo.mp4) directly:
+Below are visual frames of the 3Blue1Brown-style animations produced by the LectureOS multi-agent orchestration pipeline:
 
 <p align="center">
-  <video src="./finalvideo.mp4" width="100%" height="auto" controls autoplay loop muted>
-    Your browser does not support the video tag. You can view the video file directly: <a href="./finalvideo.mp4">finalvideo.mp4</a>
-  </video>
+  <img src="./image.png" width="32%" alt="Manim Animation Frame 1" />
+  <img src="./image%20copy.png" width="32%" alt="Manim Animation Frame 2" />
+  <img src="./image%20copy%202.png" width="32%" alt="Manim Animation Frame 3" />
 </p>
+
+> [!IMPORTANT]
+> **Zero Generative Video Models:** The animations above are created and compiled **entirely without video generation models** (such as Sora or Runway). The architecture achieves this by programmatically composing, styling, and rendering mathematical vectors and scenes using the **Manim Community Edition** engine. This eliminates visual hallucinations, guarantees pixel-perfect math layouts, and ensures deterministic outputs synced with the audio narration.
 
 ---
 
