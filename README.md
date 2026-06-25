@@ -13,7 +13,7 @@
 
 ---
 
-## 📖 Overview
+## <img src="https://api.iconify.design/lucide:book-open.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Overview
 
 LectureOS is an agentic AI SaaS platform designed to automatically transform raw, spoken lecture recordings from professors into high-fidelity, visually rich, 3Blue1Brown-style educational animations. 
 
@@ -21,7 +21,7 @@ By utilizing an advanced pipeline of 8 specialized, autonomous AI agents—cover
 
 ---
 
-## 🎬 Demo
+## <img src="https://api.iconify.design/lucide:play.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Demo
 
 Watch the video preview below, or open the [Demo Video file (finalvideo.mp4)](./finalvideo.mp4) directly:
 
@@ -33,7 +33,7 @@ Watch the video preview below, or open the [Demo Video file (finalvideo.mp4)](./
 
 ---
 
-## ⚙️ Portals and Feature Set
+## <img src="https://api.iconify.design/lucide:layout-template.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Portals and Feature Set
 
 ### Professor Dashboard
 * **One-Click Video Uploads:** Upload raw lecture footage directly to CDN storage via UploadThing.
@@ -48,7 +48,7 @@ Watch the video preview below, or open the [Demo Video file (finalvideo.mp4)](./
 
 ---
 
-## 🏗️ System Architecture and Flow
+## <img src="https://api.iconify.design/lucide:network.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> System Architecture and Flow
 
 LectureOS is structured as a robust monorepo built for high throughput and long-running GPU/CPU-intensive rendering tasks.
 
@@ -96,7 +96,7 @@ graph TD
 
 ---
 
-## 🤖 The Multi-Agent Pipeline
+## <img src="https://api.iconify.design/lucide:cpu.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> The Multi-Agent Pipeline
 
 Every stage of video generation is managed by an autonomous agent configured with error handling and robust retry logic:
 
@@ -111,7 +111,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## 🛠️ Technology Stack
+## <img src="https://api.iconify.design/lucide:layers.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Technology Stack
 
 | Layer | Technology | Purpose / Rationale |
 |---|---|---|
@@ -128,7 +128,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## 📂 Repository Structure
+## <img src="https://api.iconify.design/lucide:folder-tree.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Repository Structure
 
 ```text
 ├── apps
@@ -152,7 +152,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## 🚀 Getting Started
+## <img src="https://api.iconify.design/lucide:terminal.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Getting Started
 
 ### Prerequisites
 * **Git**
@@ -203,7 +203,7 @@ Use these pre-seeded accounts to log in:
 
 ---
 
-## 🔧 Operational Commands
+## <img src="https://api.iconify.design/lucide:wrench.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Operational Commands
 
 Manage your application stack using root `pnpm` wrappers:
 
@@ -228,7 +228,7 @@ pnpm stop
 
 ---
 
-## 💡 Troubleshooting
+## <img src="https://api.iconify.design/lucide:life-buoy.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Troubleshooting
 
 * **Port 80 Conflict (Windows):** Open `services.msc` and stop the "World Wide Web Publishing Service". Alternatively, map Nginx to port `8080:80` inside `infra/docker-compose.yml`.
 * **First-Run Whisper Delay:** The `large-v3` transcription model (~3GB) downloads inside the worker container during its first run. You can monitor this progress via `pnpm logs:worker`. For faster local testing, set `WHISPER_MODEL_SIZE=base` in `apps/api/.env`.
@@ -236,5 +236,5 @@ pnpm stop
 
 ---
 
-## 📄 License
+## <img src="https://api.iconify.design/lucide:file-text.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> License
 This project is licensed under the MIT License - see the LICENSE file for details.
