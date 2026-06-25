@@ -9,6 +9,7 @@
   <img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/DeepSeek-V3-blue?style=for-the-badge" alt="DeepSeek" />
   <img src="https://img.shields.io/badge/Manim-Community-FC60A8?style=for-the-badge" alt="Manim" />
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" alt="PRs Welcome" />
 </p>
 
 ---
@@ -128,6 +129,39 @@ Every stage of video generation is managed by an autonomous agent configured wit
 | **LLMs** | DeepSeek-V3 / Groq | Code generation and segmentation tasks. |
 | **Embeddings** | BAAI/bge-small-en-v1.5 | High quality, low resource local sentence embeddings. |
 | **Storage** | UploadThing | Secure, fast client-to-cloud file uploads. |
+
+---
+
+## <img src="https://api.iconify.design/lucide:star.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Why LectureOS? (Engineering Highlights)
+
+If you are a recruiter or engineering manager, here is a breakdown of the complex distributed system challenges solved in this repository:
+
+* **Asynchronous Task Orchestration:** Video rendering (Manim) and audio transcription (Whisper) are heavy, blocking CPU/GPU workloads. The platform offloads these tasks to a distributed **Celery** worker pool backed by a **Redis** message broker, decoupling client-server communications.
+* **Real-Time Data Streaming:** Instead of periodic polling, the backend streams live agent events and pipeline execution states to the professor's dashboard using a lightweight **Server-Sent Events (SSE)** connection over Nginx (configured with `proxy_buffering off` for minimal latency).
+* **Self-Healing LLM Pipelines:** The Manim generation agent uses a feedback loop. If the rendering engine throws a compile error, the agent automatically extracts the traceback, feeds it back into the LLM context, and retries code generation (up to 5 attempts) before falling back to a safe layout.
+* **Hybrid Vector Database:** Unifies relational database operations (user accounts, lecture metadata, auditing) with semantic search capabilities using **PostgreSQL + pgvector** to serve the student's RAG chatbot with timestamp citations.
+* **Monorepo Tooling:** Structured with **Turborepo** to orchestrate dependencies, shared types, and compilation cache between the FastAPI backend and Next.js frontend, ensuring rapid build caches and strong type safety.
+
+---
+
+## <img src="https://api.iconify.design/lucide:git-pull-request.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Roadmap & Contributing
+
+We welcome open-source contributions to LectureOS! Here is what we are planning next, and how you can get involved:
+
+### Project Roadmap
+
+- [ ] **Dynamic PPTX Ingestion:** Allow parsing slides directly into context vectors to augment the animation generation agent.
+- [ ] **Voice Cloning (TTS):** Integrate local voice models (like Coqui or Bark) to synthesize custom professor narration profiles.
+- [ ] **Interactive Manim Canvas:** Create a web-based inspector to manually edit generated Manim code in the browser with live reload.
+- [ ] **Academic Multi-Language Support:** Expand beyond Urdu-English code-switching to Spanish, Hindi, and Portuguese academic dialects.
+
+### How to Contribute
+
+1. **Fork** the repository and clone it locally.
+2. Create a branch: `git checkout -b feature/amazing-feature`.
+3. Check the code formatting and linter: `pnpm lint`.
+4. Run tests: `pnpm test` (FastAPI router checks & agent unit tests).
+5. Submit a **Pull Request** with clear description notes of your implementation.
 
 ---
 
