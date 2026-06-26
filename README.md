@@ -268,7 +268,7 @@ pnpm logs:api
 pnpm logs:worker
 pnpm logs:web
 
-# Apply new database migrations
+# Apply new database migrations.
 pnpm migrate
 
 # Shutdown the container stack (retaining database volumes)
