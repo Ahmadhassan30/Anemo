@@ -4932,7 +4932,7 @@ CMD ["node", "server.js"]
 
 #### File: [apps/web/app/(auth)/login/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/(auth)/login/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, navigation, terminal, react, link`
+- **Key Imports:** `react, navigation, react, link, terminal`
 - **Components/Functions:** `LoginPage`
 
 **Functional Details:**
@@ -5004,7 +5004,7 @@ export default function LoginPage() {
 
 #### File: [apps/web/app/(auth)/register/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/(auth)/register/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `terminal, link, react, navigation`
+- **Key Imports:** `react, link, navigation, terminal`
 - **Components/Functions:** `RegisterPage`
 
 **Functional Details:**
@@ -5076,7 +5076,7 @@ export default function RegisterPage() {
 
 #### File: [apps/web/app/api/auth/[...nextauth]/route.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/api/auth/[...nextauth]/route.ts)
 **Technical Specifications:**
-- **Key Imports:** `next-auth, auth`
+- **Key Imports:** `auth, next-auth`
 
 **Functional Details:**
 Serves as a routing page/endpoint within the Next.js App Router topology.
@@ -5095,8 +5095,8 @@ export { handler as GET, handler as POST };
 
 #### File: [apps/web/app/api/uploadthing/core.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/api/uploadthing/core.ts)
 **Technical Specifications:**
-- **Key Imports:** `next-auth, auth, next`
-- **Interfaces/Types:** `FileRouter, OurFileRouter`
+- **Key Imports:** `auth, next-auth, next`
+- **Interfaces/Types:** `OurFileRouter, FileRouter`
 
 **Functional Details:**
 Layout, CSS, or provider configuring global styles or Next-Auth context.
@@ -5218,7 +5218,7 @@ Layout, CSS, or provider configuring global styles or Next-Auth context.
 
 #### File: [apps/web/app/layout.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/layout.tsx)
 **Technical Specifications:**
-- **Key Imports:** `providers, react`
+- **Key Imports:** `react, providers`
 - **Components/Functions:** `RootLayout`
 
 **Functional Details:**
@@ -5254,7 +5254,7 @@ export default function RootLayout({
 
 #### File: [apps/web/app/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `terminal, link, react`
+- **Key Imports:** `react, link, terminal`
 - **Components/Functions:** `LandingPage`
 
 **Functional Details:**
@@ -5326,7 +5326,7 @@ export default function LandingPage() {
 
 #### File: [apps/web/app/professor/dashboard/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/professor/dashboard/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, card, api-client, button, react, link`
+- **Key Imports:** `api-client, react, card, react, button, link`
 - **Components/Functions:** `ProfessorDashboardPage`
 
 **Functional Details:**
@@ -5422,7 +5422,7 @@ export default function ProfessorLayout({
 
 #### File: [apps/web/app/professor/lectures/[lectureId]/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/professor/lectures/[lectureId]/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `navigation, PipelineMonitor, DownloadButton, next-auth, auth`
+- **Key Imports:** `PipelineMonitor, navigation, DownloadButton, next-auth, auth`
 - **Interfaces/Types:** `PageProps`
 
 **Functional Details:**
@@ -5580,7 +5580,7 @@ export default function ProfessorSettingsPage() {
 
 #### File: [apps/web/app/professor/upload/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/professor/upload/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `separator, react, card, navigation, core, react, api-client, button`...
+- **Key Imports:** `api-client, navigation, separator, card, input, core, react, button`...
 - **Components/Functions:** `UploadWizard`
 
 **Functional Details:**
@@ -5740,7 +5740,7 @@ I
 
 #### File: [apps/web/app/static/[...path]/route.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/static/[...path]/route.ts)
 **Technical Specifications:**
-- **Key Imports:** `backend-url, server`
+- **Key Imports:** `server, backend-url`
 
 **Functional Details:**
 Serves as a routing page/endpoint within the Next.js App Router topology.
@@ -5793,7 +5793,7 @@ export async function GET(
 
 #### File: [apps/web/app/student/dashboard/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/student/dashboard/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, api-client, button, react, link`
+- **Key Imports:** `api-client, react, react, button, link`
 - **Components/Functions:** `StudentDashboard`
 
 **Functional Details:**
@@ -5865,7 +5865,7 @@ export default function StudentDashboard() {
 
 #### File: [apps/web/app/student/enroll/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/student/enroll/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, card, navigation, api-client, button, input`
+- **Key Imports:** `api-client, navigation, card, input, react, button`
 - **Components/Functions:** `EnrollPage`
 
 **Functional Details:**
@@ -6002,7 +6002,7 @@ export default function StudentChatPage() {
 
 #### File: [apps/web/app/student/lectures/[lectureId]/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/student/lectures/[lectureId]/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, QuizWidget, navigation, VideoPlayer, lecture.store, NotesPanel, api-client, react`...
+- **Key Imports:** `api-client, lecture.store, VideoPlayer, react, navigation, ChatInterface, react, QuizWidget`...
 - **Components/Functions:** `StudentLectureView`
 
 **Functional Details:**
@@ -6108,8 +6108,8 @@ export default function StudentQuizPage() {
 
 #### File: [apps/web/components/magicui/terminal.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/magicui/terminal.tsx)
 **Technical Specifications:**
-- **Key Imports:** `utils, react`
-- **Components/Functions:** `Terminal, AnimatedSpan, TypingAnimation`
+- **Key Imports:** `react, utils`
+- **Components/Functions:** `AnimatedSpan, Terminal, TypingAnimation`
 
 **Functional Details:**
 A reusable UI component. Adheres to modern styles using Radix/Shadcn primitives and Tailwind CSS.
@@ -6354,8 +6354,8 @@ export function LectureCard({ title, status }: LectureCardProps) {
 
 #### File: [apps/web/components/professor/PipelineMonitor.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/professor/PipelineMonitor.tsx)
 **Technical Specifications:**
-- **Key Imports:** `sse-client, react, DownloadButton, api-client, pipeline.store, terminal`
-- **Interfaces/Types:** `PipelineEvent, PipelineMonitorProps, AgentRunRecord, StepStatus`
+- **Key Imports:** `api-client, DownloadButton, sse-client, react, pipeline.store, terminal`
+- **Interfaces/Types:** `PipelineMonitorProps, StepStatus, AgentRunRecord, PipelineEvent`
 - **Components/Functions:** `PipelineMonitor`
 
 **Functional Details:**
@@ -6500,7 +6500,7 @@ export function UploadDropzone({ onFileSelect }: UploadDropzoneProps) {
 
 #### File: [apps/web/components/shared/LoadingSpinner.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/shared/LoadingSpinner.tsx)
 **Technical Specifications:**
-- **Key Imports:** `utils, react`
+- **Key Imports:** `react, utils`
 - **Components/Functions:** `LoadingSpinner`
 
 **Functional Details:**
@@ -6531,7 +6531,7 @@ export function LoadingSpinner({
 
 #### File: [apps/web/components/shared/Navbar.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/shared/Navbar.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, link, react`
+- **Key Imports:** `react, react, link`
 - **Components/Functions:** `Navbar`
 
 **Functional Details:**
@@ -6575,7 +6575,7 @@ export function Navbar() {
 
 #### File: [apps/web/components/shared/Sidebar.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/shared/Sidebar.tsx)
 **Technical Specifications:**
-- **Key Imports:** `utils, link, react, navigation`
+- **Key Imports:** `react, link, navigation, utils`
 - **Interfaces/Types:** `SidebarItem`
 - **Components/Functions:** `Sidebar`
 
@@ -6628,8 +6628,8 @@ export function Sidebar({ items = [] }: { items?: SidebarItem[] }) {
 
 #### File: [apps/web/components/student/ChatInterface.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/student/ChatInterface.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, card, api-client, button, input, CitationCard`
-- **Interfaces/Types:** `ChatMessage, ChatInterfaceProps`
+- **Key Imports:** `api-client, CitationCard, card, input, react, button`
+- **Interfaces/Types:** `ChatInterfaceProps, ChatMessage`
 - **Components/Functions:** `ChatInterface`
 
 **Functional Details:**
@@ -6701,7 +6701,7 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
 
 #### File: [apps/web/components/student/CitationCard.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/student/CitationCard.tsx)
 **Technical Specifications:**
-- **Key Imports:** `lecture.store, card`
+- **Key Imports:** `card, lecture.store`
 - **Interfaces/Types:** `CitationCardProps`
 - **Components/Functions:** `CitationCard`
 
@@ -6825,8 +6825,8 @@ export function NotesPanel() {
 
 #### File: [apps/web/components/student/QuizWidget.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/student/QuizWidget.tsx)
 **Technical Specifications:**
-- **Key Imports:** `api-client, react, button, card`
-- **Interfaces/Types:** `QuizResult, QuizSubmissionResult, QuizQuestion, QuizWidgetProps`
+- **Key Imports:** `react, api-client, card, button`
+- **Interfaces/Types:** `QuizResult, QuizQuestion, QuizWidgetProps, QuizSubmissionResult`
 - **Components/Functions:** `QuizWidget`
 
 **Functional Details:**
@@ -6898,7 +6898,7 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
 
 #### File: [apps/web/components/student/VideoPlayer.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/student/VideoPlayer.tsx)
 **Technical Specifications:**
-- **Key Imports:** `lecture.store, react, dropdown-menu`
+- **Key Imports:** `react, lecture.store, dropdown-menu`
 - **Interfaces/Types:** `VideoPlayerProps`
 - **Components/Functions:** `VideoPlayer`
 
@@ -6971,7 +6971,7 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
 
 #### File: [apps/web/components/ui/badge.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/badge.tsx)
 **Technical Specifications:**
-- **Key Imports:** `utils, react`
+- **Key Imports:** `react, utils`
 - **Interfaces/Types:** `BadgeProps`
 - **Components/Functions:** `Badge`
 
@@ -7009,7 +7009,7 @@ export function Badge({ className, variant = "default", ...props }: BadgeProps) 
 
 #### File: [apps/web/components/ui/button.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/button.tsx)
 **Technical Specifications:**
-- **Key Imports:** `utils, react-slot, react`
+- **Key Imports:** `react, react-slot, utils`
 - **Interfaces/Types:** `ButtonProps`
 
 **Functional Details:**
@@ -7058,9 +7058,9 @@ Button.displayName = "Button";
 
 #### File: [apps/web/components/ui/card.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/card.tsx)
 **Technical Specifications:**
-- **Key Imports:** `utils, react`
+- **Key Imports:** `react, utils`
 - **Interfaces/Types:** `CardProps`
-- **Components/Functions:** `CardHeader, CardContent, Card, CardDescription, CardTitle, CardFooter`
+- **Components/Functions:** `CardFooter, CardTitle, CardContent, Card, CardHeader, CardDescription`
 
 **Functional Details:**
 A reusable UI component. Adheres to modern styles using Radix/Shadcn primitives and Tailwind CSS.
@@ -7157,7 +7157,7 @@ export function Dialog({ children, className, ...props }: DialogProps) {
 
 #### File: [apps/web/components/ui/dropdown-menu.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/dropdown-menu.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react-dropdown-menu, react`
+- **Key Imports:** `react, react-dropdown-menu`
 
 **Functional Details:**
 A reusable UI component. Adheres to modern styles using Radix/Shadcn primitives and Tailwind CSS.
@@ -7203,7 +7203,7 @@ DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
 #### File: [apps/web/components/ui/input.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/input.tsx)
 **Technical Specifications:**
-- **Key Imports:** `utils, react`
+- **Key Imports:** `react, utils`
 - **Interfaces/Types:** `InputProps`
 
 **Functional Details:**
@@ -7239,7 +7239,7 @@ Input.displayName = "Input";
 
 #### File: [apps/web/components/ui/progress.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/progress.tsx)
 **Technical Specifications:**
-- **Key Imports:** `utils, react-progress, react`
+- **Key Imports:** `react, react-progress, utils`
 
 **Functional Details:**
 A reusable UI component. Adheres to modern styles using Radix/Shadcn primitives and Tailwind CSS.
@@ -7298,7 +7298,7 @@ ScrollArea.displayName = "ScrollArea"
 
 #### File: [apps/web/components/ui/separator.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/separator.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react-separator, react`
+- **Key Imports:** `react, react-separator`
 
 **Functional Details:**
 A reusable UI component. Adheres to modern styles using Radix/Shadcn primitives and Tailwind CSS.
@@ -7334,7 +7334,7 @@ Separator.displayName = SeparatorPrimitive.Root.displayName
 #### File: [apps/web/lib/api-client.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/lib/api-client.ts)
 **Technical Specifications:**
 - **Key Imports:** `react`
-- **Interfaces/Types:** `for, UserResponse, AgentRunRecord, LectureListResponse, LectureResponse, CreateLectureResponse, TokenResponse, PipelineStateResponse`
+- **Interfaces/Types:** `TokenResponse, for, LectureListResponse, AgentRunRecord, UserResponse, PipelineStateResponse, LectureResponse, CreateLectureResponse`
 
 **Functional Details:**
 Frontend utility, API client handler, or configuration script.
@@ -7405,7 +7405,7 @@ export interface LectureListResponse {
 
 #### File: [apps/web/lib/auth.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/lib/auth.ts)
 **Technical Specifications:**
-- **Key Imports:** `next-auth, credentials`
+- **Key Imports:** `credentials, next-auth`
 
 **Functional Details:**
 Frontend utility, API client handler, or configuration script.
@@ -7830,7 +7830,7 @@ export const useChatStore = create<ChatState>(() => ({
 #### File: [apps/web/store/lecture.store.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/store/lecture.store.ts)
 **Technical Specifications:**
 - **Key Imports:** `zustand`
-- **Interfaces/Types:** `LectureState, Concept`
+- **Interfaces/Types:** `Concept, LectureState`
 - **Zustand Stores / Custom Hooks:** `useLectureStore`
 
 **Functional Details:**
@@ -7894,7 +7894,7 @@ export const useLectureStore = create<LectureState>((set, get) => ({
 
 #### File: [apps/web/store/pipeline.store.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/store/pipeline.store.ts)
 **Technical Specifications:**
-- **Key Imports:** `sse-client, zustand`
+- **Key Imports:** `zustand, sse-client`
 - **Interfaces/Types:** `PipelineState`
 - **Zustand Stores / Custom Hooks:** `usePipelineStore`
 
@@ -8098,7 +8098,7 @@ Frontend utility, API client handler, or configuration script.
 
 #### File: [apps/web/types/agent.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/types/agent.ts)
 **Technical Specifications:**
-- **Interfaces/Types:** `AgentStatus, definitions`
+- **Interfaces/Types:** `definitions, AgentStatus`
 
 **Functional Details:**
 Frontend utility, API client handler, or configuration script.
@@ -8139,7 +8139,7 @@ export type ChatMessage = {
 
 #### File: [apps/web/types/lecture.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/types/lecture.ts)
 **Technical Specifications:**
-- **Interfaces/Types:** `LectureDetail, definitions, LectureSummary`
+- **Interfaces/Types:** `definitions, LectureDetail, LectureSummary`
 
 **Functional Details:**
 Frontend utility, API client handler, or configuration script.
@@ -8790,7 +8790,18 @@ Configuration, dependency manifest, or utility helper.
   <img src="./Logo.png" alt="Anemo Logo" width="180" />
 </p>
 
-<h1 align="center"><b>ANEMO</b></h1>
+<p align="center">
+  <svg viewBox="0 0 800 140" width="450" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="anemo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#22d3ee" />
+        <stop offset="50%" stop-color="#0ea5e9" />
+        <stop offset="100%" stop-color="#2563eb" />
+      </linearGradient>
+    </defs>
+    <text x="50%" y="105" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="900" font-size="96" fill="url(#anemo-gradient)" letter-spacing="8">ANEMO</text>
+  </svg>
+</p>
 
 <p align="center">
   <b>Agentic AI Framework for Lecture-to-Animation Transformation</b>
@@ -8835,18 +8846,7 @@ Below are visual frames of the 3Blue1Brown-style animations produced by the Anem
   <img src="./image.png" width="32%" alt="Manim Animation Frame 1" />
   <img src="./image%20copy.png" width="32%" alt="Manim Animation Frame 2" />
   <img src="./image%20copy%202.png" width="32%" alt="Manim Animation Frame 3" />
-</p>
-
----
-
-## Portals and Feature Set
-
-### Professor Dashboard
-* **One-Click Video Uploads:** Upload raw lecture footage directly to CDN storage via UploadThing.
-* **Real-time Pipeline Tracking:** Monitor the progress of the agentic pipeline using a live Server-Sent Events (SSE) stream.
-* **Auto-Publishing:** Connect a YouTube account via OAuth2 for hands-free video deployment complete with auto-generated chapters and SEO tags.
-* **Analytics & Management:** Audit history of past runs, retry failed render scenes, and track processing metrics.
-# ... (truncated, total lines: 276)
+# ... (truncated, total lines: 287)
 ```
 
 #### File: [docs/Anemo-Comprehensive-Architecture-and-System-Design.md](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/docs/Anemo-Comprehensive-Architecture-and-System-Design.md)
@@ -8914,7 +8914,7 @@ graph TD
 ```
 
 ### Topology Analysis
-# ... (truncated, total lines: 9395)
+# ... (truncated, total lines: 9601)
 ```
 
 #### File: [docs/agent-pipeline.md](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/docs/agent-pipeline.md)
