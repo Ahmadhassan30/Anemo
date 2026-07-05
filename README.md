@@ -8,6 +8,17 @@
   <b>Agentic AI Framework for Lecture-to-Animation Transformation</b>
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Celery-5.3-37814A?style=for-the-badge&logo=celery&logoColor=white" alt="Celery" />
+  <img src="https://img.shields.io/badge/Docker-24+-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/LLM--Orchestrator-Groq-orange?style=for-the-badge" alt="Groq" />
+  <img src="https://img.shields.io/badge/Manim-Community-FC60A8?style=for-the-badge" alt="Manim" />
+  <img src="https://img.shields.io/badge/Video--Generation%20Models-Zero%20Used-red?style=for-the-badge" alt="Zero Video Models" />
+</p>
+
 ---
 
 ## Overview
