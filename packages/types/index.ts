@@ -1,5 +1,5 @@
 /*
- * Purpose: Shared TypeScript types for LectureOS packages.
+ * Purpose: Shared TypeScript types for Anemo packages.
  */
 export type LectureId = string;
 

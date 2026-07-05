@@ -30,21 +30,21 @@ An Agentic Al Platform for Transforming Raw Lectures into Animated Educational V
 
 1 
 
-~~LectureOS~~ 
+~~Anemo~~ 
 
 ~~Project Proposal: Artificial Intelligence~~ 
 
 ## 1. Idea Origin 
 
-During one of his lectures, our professor casually mentioned that he plans to spend his summer recording his course material so that students beyond this classroom, across the country and around the world, could benefit from his teaching. That single remark stayed with us. We have seen firsthand how clearly, he explains concepts that most textbooks struggle to convey, and the thought of that knowledge being confined to four walls felt like a profound waste. At the same time, we knew that turning raw recordings into polished, engaging YouTube content demands hours of editing, thumbnail design, SEO optimisation, and visualisation work that no busy academic should have to do alone. That evening we asked ourselves: what ifan AI system could take his recording and handle everything else, producing a publication ready animated educational video with zero manual effort on his part? LectureOS is our answer to that question, and our humble way of ensuring that his teaching reaches every student who deserves to hear it. 
+During one of his lectures, our professor casually mentioned that he plans to spend his summer recording his course material so that students beyond this classroom, across the country and around the world, could benefit from his teaching. That single remark stayed with us. We have seen firsthand how clearly, he explains concepts that most textbooks struggle to convey, and the thought of that knowledge being confined to four walls felt like a profound waste. At the same time, we knew that turning raw recordings into polished, engaging YouTube content demands hours of editing, thumbnail design, SEO optimisation, and visualisation work that no busy academic should have to do alone. That evening we asked ourselves: what ifan AI system could take his recording and handle everything else, producing a publication ready animated educational video with zero manual effort on his part? Anemo is our answer to that question, and our humble way of ensuring that his teaching reaches every student who deserves to hear it. 
 
 ## 2. Project Description 
 
-LectureOS is an agentic AI platform that accepts a raw lecture video recorded by a professor and autonomously transforms it into a polished, 3Bluel1Brown- ~~s~~ tyle animated educational video. The system transcribes the lecture using OpenAI Whisper (supporting mixed Urdu ~~—E~~ nglish code ~~-~~ switched speech common in Pakistani academia), extracts discrete conceptual segments using a large language model, generates Manim animation code per concept, renders each scene, and re ~~-~~ synchronises the professor’s original voice over the final composited video. 
+Anemo is an agentic AI platform that accepts a raw lecture video recorded by a professor and autonomously transforms it into a polished, 3Bluel1Brown- ~~s~~ tyle animated educational video. The system transcribes the lecture using OpenAI Whisper (supporting mixed Urdu ~~—E~~ nglish code ~~-~~ switched speech common in Pakistani academia), extracts discrete conceptual segments using a large language model, generates Manim animation code per concept, renders each scene, and re ~~-~~ synchronises the professor’s original voice over the final composited video. 
 
 The platform exposes two interfaces: a Professor Portal where educators upload recordings and monitor the agentic pipeline in real time via Server ~~-~~ Sent Events (SSE), and a Student Portal where enrolled students access the produced videos, auto ~~-~~ generated notes, quizzes, and a Retrieva ~~l~~ -Augmented Generation (RAG) chatbot grounded in the professor’s own words with timestamp ~~-l~~ inked citations. 
 
-Unlike existing tools (Panopto, Synthesia, Pictory) which either store raw recordings passively or require a pre ~~-~~ written script, LectureOS is the only system that takes unedited, code ~~-~~ switched speech and produces a 3Blue1Brown- ~~q~~ uality animated video end ~~-~~ t ~~o-~~ end without any human post ~~-~~ production. 
+Unlike existing tools (Panopto, Synthesia, Pictory) which either store raw recordings passively or require a pre ~~-~~ written script, Anemo is the only system that takes unedited, code ~~-~~ switched speech and produces a 3Blue1Brown- ~~q~~ uality animated video end ~~-~~ t ~~o-~~ end without any human post ~~-~~ production. 
 
 ## 3. Problem Statement & Impact 
 
@@ -58,7 +58,7 @@ A professor with deep domain expertise faces three compounding barriers when att
 
 2 
 
-~~LectureOS~~ 
+~~Anemo~~ 
 
 ~~Project Proposal: Artificial Intelligence~~ 
 
@@ -76,9 +76,9 @@ A professor with deep domain expertise faces three compounding barriers when att
 
 ## 4. Competitive Analysis 
 
-Table |: Feature comparison of LectureOS against existing platforms. 
+Table |: Feature comparison of Anemo against existing platforms. 
 
-|Feature|Panopto|Synthesia|Pictory||Mindgrasp|ManimatorLectureOS|LectureOS|
+|Feature|Panopto|Synthesia|Pictory||Mindgrasp|ManimatorAnemo|Anemo|
 |---|---|---|---|---|---|---|
 |Rawvideoupload|JV|JV|V|JV|x|A|
 |Urdu~~-—E~~nglish|x|x|x|x|x|JV|
@@ -103,7 +103,7 @@ Table |: Feature comparison of LectureOS against existing platforms.
 
 3 
 
-~~LectureOS~~ 
+~~Anemo~~ 
 
 ~~Project Proposal: Artificial Intelligence~~ 
 
@@ -120,7 +120,7 @@ trigger
 WhisperAgent 1 v3 tre psf.-LM-GonceptABE it 2<br>Transcription Segmentation<br>Mh amnidism Code Manim<br>Generation Render<br>Agent 6 ildexed Ag ent 5 final. mp4 Agent 7<br>RAG Video YouTube<br>Indexing Composition Publish<br>pgvector<br>Student Professor<br>Portal Dashboard<br>**----- End of picture text -----**<br>
 
 
-Figure 1: LectureOS end ~~-~~ t ~~o-~~ end agentic pipeline. 
+Figure 1: Anemo end ~~-~~ t ~~o-~~ end agentic pipeline. 
 
 ## 5.2. Agentic Pipeline Detail 
 
@@ -140,7 +140,7 @@ Figure 1: LectureOS end ~~-~~ t ~~o-~~ end agentic pipeline.
 
 4 
 
-~~LectureOS~~ 
+~~Anemo~~ 
 
 ~~Project Proposal: Artificial Intelligence~~ 
 
@@ -155,7 +155,7 @@ Figure 1: LectureOS end ~~-~~ t ~~o-~~ end agentic pipeline.
 **==> picture [414 x 394] intentionally omitted <==**
 
 **----- Start of picture text -----**<br>
-User re, Concept<br>email : varchar creates 1."FKBx professor_id:lecture_id: uuiduuid has 1..’ FK lectur e_i d: uuid<br>role: enum(prof,student) title: varchar title : varchar<br>created_at : timestamptz raw_video_url: text t s_s tart : float<br>status: enum t s_ end: float<br>youtube_url: text manim _co de: text<br>created_at : timestamptz cli p_u rl: text<br>generates 1..* embeds 1..*<br>Embedding<br>ri<br>FK lecture_id: uuid FK concep t_i d: uuid<br>question : text vector : vector(384)<br>choices: jsonb chunk _t ext: text<br>answer: varchar<br>Figure 2: Entity - Relationship Diagram for LectureOS PostgreSQL schema.<br>Schema Overview<br>Table 2: Core database tables and their primary responsibilities.<br>Table Purpose Engine<br>users Authentication, role management (professor / student) PostgreSQL<br>lectures Lecture metadata, status tracking, YouTube URL PostgreSQL<br>concepts Segmented concepts, Manim code, rendered clip URLs PostgreSQL<br>embeddings Vector embeddings for RAG retrieval pgvector<br>quizzes LLM- g enerated MCQs per lecture PostgreSQL<br>agent runs Audit log of every agent invocation and retry PostgreSQL<br>**----- End of picture text -----**<br>
+User re, Concept<br>email : varchar creates 1."FKBx professor_id:lecture_id: uuiduuid has 1..’ FK lectur e_i d: uuid<br>role: enum(prof,student) title: varchar title : varchar<br>created_at : timestamptz raw_video_url: text t s_s tart : float<br>status: enum t s_ end: float<br>youtube_url: text manim _co de: text<br>created_at : timestamptz cli p_u rl: text<br>generates 1..* embeds 1..*<br>Embedding<br>ri<br>FK lecture_id: uuid FK concep t_i d: uuid<br>question : text vector : vector(384)<br>choices: jsonb chunk _t ext: text<br>answer: varchar<br>Figure 2: Entity - Relationship Diagram for Anemo PostgreSQL schema.<br>Schema Overview<br>Table 2: Core database tables and their primary responsibilities.<br>Table Purpose Engine<br>users Authentication, role management (professor / student) PostgreSQL<br>lectures Lecture metadata, status tracking, YouTube URL PostgreSQL<br>concepts Segmented concepts, Manim code, rendered clip URLs PostgreSQL<br>embeddings Vector embeddings for RAG retrieval pgvector<br>quizzes LLM- g enerated MCQs per lecture PostgreSQL<br>agent runs Audit log of every agent invocation and retry PostgreSQL<br>**----- End of picture text -----**<br>
 
 
 ## 6.2. Schema Overview 
@@ -164,7 +164,7 @@ User re, Concept<br>email : varchar creates 1."FKBx professor_id:lecture_id: uui
 
 5 
 
-~~LectureOS~~ 
+~~Anemo~~ 
 
 ~~Project Proposal: Artificial Intelligence~~ 
 
@@ -180,7 +180,7 @@ Figure 3: UML Class Diagram showing core domain model and key associations.
 
 6 
 
-~~LectureOS~~ 
+~~Anemo~~ 
 
 ~~Project Proposal: Artificial Intelligence~~ 
 
@@ -196,11 +196,11 @@ Figure 4: UML Sequence Diagram for the lectur ~~e-~~ t ~~o-~~ video pipeline. Da
 
 7 
 
-LectureOS 
+Anemo 
 
 Project Proposal: Artificial Intelligence 
 
-Table 3: Full technology stack for LectureOS. 
+Table 3: Full technology stack for Anemo. 
 
 |Layer|Technology|Rationale|
 |---|---|---|
@@ -235,13 +235,13 @@ Table 3: Full technology stack for LectureOS.
 
 8 
 
-~~LectureOS~~ 
+~~Anemo~~ 
 
 ~~Project Proposal: Artificial Intelligence~~ 
 
 ## Classification: Industry Project (with Research Components) 
 
-LectureOS is primarily an industry project, targeting deployment as a produc ~~-~~ tion SaaS platform for universities and independent educators. The deliverable is a working, demonstrable produc ~~t—n~~ ot a theoretical system. However, two embedded research components justify academic publication potential: 
+Anemo is primarily an industry project, targeting deployment as a produc ~~-~~ tion SaaS platform for universities and independent educators. The deliverable is a working, demonstrable produc ~~t—n~~ ot a theoretical system. However, two embedded research components justify academic publication potential: 
 
 1. Code ~~-s~~ witched Urdu ~~—E~~ nglish lecture transcription: Evaluating and fine ~~-~~ tuning Whisper larg ~~e-~~ v3 for Pakistani academic audi ~~o—a~~ domain with no pub ~~-~~ lished benchmarks ~~—co~~ nstitutes an original empirical contribution suitable for a short paper at an NLP venue. 
 
@@ -281,7 +281,7 @@ Table 4: Fou ~~r-~~ week development sprint plan.
 
 9 
 
-~~LectureOS~~ 
+~~Anemo~~ 
 
 ~~Project Proposal: Artificial Intelligence~~ 
 
@@ -304,4 +304,5 @@ Table 4: Fou ~~r-~~ week development sprint plan.
 - [5] DeepSeek ~~-A~~ I. (2024). DeepSeek ~~-~~ V3 Technical Report. arXiv preprint arXiv: 2412.19437. 
 
 10 
+
 

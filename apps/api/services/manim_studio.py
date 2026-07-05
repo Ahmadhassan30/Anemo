@@ -1,4 +1,4 @@
-"""LectureOS Studio Kit.
+"""Anemo Studio Kit.
 
 Exports a single string, ``PREAMBLE``, prepended to every generated Manim scene.
 It defines a cohesive-but-varied visual system: a set of curated palettes, several
@@ -16,7 +16,7 @@ PREAMBLE = '''from manim import *
 import numpy as np
 
 # ============================================================================
-# LectureOS Studio Kit — varied, self-contained visual system
+# Anemo Studio Kit — varied, self-contained visual system
 # ============================================================================
 
 # Curated palettes. Each: deep/bg/surf backgrounds, ink/muted text, grid line,

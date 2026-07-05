@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Typed settings for the LectureOS backend."""
+    """Typed settings for the Anemo backend."""
 
     APP_ENV: str = "development"
     DATABASE_URL: str

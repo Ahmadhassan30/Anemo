@@ -110,7 +110,7 @@ def generate_markdown(files_dict):
     markdown = []
     
     # Title & Front Matter
-    markdown.append("# LectureOS: Autonomous Lecture-to-Animation Synthesis Framework")
+    markdown.append("# Anemo: Autonomous Lecture-to-Animation Synthesis Framework")
     markdown.append("### A Comprehensive Architectural, Mathematical, and Codebase Analysis")
     markdown.append("\n**Author:** Lead Architect & Agentic AI Systems Group  ")
     markdown.append("**Status:** Production & Research Specification Document  ")
@@ -138,9 +138,9 @@ def generate_markdown(files_dict):
     # 1. Abstract
     markdown.append("## 1. Abstract & Executive Summary")
     markdown.append(
-        "LectureOS is an advanced agentic AI platform designed to close the accessibility and retention gap in online educational content. "
+        "Anemo is an advanced agentic AI platform designed to close the accessibility and retention gap in online educational content. "
         "Busy academics face immense post-production barriers when attempting to create high-retention, visual animations (e.g., 3Blue1Brown-style) "
-        "for complex STEM subjects. LectureOS solves this by orchestrating a pipeline of specialized AI agents that ingest raw, unedited lecture videos "
+        "for complex STEM subjects. Anemo solves this by orchestrating a pipeline of specialized AI agents that ingest raw, unedited lecture videos "
         "(with native support for Urdu-English code-switching), transcribe and segment them into discrete pedagogical concepts, dynamically synthesize "
         "and compile executable Manim animation code, composite the visual clips with synchronized cleaned voiceovers and burned-in subtitles, "
         "and automatically index the context for a student-facing RAG study chatbot and quiz generator.\n\n"
@@ -159,7 +159,7 @@ def generate_markdown(files_dict):
         "and development time (often 20+ hours per 5 minutes of footage).\n\n"
         "Furthermore, in regions like Pakistan, academic speech is heavily code-switched (frequently alternating between English and Urdu). "
         "Standard transcription tools fail to resolve this linguistic mixing, corrupting downstream NLP tasks like concept segmentation. "
-        "LectureOS targets this intersection: enabling a zero-touch, automated path from code-switched spoken audio to high-quality "
+        "Anemo targets this intersection: enabling a zero-touch, automated path from code-switched spoken audio to high-quality "
         "3Blue1Brown-style vector animations, backed by timestamp-anchored interactive student learning tools."
     )
     markdown.append("\n---\n")
@@ -215,7 +215,7 @@ def generate_markdown(files_dict):
 
     # 5. Database Schema
     markdown.append("## 5. Relational and Vector Database Schema")
-    markdown.append("LectureOS utilizes PostgreSQL to maintain application state, relational constraints, audit trails, and vector search indices.")
+    markdown.append("Anemo utilizes PostgreSQL to maintain application state, relational constraints, audit trails, and vector search indices.")
     markdown.append("```mermaid")
     markdown.append("erDiagram")
     markdown.append("    users ||--o{ lectures : \"creates\"")
@@ -420,7 +420,7 @@ def generate_markdown(files_dict):
     # 9. Benchmarks & Evaluation
     markdown.append("## 9. Verification, Benchmarking & Evaluation")
     markdown.append(
-        "To guarantee pipeline stability and scientific validity, LectureOS implements automated evaluation protocols:\n"
+        "To guarantee pipeline stability and scientific validity, Anemo implements automated evaluation protocols:\n"
         "1. **Whisper Accuracy:** Benchmarked using Word Error Rate (WER) against code-switched audio. The Urdu-English mixed audio corpus demonstrates that `faster-whisper-large-v3` yields a WER of less than 12% in multi-lingual classrooms.\n"
         "2. **Manim Codegen Compile Rates:** Monitored via the Planner-Critic evaluation loop. Standard tests on DeepSeek-V3 show a first-pass compilation rate of 78%. By the 3rd retry iteration, the rendering success rate converges to 96.4%.\n"
         "3. **RAG Retrieval Precision:** The system chunks concepts based on transcription gaps and queries the vector space via cosine distance. The BAAI embedding model paired with custom contextual prompts matches citation timestamps with a mean reciprocal rank (MRR) of 0.88."
@@ -441,7 +441,7 @@ def generate_markdown(files_dict):
     # 11. Conclusion
     markdown.append("## 11. Conclusion, Limitations & Future Work")
     markdown.append(
-        "LectureOS demonstrates the viability of utilizing agentic frameworks to automate complex multimedia synthesis tasks. "
+        "Anemo demonstrates the viability of utilizing agentic frameworks to automate complex multimedia synthesis tasks. "
         "By packaging transcription, segmentation, mathematical scene-code generation, compilation, and RAG indexing into a single, cohesive engine, "
         "the tool effectively eliminates post-production overhead for academic educators.\n\n"
         "**Future Work includes:**\n"
@@ -455,7 +455,7 @@ def generate_markdown(files_dict):
 def main():
     root_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     context_file = os.path.join(root_dir, 'Context.md')
-    doc_output_file = os.path.join(root_dir, 'docs', 'LectureOS-Comprehensive-Architecture-and-System-Design.md')
+    doc_output_file = os.path.join(root_dir, 'docs', 'Anemo-Comprehensive-Architecture-and-System-Design.md')
     
     print(f"Reading Context.md from {context_file}...")
     files = parse_context_md(context_file)
@@ -473,3 +473,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

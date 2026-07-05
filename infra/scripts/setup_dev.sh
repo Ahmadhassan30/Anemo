@@ -2,7 +2,7 @@
 set -e
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  LectureOS — Local Dev Setup"
+echo "  Anemo — Local Dev Setup"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Step 1 — Check Docker is running
@@ -50,7 +50,7 @@ echo "  ✓ Postgres and Redis containers started"
 echo "[5/8] Waiting for Postgres to be ready..."
 attempt=0
 until docker compose -f infra/docker-compose.yml exec postgres \
-  pg_isready -U lectureos > /dev/null 2>&1; do
+  pg_isready -U anemo > /dev/null 2>&1; do
   attempt=$((attempt + 1))
   if [ $attempt -gt 30 ]; then
     echo "ERROR: Postgres did not become ready in 60 seconds"
@@ -86,7 +86,7 @@ chmod +x infra/scripts/teardown.sh
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  ✓ LectureOS is running!"
+echo "  ✓ Anemo is running!"
 echo ""
 echo "  App:      http://localhost"
 echo "  API:      http://localhost/api/v1"

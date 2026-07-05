@@ -6,7 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
-logger = logging.getLogger("lectureos.api")
+logger = logging.getLogger("anemo.api")
 logger.setLevel(logging.INFO)
 
 

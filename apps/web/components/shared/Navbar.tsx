@@ -15,8 +15,8 @@ export function Navbar() {
     <nav className="glass sticky top-0 z-50">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-ink">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-ink text-white">L</span>
-          LectureOS
+          <img src="/Logo.png" alt="Anemo Logo" className="h-7 w-7 object-contain" />
+          Anemo
         </Link>
         <div className="flex items-center gap-4">
           {email && <span className="text-sm text-subtle">{email}</span>}

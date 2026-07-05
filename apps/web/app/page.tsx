@@ -24,8 +24,8 @@ export default function LandingPage() {
       <header className="glass sticky top-0 z-50">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-ink text-white">L</span>
-            LectureOS
+            <img src="/Logo.png" alt="Anemo Logo" className="h-7 w-7 object-contain" />
+            Anemo
           </Link>
           <div className="flex items-center gap-2">
             <Link href="/login" className="rounded-full px-4 py-2 text-sm font-medium text-subtle transition-colors hover:text-ink">
@@ -62,8 +62,8 @@ export default function LandingPage() {
 
         {/* Terminal showcase */}
         <section className="mx-auto max-w-3xl pb-8">
-          <Terminal title="lectureos — pipeline">
-            <TypingAnimation className="text-term-fg">&gt; lectureos render lecture.mp4</TypingAnimation>
+          <Terminal title="anemo — pipeline">
+            <TypingAnimation className="text-term-fg">&gt; anemo render lecture.mp4</TypingAnimation>
             <AnimatedSpan delay={1400} className="text-term-green">✔ extracting audio</AnimatedSpan>
             <AnimatedSpan delay={2000} className="text-term-green">✔ transcribing — whisper</AnimatedSpan>
             <AnimatedSpan delay={2600} className="text-term-green">✔ segmenting concepts — 6 found</AnimatedSpan>
@@ -87,7 +87,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 text-sm text-faint">
-          <span>© {new Date().getFullYear()} LectureOS</span>
+          <span>© {new Date().getFullYear()} Anemo</span>
           <span>Lecture → animation, automatically.</span>
         </div>
       </footer>

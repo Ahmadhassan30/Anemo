@@ -1,6 +1,6 @@
 """Orchestrator package exports."""
 from .events import PipelineEvent, PipelineEventType, publish_event, subscribe_events
-from .pipeline import LectureOSPipeline
+from .pipeline import AnemoPipeline
 from .retry import RetryPolicy
 
 __all__ = [
@@ -8,6 +8,6 @@ __all__ = [
     "PipelineEventType",
     "publish_event",
     "subscribe_events",
-    "LectureOSPipeline",
+    "AnemoPipeline",
     "RetryPolicy",
 ]

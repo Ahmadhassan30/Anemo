@@ -24,7 +24,7 @@ async def main():
         # 1. Create the Lecture
         lecture = Lecture(
             professor_id=prof.id,
-            title="LectureOS Animation System Test Run",
+            title="Anemo Animation System Test Run",
             raw_video_url="http://api:8080/dummy.mp4",
             status=LectureStatus.pending
         )

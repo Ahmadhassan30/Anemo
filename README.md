@@ -1,29 +1,25 @@
-# <p align="center"><img src="https://api.iconify.design/lucide:layers.svg?color=%236366f1" width="36" height="36" align="absmiddle" /> LectureOS</p>
-### <p align="center">Agentic AI Framework for Lecture-to-Animation Transformation</p>
+<p align="center">
+  <img src="./Logo.png" alt="Anemo Logo" width="180" />
+</p>
+
+<h1 align="center"><b>ANEMO</b></h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" />
-  <img src="https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
-  <img src="https://img.shields.io/badge/Celery-5.3-37814A?style=for-the-badge&logo=celery&logoColor=white" alt="Celery" />
-  <img src="https://img.shields.io/badge/Docker-24+-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
-  <img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/LLM--Orchestrator-Groq-orange?style=for-the-badge" alt="Groq" />
-  <img src="https://img.shields.io/badge/Manim-Community-FC60A8?style=for-the-badge" alt="Manim" />
-  <img src="https://img.shields.io/badge/Video--Generation%20Models-Zero%20Used-red?style=for-the-badge" alt="Zero Video Models" />
+  <b>Agentic AI Framework for Lecture-to-Animation Transformation</b>
 </p>
 
 ---
 
-## <img src="https://api.iconify.design/lucide:book-open.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Overview
+## Overview
 
-LectureOS is an agentic AI SaaS platform designed to automatically transform raw, spoken lecture recordings from professors into high-fidelity, visually rich, 3Blue1Brown-style educational animations. 
+Anemo is an agentic AI SaaS platform designed to automatically transform raw, spoken lecture recordings from professors into high-fidelity, visually rich, 3Blue1Brown-style educational animations. 
 
 By utilizing an advanced pipeline of 8 specialized, autonomous AI agents—covering ingestion, multi-lingual transcription, conceptual segmentation, parameter-based code generation, animation rendering, voice synchronization, RAG indexing, and publishing—the system generates educational videos. The output is complete with synchronized audio, burned subtitles, and matching animated visual elements rendered using Manim.
 
 > [!IMPORTANT]
 > **Core Engineering Breakthrough: Zero Generative Video Models Used**
 > 
-> Unlike traditional AI video generation tools (like Runway, Sora, or Stable Video Diffusion) which are extremely expensive, slow, and prone to visual hallucinations, **LectureOS uses zero video generation models**. 
+> Unlike traditional AI video generation tools (like Runway, Sora, or Stable Video Diffusion) which are extremely expensive, slow, and prone to visual hallucinations, **Anemo uses zero video generation models**. 
 > 
 > Instead, it works by programmatically composing, styling, and rendering mathematical vectors and scenes using the **Manim Community Edition** engine from structural concepts extracted by **Groq** LLMs. This key invention guarantees:
 > * **Zero Hallucinations:** Formulas, text, and charts remain mathematically exact.
@@ -32,9 +28,9 @@ By utilizing an advanced pipeline of 8 specialized, autonomous AI agents—cover
 
 ---
 
-## <img src="https://api.iconify.design/lucide:play.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Animation Gallery
+## Animation Gallery
 
-Below are visual frames of the 3Blue1Brown-style animations produced by the LectureOS multi-agent orchestration pipeline:
+Below are visual frames of the 3Blue1Brown-style animations produced by the Anemo multi-agent orchestration pipeline:
 
 <p align="center">
   <img src="./image.png" width="32%" alt="Manim Animation Frame 1" />
@@ -44,7 +40,7 @@ Below are visual frames of the 3Blue1Brown-style animations produced by the Lect
 
 ---
 
-## <img src="https://api.iconify.design/lucide:layout-template.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Portals and Feature Set
+## Portals and Feature Set
 
 ### Professor Dashboard
 * **One-Click Video Uploads:** Upload raw lecture footage directly to CDN storage via UploadThing.
@@ -59,9 +55,9 @@ Below are visual frames of the 3Blue1Brown-style animations produced by the Lect
 
 ---
 
-## <img src="https://api.iconify.design/lucide:network.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> System Architecture and Flow
+## System Architecture and Flow
 
-LectureOS is structured as a robust monorepo built for high throughput and long-running GPU/CPU-intensive rendering tasks.
+Anemo is structured as a robust monorepo built for high throughput and long-running GPU/CPU-intensive rendering tasks.
 
 ### System Topography
 ```mermaid
@@ -71,12 +67,12 @@ graph TD
     subgraph Frontend Portal
         Nginx -->|Route: /*| NextJS[Next.js App Router - Port 3000]
     end
-
+ 
     subgraph API Services
         Nginx -->|Route: /api/v1/*| FastAPI[FastAPI Server - Port 8000]
         FastAPI -->|Auth / Metadata| Postgres[(PostgreSQL Database + pgvector)]
     end
-
+ 
     subgraph Asynchronous Workers
         FastAPI -->|Trigger Pipeline Tasks| Redis[Redis Task Broker - Port 6379]
         Redis -->|Fetch Task| Celery[Celery Worker Cluster]
@@ -85,7 +81,7 @@ graph TD
         Celery -->|Extract concept embeddings| pgvector[(pgvector Store)]
         Celery -->|Write compiled clips| Output[Shared Storage - /tmp/manim_output]
     end
-
+ 
     style NextJS fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#fff
     style FastAPI fill:#0f172a,stroke:#06b6d4,stroke-width:2px,color:#fff
     style Celery fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#fff
@@ -112,7 +108,7 @@ graph TD
 
 ---
 
-## <img src="https://api.iconify.design/lucide:cpu.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> The Multi-Agent Pipeline
+## The Multi-Agent Pipeline
 
 Every stage of video generation is managed by an autonomous agent configured with error handling and robust retry logic:
 
@@ -127,7 +123,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## <img src="https://api.iconify.design/lucide:layers.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Technology Stack
+## Technology Stack
 
 | Layer | Technology | Purpose / Rationale |
 |---|---|---|
@@ -144,7 +140,7 @@ Every stage of video generation is managed by an autonomous agent configured wit
 
 ---
 
-## <img src="https://api.iconify.design/lucide:star.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Why LectureOS? (Engineering Highlights)
+## Why Anemo? (Engineering Highlights)
 
 If you are a recruiter or engineering manager, here is a breakdown of the complex distributed system challenges solved in this repository:
 
@@ -156,52 +152,31 @@ If you are a recruiter or engineering manager, here is a breakdown of the comple
 
 ---
 
-## <img src="https://api.iconify.design/lucide:git-pull-request.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Roadmap & Contributing
-
-We welcome open-source contributions to LectureOS! Here is what we are planning next, and how you can get involved:
-
-### Project Roadmap
-
-- [ ] **Dynamic PPTX Ingestion:** Allow parsing slides directly into context vectors to augment the animation generation agent.
-- [ ] **Voice Cloning (TTS):** Integrate local voice models (like Coqui or Bark) to synthesize custom professor narration profiles.
-- [ ] **Interactive Manim Canvas:** Create a web-based inspector to manually edit generated Manim code in the browser with live reload.
-- [ ] **Academic Multi-Language Support:** Expand beyond Urdu-English code-switching to Spanish, Hindi, and Portuguese academic dialects.
-
-### How to Contribute
-
-1. **Fork** the repository and clone it locally.
-2. Create a branch: `git checkout -b feature/amazing-feature`.
-3. Check the code formatting and linter: `pnpm lint`.
-4. Run tests: `pnpm test` (FastAPI router checks & agent unit tests).
-5. Submit a **Pull Request** with clear description notes of your implementation.
-
----
-
-## <img src="https://api.iconify.design/lucide:folder-tree.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Repository Structure
+## Repository Structure
 
 ```text
-├── apps
-│   ├── api                 # FastAPI backend server & pipeline orchestrator
-│   │   ├── agents          # The 8-agent definitions (Whisper, Manim, RAG, etc.)
-│   │   ├── db              # Database schemas, migrations (Alembic), and seeders
-│   │   ├── routers         # API endpoints (Auth, Chats, Lectures, SSE, YouTube)
-│   │   ├── services        # External service connectors (FFmpeg, LLM, YouTube, UploadThing)
-│   │   └── tasks           # Celery task definitions
-│   └── web                 # Next.js frontend application (Professor / Student Portals)
-│       ├── app             # App router pages (Student hub, Professor dashboard)
-│       ├── components      # Shared and role-specific UI components
-│       └── store           # Zustand client state managers
-├── infra                   # Docker compose and deployment configuration
-│   ├── nginx               # Nginx reverse proxy configuration
-│   └── scripts             # Development, migration, and health check scripts
-├── packages                # Monorepo shared packages
-│   └── types               # Shared TypeScript typings
-└── docs                    # Comprehensive system design guides and setup files
+📂 apps/
+├── 📂 api/                 # FastAPI backend server & pipeline orchestrator
+│   ├── 📂 agents/          # The 8-agent definitions (Whisper, Manim, RAG, etc.)
+│   ├── 📂 db/              # Database schemas, migrations (Alembic), and seeders
+│   ├── 📂 routers/         # API endpoints (Auth, Chats, Lectures, SSE, YouTube)
+│   ├── 📂 services/        # External service connectors (FFmpeg, LLM, YouTube, UploadThing)
+│   └── 📂 tasks/           # Celery task definitions
+└── 📂 web/                 # Next.js frontend application (Professor / Student Portals)
+    ├── 📂 app/             # App router pages (Student hub, Professor dashboard)
+    ├── 📂 components/      # Shared and role-specific UI components
+    └── 📂 store/           # Zustand client state managers
+📂 infra/                   # Docker compose and deployment configuration
+├── 📂 nginx/               # Nginx reverse proxy configuration
+└── 📂 scripts/             # Development, migration, and health check scripts
+📂 packages/                # Monorepo shared packages
+└── 📂 types/               # Shared TypeScript typings
+📂 docs/                    # Comprehensive system design guides and setup files
 ```
 
 ---
 
-## <img src="https://api.iconify.design/lucide:terminal.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Getting Started
+## Getting Started
 
 ### Prerequisites
 * **Git**
@@ -237,7 +212,8 @@ We welcome open-source contributions to LectureOS! Here is what we are planning 
 
 4. **Restart the Stack:**
    ```bash
-   docker compose -f infra/docker-compose.yml restart
+   pnpm stop
+   pnpm setup
    ```
    Access http://localhost in your browser to view the application!
 
@@ -252,7 +228,7 @@ Use these pre-seeded accounts to log in:
 
 ---
 
-## <img src="https://api.iconify.design/lucide:wrench.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Operational Commands
+## Operational Commands
 
 Manage your application stack using root `pnpm` wrappers:
 
@@ -277,7 +253,7 @@ pnpm stop
 
 ---
 
-## <img src="https://api.iconify.design/lucide:life-buoy.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> Troubleshooting
+## Troubleshooting
 
 * **Port 80 Conflict (Windows):** Open `services.msc` and stop the "World Wide Web Publishing Service". Alternatively, map Nginx to port `8080:80` inside `infra/docker-compose.yml`.
 * **First-Run Whisper Delay:** The `large-v3` transcription model (~3GB) downloads inside the worker container during its first run. You can monitor this progress via `pnpm logs:worker`. For faster local testing, set `WHISPER_MODEL_SIZE=base` in `apps/api/.env`.
@@ -285,5 +261,5 @@ pnpm stop
 
 ---
 
-## <img src="https://api.iconify.design/lucide:file-text.svg?color=%236366f1" width="22" height="22" align="absmiddle" /> License
+## License
 This project is licensed under the MIT License - see the LICENSE file for details.

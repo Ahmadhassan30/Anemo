@@ -7,7 +7,7 @@ from sqlalchemy import select
 from tasks.celery_app import celery_app
 from db.session import async_session_maker
 from models.lecture import Lecture, LectureStatus
-from orchestrator.pipeline import LectureOSPipeline
+from orchestrator.pipeline import AnemoPipeline
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ def run_pipeline_task(self, lecture_id: str) -> None:
     """Celery entry point — bridges sync Celery into async pipeline.
 
     Creates a fresh asyncio event loop, opens its own DB session, and
-    runs ``LectureOSPipeline.run()`` synchronously to completion.
+    runs ``AnemoPipeline.run()`` synchronously to completion.
     """
     logger.info("Celery task started for lecture %s", lecture_id)
 
@@ -43,7 +43,7 @@ def run_pipeline_task(self, lecture_id: str) -> None:
 async def _run_async(lecture_id: str) -> None:
     """Async wrapper that creates a DB session and runs the pipeline."""
     async with async_session_maker() as db:
-        pipeline = LectureOSPipeline(lecture_id, db)
+        pipeline = AnemoPipeline(lecture_id, db)
         await pipeline.run()
 
 

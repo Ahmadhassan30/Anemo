@@ -1,12 +1,12 @@
 /*
- * Purpose: Root layout for the LectureOS web application.
+ * Purpose: Root layout for the Anemo web application.
  */
 import React from "react";
 import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata = {
-  title: "LectureOS — lecture to animation",
+  title: "Anemo — lecture to animation",
   description: "Turn any lecture into a beautifully animated, narrated course.",
 };
 

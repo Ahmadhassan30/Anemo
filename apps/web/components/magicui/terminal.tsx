@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 export function Terminal({
   children,
   className,
-  title = "lectureos — zsh",
+  title = "anemo — zsh",
 }: {
   children: React.ReactNode;
   className?: string;

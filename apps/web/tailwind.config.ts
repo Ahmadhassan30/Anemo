@@ -1,5 +1,5 @@
 /*
- * Purpose: TailwindCSS configuration — LectureOS "Apple-minimal" design system.
+ * Purpose: TailwindCSS configuration — Anemo "Apple-minimal" design system.
  * Clean light surfaces, SF-style type, a single blue accent, generous radii and
  * soft shadows. A dedicated `term-*` palette powers the dark live-logs terminal.
  */

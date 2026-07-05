@@ -47,8 +47,8 @@ export default function LoginPage() {
       {/* Left — brand + live demo */}
       <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-[#f5f7fb] via-canvas to-[#eef1f6] p-12 lg:flex">
         <Link href="/" className="flex items-center gap-2 text-[15px] font-semibold tracking-tight">
-          <span className="grid h-7 w-7 place-items-center rounded-lg bg-ink text-white">L</span>
-          LectureOS
+          <img src="/Logo.png" alt="Anemo Logo" className="h-7 w-7 object-contain" />
+          Anemo
         </Link>
 
         <div className="max-w-md">
@@ -60,8 +60,8 @@ export default function LoginPage() {
             live, in your terminal.
           </p>
 
-          <Terminal className="mt-8" title="lectureos — pipeline">
-            <TypingAnimation className="text-term-fg">&gt; lectureos render lecture.mp4</TypingAnimation>
+          <Terminal className="mt-8" title="anemo — pipeline">
+            <TypingAnimation className="text-term-fg">&gt; anemo render lecture.mp4</TypingAnimation>
             <AnimatedSpan delay={1400} className="text-term-green">✔ extracting audio</AnimatedSpan>
             <AnimatedSpan delay={2000} className="text-term-green">✔ transcribing — whisper</AnimatedSpan>
             <AnimatedSpan delay={2600} className="text-term-green">✔ segmenting concepts — 6 found</AnimatedSpan>
@@ -71,15 +71,15 @@ export default function LoginPage() {
           </Terminal>
         </div>
 
-        <p className="text-xs text-faint">© {new Date().getFullYear()} LectureOS</p>
+        <p className="text-xs text-faint">© {new Date().getFullYear()} Anemo</p>
       </div>
 
       {/* Right — sign in */}
       <div className="flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm">
           <Link href="/" className="mb-10 flex items-center gap-2 text-[15px] font-semibold tracking-tight lg:hidden">
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-ink text-white">L</span>
-            LectureOS
+            <img src="/Logo.png" alt="Anemo Logo" className="h-7 w-7 object-contain" />
+            Anemo
           </Link>
 
           <h1 className="text-[28px] font-semibold tracking-tight text-ink">Sign in</h1>

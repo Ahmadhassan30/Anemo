@@ -1,4 +1,4 @@
-# Running LectureOS Locally
+# Running Anemo Locally
 
 > **Windows users**: Run all `pnpm` commands in a **WSL2 terminal** (Ubuntu),
 > not PowerShell or CMD. The shell scripts use bash.
@@ -173,3 +173,4 @@ If running FastAPI outside Docker, the host must be `localhost:5432`.
 Inside Docker, it must be `postgres:5432`.
 The `.env` file uses the Docker service name. Do not change it unless
 you are running the API directly on your machine.
+

@@ -38,7 +38,7 @@ MIN_CONCEPT_SECONDS = 5.0
 MAX_CONCEPT_SECONDS = 20.0
 
 
-class LectureOSPipeline:
+class AnemoPipeline:
     """Orchestrates the full lecture → animation → publish pipeline."""
 
     def __init__(self, lecture_id: str, db: AsyncSession) -> None:

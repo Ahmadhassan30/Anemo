@@ -89,8 +89,8 @@ def main():
             
     print(f"Writing to {context_file}...")
     with open(context_file, 'w', encoding='utf-8') as f:
-        f.write("# LectureOS - Complete Project Context\n\n")
-        f.write("This document contains the entire project structure and full source code for LectureOS.\n\n")
+        f.write("# Anemo - Complete Project Context\n\n")
+        f.write("This document contains the entire project structure and full source code for Anemo.\n\n")
         f.write("## Directory Structure\n\n")
         f.write("```text\n")
         f.write(tree_str)

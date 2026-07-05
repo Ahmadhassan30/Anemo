@@ -275,7 +275,7 @@ export function PipelineMonitor({ lectureId }: PipelineMonitorProps) {
           {error && (
             <p className="mb-2 font-mono text-xs text-danger">✘ sse_connection_error: {error}</p>
           )}
-          <Terminal title={`lectureos — pipeline/${lectureId.slice(0, 8)} — live`}>
+          <Terminal title={`anemo — pipeline/${lectureId.slice(0, 8)} — live`}>
             <div ref={scrollRef} className="term-scroll max-h-[400px] overflow-y-auto">
               {events.length === 0 && (
                 <AnimatedSpan className="text-term-muted">$ waiting for pipeline…</AnimatedSpan>

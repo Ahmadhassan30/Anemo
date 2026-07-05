@@ -23,7 +23,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="LectureOS API",
+    title="Anemo API",
     version="1.0.0",
     lifespan=lifespan,
     docs_url="/api/v1/docs",
@@ -55,7 +55,7 @@ app.include_router(youtube.router, prefix="/api/v1")
 @app.get("/health")
 @app.get("/api/v1/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok", "service": "lectureos-api"}
+    return {"status": "ok", "service": "anemo-api"}
 
 
 @app.exception_handler(Exception)

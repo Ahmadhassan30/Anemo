@@ -221,7 +221,7 @@ export default function UploadWizard() {
             <CardContent className="py-8">
               <div className="space-y-1.5 rounded-xl border border-line bg-fill px-5 py-4 font-mono text-sm leading-relaxed">
                 <p className="text-ink">
-                  <span className="text-accent">$ </span>lectureos confirm --upload
+                  <span className="text-accent">$ </span>anemo confirm --upload
                 </p>
                 <p className="text-subtle">
                   <span className="text-accent">› </span>video staged ............ ok
