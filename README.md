@@ -3,16 +3,7 @@
 </p>
 
 <p align="center">
-  <svg viewBox="0 0 800 140" width="450" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="anemo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#22d3ee" />
-        <stop offset="50%" stop-color="#0ea5e9" />
-        <stop offset="100%" stop-color="#041c4eff" />
-      </linearGradient>
-    </defs>
-    <text x="50%" y="105" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="900" font-size="96" fill="url(#anemo-gradient)" letter-spacing="8">ANEMO</text>
-  </svg>
+  <img src="./Title.svg" alt="ANEMO" width="450" />
 </p>
 
 <p align="center">
