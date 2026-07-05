@@ -8,7 +8,7 @@
       <linearGradient id="anemo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#22d3ee" />
         <stop offset="50%" stop-color="#0ea5e9" />
-        <stop offset="100%" stop-color="#2563eb" />
+        <stop offset="100%" stop-color="#041c4eff" />
       </linearGradient>
     </defs>
     <text x="50%" y="105" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="900" font-size="96" fill="url(#anemo-gradient)" letter-spacing="8">ANEMO</text>
