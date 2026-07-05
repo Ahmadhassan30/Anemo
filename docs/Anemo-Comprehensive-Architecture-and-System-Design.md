@@ -4932,7 +4932,7 @@ CMD ["node", "server.js"]
 
 #### File: [apps/web/app/(auth)/login/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/(auth)/login/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, terminal, react, link, navigation`
+- **Key Imports:** `react, navigation, terminal, react, link`
 - **Components/Functions:** `LoginPage`
 
 **Functional Details:**
@@ -5004,7 +5004,7 @@ export default function LoginPage() {
 
 #### File: [apps/web/app/(auth)/register/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/(auth)/register/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `link, navigation, react, terminal`
+- **Key Imports:** `terminal, link, react, navigation`
 - **Components/Functions:** `RegisterPage`
 
 **Functional Details:**
@@ -5254,7 +5254,7 @@ export default function RootLayout({
 
 #### File: [apps/web/app/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `link, terminal, react`
+- **Key Imports:** `terminal, link, react`
 - **Components/Functions:** `LandingPage`
 
 **Functional Details:**
@@ -5326,7 +5326,7 @@ export default function LandingPage() {
 
 #### File: [apps/web/app/professor/dashboard/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/professor/dashboard/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, api-client, card, link, react, button`
+- **Key Imports:** `react, card, api-client, button, react, link`
 - **Components/Functions:** `ProfessorDashboardPage`
 
 **Functional Details:**
@@ -5422,7 +5422,7 @@ export default function ProfessorLayout({
 
 #### File: [apps/web/app/professor/lectures/[lectureId]/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/professor/lectures/[lectureId]/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `auth, PipelineMonitor, DownloadButton, next-auth, navigation`
+- **Key Imports:** `navigation, PipelineMonitor, DownloadButton, next-auth, auth`
 - **Interfaces/Types:** `PageProps`
 
 **Functional Details:**
@@ -5580,7 +5580,7 @@ export default function ProfessorSettingsPage() {
 
 #### File: [apps/web/app/professor/upload/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/professor/upload/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `core, api-client, card, input, react, separator, react, navigation`...
+- **Key Imports:** `separator, react, card, navigation, core, react, api-client, button`...
 - **Components/Functions:** `UploadWizard`
 
 **Functional Details:**
@@ -5740,7 +5740,7 @@ I
 
 #### File: [apps/web/app/static/[...path]/route.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/static/[...path]/route.ts)
 **Technical Specifications:**
-- **Key Imports:** `server, backend-url`
+- **Key Imports:** `backend-url, server`
 
 **Functional Details:**
 Serves as a routing page/endpoint within the Next.js App Router topology.
@@ -5793,7 +5793,7 @@ export async function GET(
 
 #### File: [apps/web/app/student/dashboard/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/student/dashboard/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, api-client, link, react, button`
+- **Key Imports:** `react, api-client, button, react, link`
 - **Components/Functions:** `StudentDashboard`
 
 **Functional Details:**
@@ -5865,7 +5865,7 @@ export default function StudentDashboard() {
 
 #### File: [apps/web/app/student/enroll/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/student/enroll/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `api-client, card, input, react, navigation, button`
+- **Key Imports:** `react, card, navigation, api-client, button, input`
 - **Components/Functions:** `EnrollPage`
 
 **Functional Details:**
@@ -6002,7 +6002,7 @@ export default function StudentChatPage() {
 
 #### File: [apps/web/app/student/lectures/[lectureId]/page.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/app/student/lectures/[lectureId]/page.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, ChatInterface, QuizWidget, VideoPlayer, lecture.store, react, NotesPanel, navigation`...
+- **Key Imports:** `react, QuizWidget, navigation, VideoPlayer, lecture.store, NotesPanel, api-client, react`...
 - **Components/Functions:** `StudentLectureView`
 
 **Functional Details:**
@@ -6108,7 +6108,7 @@ export default function StudentQuizPage() {
 
 #### File: [apps/web/components/magicui/terminal.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/magicui/terminal.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, utils`
+- **Key Imports:** `utils, react`
 - **Components/Functions:** `Terminal, AnimatedSpan, TypingAnimation`
 
 **Functional Details:**
@@ -6181,7 +6181,7 @@ export function AnimatedSpan({
 #### File: [apps/web/components/professor/AgentStatusBadge.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/professor/AgentStatusBadge.tsx)
 **Technical Specifications:**
 - **Key Imports:** `utils`
-- **Interfaces/Types:** `AgentStatus, AgentStatusBadgeProps`
+- **Interfaces/Types:** `AgentStatusBadgeProps, AgentStatus`
 - **Components/Functions:** `AgentStatusBadge`
 
 **Functional Details:**
@@ -6354,8 +6354,8 @@ export function LectureCard({ title, status }: LectureCardProps) {
 
 #### File: [apps/web/components/professor/PipelineMonitor.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/professor/PipelineMonitor.tsx)
 **Technical Specifications:**
-- **Key Imports:** `DownloadButton, terminal, sse-client, pipeline.store, react, api-client`
-- **Interfaces/Types:** `PipelineEvent, StepStatus, PipelineMonitorProps, AgentRunRecord`
+- **Key Imports:** `sse-client, react, DownloadButton, api-client, pipeline.store, terminal`
+- **Interfaces/Types:** `PipelineEvent, PipelineMonitorProps, AgentRunRecord, StepStatus`
 - **Components/Functions:** `PipelineMonitor`
 
 **Functional Details:**
@@ -6427,7 +6427,7 @@ function runToEvent(r: AgentRunRecord, lectureId: string): PipelineEvent {
 
 #### File: [apps/web/components/professor/UploadDropzone.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/professor/UploadDropzone.tsx)
 **Technical Specifications:**
-- **Key Imports:** `card, react, button`
+- **Key Imports:** `react, button, card`
 - **Interfaces/Types:** `UploadDropzoneProps`
 - **Components/Functions:** `UploadDropzone`
 
@@ -6500,7 +6500,7 @@ export function UploadDropzone({ onFileSelect }: UploadDropzoneProps) {
 
 #### File: [apps/web/components/shared/LoadingSpinner.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/shared/LoadingSpinner.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, utils`
+- **Key Imports:** `utils, react`
 - **Components/Functions:** `LoadingSpinner`
 
 **Functional Details:**
@@ -6531,7 +6531,7 @@ export function LoadingSpinner({
 
 #### File: [apps/web/components/shared/Navbar.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/shared/Navbar.tsx)
 **Technical Specifications:**
-- **Key Imports:** `link, react, react`
+- **Key Imports:** `react, link, react`
 - **Components/Functions:** `Navbar`
 
 **Functional Details:**
@@ -6575,7 +6575,7 @@ export function Navbar() {
 
 #### File: [apps/web/components/shared/Sidebar.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/shared/Sidebar.tsx)
 **Technical Specifications:**
-- **Key Imports:** `link, navigation, react, utils`
+- **Key Imports:** `utils, link, react, navigation`
 - **Interfaces/Types:** `SidebarItem`
 - **Components/Functions:** `Sidebar`
 
@@ -6628,7 +6628,7 @@ export function Sidebar({ items = [] }: { items?: SidebarItem[] }) {
 
 #### File: [apps/web/components/student/ChatInterface.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/student/ChatInterface.tsx)
 **Technical Specifications:**
-- **Key Imports:** `card, input, button, CitationCard, react, api-client`
+- **Key Imports:** `react, card, api-client, button, input, CitationCard`
 - **Interfaces/Types:** `ChatMessage, ChatInterfaceProps`
 - **Components/Functions:** `ChatInterface`
 
@@ -6701,7 +6701,7 @@ export function ChatInterface({ lectureId }: ChatInterfaceProps) {
 
 #### File: [apps/web/components/student/CitationCard.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/student/CitationCard.tsx)
 **Technical Specifications:**
-- **Key Imports:** `card, lecture.store`
+- **Key Imports:** `lecture.store, card`
 - **Interfaces/Types:** `CitationCardProps`
 - **Components/Functions:** `CitationCard`
 
@@ -6825,7 +6825,7 @@ export function NotesPanel() {
 
 #### File: [apps/web/components/student/QuizWidget.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/student/QuizWidget.tsx)
 **Technical Specifications:**
-- **Key Imports:** `card, react, button, api-client`
+- **Key Imports:** `api-client, react, button, card`
 - **Interfaces/Types:** `QuizResult, QuizSubmissionResult, QuizQuestion, QuizWidgetProps`
 - **Components/Functions:** `QuizWidget`
 
@@ -6898,7 +6898,7 @@ export function QuizWidget({ lectureId }: QuizWidgetProps) {
 
 #### File: [apps/web/components/student/VideoPlayer.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/student/VideoPlayer.tsx)
 **Technical Specifications:**
-- **Key Imports:** `dropdown-menu, lecture.store, react`
+- **Key Imports:** `lecture.store, react, dropdown-menu`
 - **Interfaces/Types:** `VideoPlayerProps`
 - **Components/Functions:** `VideoPlayer`
 
@@ -6971,7 +6971,7 @@ export function VideoPlayer({ src }: VideoPlayerProps) {
 
 #### File: [apps/web/components/ui/badge.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/badge.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, utils`
+- **Key Imports:** `utils, react`
 - **Interfaces/Types:** `BadgeProps`
 - **Components/Functions:** `Badge`
 
@@ -7009,7 +7009,7 @@ export function Badge({ className, variant = "default", ...props }: BadgeProps) 
 
 #### File: [apps/web/components/ui/button.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/button.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react-slot, react, utils`
+- **Key Imports:** `utils, react-slot, react`
 - **Interfaces/Types:** `ButtonProps`
 
 **Functional Details:**
@@ -7058,9 +7058,9 @@ Button.displayName = "Button";
 
 #### File: [apps/web/components/ui/card.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/card.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, utils`
+- **Key Imports:** `utils, react`
 - **Interfaces/Types:** `CardProps`
-- **Components/Functions:** `Card, CardTitle, CardFooter, CardContent, CardDescription, CardHeader`
+- **Components/Functions:** `CardHeader, CardContent, Card, CardDescription, CardTitle, CardFooter`
 
 **Functional Details:**
 A reusable UI component. Adheres to modern styles using Radix/Shadcn primitives and Tailwind CSS.
@@ -7203,7 +7203,7 @@ DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
 #### File: [apps/web/components/ui/input.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/input.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, utils`
+- **Key Imports:** `utils, react`
 - **Interfaces/Types:** `InputProps`
 
 **Functional Details:**
@@ -7239,7 +7239,7 @@ Input.displayName = "Input";
 
 #### File: [apps/web/components/ui/progress.tsx](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/components/ui/progress.tsx)
 **Technical Specifications:**
-- **Key Imports:** `react, react-progress, utils`
+- **Key Imports:** `utils, react-progress, react`
 
 **Functional Details:**
 A reusable UI component. Adheres to modern styles using Radix/Shadcn primitives and Tailwind CSS.
@@ -7334,7 +7334,7 @@ Separator.displayName = SeparatorPrimitive.Root.displayName
 #### File: [apps/web/lib/api-client.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/lib/api-client.ts)
 **Technical Specifications:**
 - **Key Imports:** `react`
-- **Interfaces/Types:** `CreateLectureResponse, UserResponse, PipelineStateResponse, LectureListResponse, for, TokenResponse, LectureResponse, AgentRunRecord`
+- **Interfaces/Types:** `for, UserResponse, AgentRunRecord, LectureListResponse, LectureResponse, CreateLectureResponse, TokenResponse, PipelineStateResponse`
 
 **Functional Details:**
 Frontend utility, API client handler, or configuration script.
@@ -7493,7 +7493,7 @@ export function getBackendBaseUrl(): string {
 
 #### File: [apps/web/lib/sse-client.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/lib/sse-client.ts)
 **Technical Specifications:**
-- **Key Imports:** `api-client, react`
+- **Key Imports:** `react, api-client`
 - **Interfaces/Types:** `PipelineEvent, SubscribeHandlers`
 
 **Functional Details:**
@@ -7731,9 +7731,79 @@ module.exports = {
 };
 ```
 
+#### File: [apps/web/public/Logo.png](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/public/Logo.png)
+**Technical Specifications:**
+
+**Functional Details:**
+Frontend utility, API client handler, or configuration script.
+
+```text
+PNG
+
+   
+IHDR        Q#   IDATx`FG2!0:)3iyqimp87̜q$OۻܗҾk{kWxFڙgf~Ү̬-@ @ @ @ @ @ @ @ @ @?F  c@`/@ @ @ @ @I  =     .@|_|@:@ @ @ @ @ @ @ @@  U	z   &}@@@@@@_9f5_<z p?@:@ @ @ @ @ @H  Uz  '~
+         "!WHu	_z  #q@@@@@NB	nO  Hw0 p?@:@ @ @ @ @ @ @  @@@@@@ :	|z        'h^@@=8@ @ @ @ @ @ @G У?  @{n=@        !hF@@@@W?&?&	؃         !?tM
+7       EO"8         ;j        	4    ?@Ozb
+$: /B~C
+@         *c-?	
+4/@ @ @ @ @ @ @ @E  \@<)&o>@ @ @ @	     #/}XV܏5E6qA}#u'
+
+1;ZXOkBز;pݾ ӆ
+只+Gȉ
+43@AV~95.x{mm཯:{ۘo?fy>o}lz*'~ej;f}cN;C޺s֕v
+Ӓ>x&|y\§F}~
+Y7~|v޻kYh۟`n ?2+S?n϶
+Oo;<Gy>,̋4MCp| xr M0Dp"*!B`ő gC(U ڰ'9c}į/Xeܸ/J_|9n;!q_նVk$~CLGfh[@	y0[Nl?Y.~38u'~~z!Q)f(\,I
+d^%{˨WfоӾѽ׽ӭ3KC4JoP)*EQ):,_RՊ:|J&^WH_(RR4iIrH^DR$xaG?85Í?g&.Th>?@C	/
++|ڧe_lW>-'?鮩/}UP!#fD:-hT-]5DK>}1}hpZH2Q;?ڨ*8+:4VϵuDԣ!GFD<**zJȨ#x8",А
+~2h|>hf7"(!=ʠ!487Z*W)+$*%.WL+Sc$,ظ+1ssu&$^'۲NkZg|#,MTk[@@@!NCe/7g}Sʗ,p9}lʗ[juRdEFq^{3Bgx3LYhFEgD>:1<4|Zx."1Rd0RDJ\$!)&2 ,#ycQL&He\Hdb$D,8	EAAAzv{8ب>h&"bVvAjuAZ"Hz]PiJRE.*fۓ
+3|9oM|kJ_zzƽaϯ?ox]>e4,8ЪUAƕCv	5vNcD؜А"BBe#j]T&Bja}0jtn S[Qf7J4)PYeu]XrTU㱓U
+߬yv7Z͚7ˎޭuN힫
+o5V[ךL]<BAIF8!\̈J((JjIRJ*U%
++AJ\Js2IQ/Y!b.J)rNʷۦaR}7nU\t`?@ @_B)'@7 f|.kKGe|̵;2X\+W5!
+mIд  f^l4F:TJg9pb|}vk;3[7;[o۝kꭎ5Vzzmeű7=9f7f[Tvדq68vuuf[ZެnjzX]oPexyO(z\88B0mTdx`(hnVV:Ę&",?D]kdJbD.]ɥݾ`ץ1<=?575
+?[Nhn<6cfm8>lƺ@<cۙ)#[+dA 1X}F%?hF3ڶ8fzmJm#tN;oT:xʾ;wެ۶J庵n}R;^KooV;ﭷvZyM/C+*in
+j YcE|CV1tWsPV=!4U<XBwrki>h6sRa+ ̋['#NZRkUh!h	ҶUۡa	:I5(3T&/އKr2s?<6o.9wD9l7h? sG%iK`8CNHJtkHDZNlӿnԎjz5RTDKcszs]wݮܭ2ݬO0<nOovئ;	h.I˟1i߇F<2<xJlVa9yO]9q=nCL4) EJ.~lLRɓ㓖<3)A&L-6gzxnb*e]eᅛw^k\}˷nYyx]CЍ<JAmfRr63R] JBŨϜozyF-tS׿{mneÞvS~cO|&ɋiKL
+YfZSM
+LC2EWF|lU][%=s8~86 +
+˵
+Z.W7_mW޶8=0T$KAbAJ	;ɞeHOFگZ60L!
+Vhja|B!?IUTѳrR!%	, a zQ05q51~緐(%IG
+~vͭwܶ]ifkYy+ujZ,-   IDAT4O+ABB!!aN
+#hO%A>diFrFTAL&}] g5)/|sz *5	>ܠLrS1.﫲8LgT(WE^mR1:*cFbRVarUZ]49=83nf<=N(=QYO]S/%7}sGF^3=[mz&N-Oo2={XE8ezxı/xxGolEO.aY_S}y Hj1VZ̯;55nA. -}VOqzvmۇ$/=܍sחOZ_-˝SWi9u)K[Nya˩Om9NDIZ9j y^9	Ir$!
+N^o
+ ޼n5<!bHZ
+!!PCu6vvDޝkգMV=Fw&vnjȰvl5r`Ǩؾ"Gn>W">#Dd`ӭm3m3mԒ:ke/ԩft('8(H	 |>&GT'ov:wxde!HpV@^yݷ	DH!a{!dN;nWmuf7849[va{q^-꾡#gN֨
+bQ	M0
+6xhwV6}Q\lzmik2?neMI)j`ЮiUDDzhH3Z~AH1 W[6ܮmXsݒ5uN;CϤ l>Tũb_O5y7TSȖUrhόyOQOR,,`XO9|:;fmsA5M
+-;.P+jդ[ό
+4Kex36ذov0}[]e3c	m['6zaT)rTR"RFhTqqA HcD#6`4s `p#0nڂ`!t:vu r(T* ɅrcgT74_~ݣݮ8xƞ.?uq[;܅/^xG,=yN]窪v-TSBu5Uo6ԝkilv;8:@($\ʃ
+E0W\:$HB>bqL$"'D![bH+y!0G&8f!z!}FXBĮ^7
+z>nXw-O18d#&4]YWkW\qK_aX&id6s6Z딚%($eXreӅآm	7Ȁ@@+yk}mGF|c>΋MrbA!{5ؠˎ
+VSiu1Tvl9v٥W+U--.ǳ⸜̧><GGI<bRb_
+ߛnn{#{G/|(bY]lE=,dw$W[V4\_},A08P%jݓjmZD0Ŝ]o7w2}^WGu#^r-' |JprlJ"HbrYgDJ"x݄ppH%@'X"H@
+^X]huM-ҵ`ҝ5pșKwt.}w=..;r}G]sݦ=Xޝu.NpNmuC
+v ܧN{1oY}̚fZVzx@?aֳ83Y ؤzɬrًX-n45{,Nk4NCkUrA&
+׫_igFtsTʤ,O'B|+s3t٨gBN Bjĺ}Hg1 8I:Hw:km4ոL* A*UJ+96)yv4}=250#m?I4G/|WƗh#ZxUVU$ȱj 梨3wu2yC^6EBxf?:'Ff?1զ'ƚx=c-OZԨ˅ȟ23Wxx6Wkf\k\taYv_ ńǨt*e?RQKhD5,I4)m3?w^|6o
+	$MyFOFiT:mw1(0)-m;K6VԷX*pep)ppEp5P[[BF )I`Z+dbZj.ͨ:ֹNm0UᭂnxyPfZ?敾A}ڸ
+i\G% J".":F(g4:>"/)WEkJH)dY-:}Z5fsܳw&u[ܨp@ScMuQHjۨqtS:qAUS9Kvpx#mU1`DcbJFx nWmn}6jm&erW)S%B"V)sJ`"-O#C~  	gH	dmiLWpbqAVxԡMKB;NKCyz%M#(O IC-2ؿ.ѵű7=k]hluCC.-{`_G؝xYbw>0$n	!7hUaƈhrTFg}1;ڧ+j?G?,ʌT)TcP+Rx2% F!\Z88 @r	Pn5456 KC#66T	"#AHУC;лkGУc[!:
+tn
+Cөg;EDCcTX,2<H.:BFk5mCtamSZ5B,&m'U=AygPc=o+U?FxD>TS\ґU:^WE^WLojqnԣGQL(HGi ,]HƐ;rb{|7JRF8aq(aduSyMMo2zq=vg
+@>RjP+ja*
+=ҔblA䴲|ǱlZFP_*dLͿ)!S5TQiTuZG,e|ow0[B SYkK~]tK
+ٛw(@#O*1Mfsԝ/T'f#rr&Yž5yָAWM~/=UѿIjG? sc{"<_63za*im}S%v kfde$ϽH~'[fe}Y6@+u@܆돶c%$iIAZ,
+3l%i8`8L.x=(8p	6h,[pz-k@T D}de{shߵծk׮O;|GVx7=wa3Nn񓛿8ztgGO~乍NvӅ_lt
+Wo{]`ߍO4~zeõFˎ;fVǞ+5
+/ީ:j2ם˰/ŰQ	Fsm5څ'x{΃   IDATR~OK<*yQ>_Sv|,c>'[0eҐ6뭸ᝎav"//tbt;
+ͪ\s5'_{vm+<ùXFEݴ>J9=\&/ī< 82h++NGv`^4׍q1fy\3QcpaAݾP)ϩQ(5a#"^nc07qZŖ;F+v  W"3M .{TF3KNK]nۻ(2GLX>iG6ۍ	ďR7߹	LxEr0Pq+Z-{. vhP!
+I
+ohnEڲyoebwo쟠^hfq|r2dN+Ҫ0N/@/܂  8 , MB$,!!37[7ݻwA۠PW._9:|Pׇ/]vG/^u+o>NͩcU_<rNu#Z'ڼZhAXCz 8vŰ0a|(co)fBǹ13ftAgZٙ&,jLM4nsabx,M ImKB`EUsV:UJ\I@̻v--ulgF/{ǒ'Zv
+// ... (truncated, total lines: 5615)
+```
+
 #### File: [apps/web/store/chat.store.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/store/chat.store.ts)
 **Technical Specifications:**
-- **Key Imports:** `api, zustand`
+- **Key Imports:** `zustand, api`
 - **Interfaces/Types:** `ChatState`
 - **Zustand Stores / Custom Hooks:** `useChatStore`
 
@@ -7760,7 +7830,7 @@ export const useChatStore = create<ChatState>(() => ({
 #### File: [apps/web/store/lecture.store.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/store/lecture.store.ts)
 **Technical Specifications:**
 - **Key Imports:** `zustand`
-- **Interfaces/Types:** `Concept, LectureState`
+- **Interfaces/Types:** `LectureState, Concept`
 - **Zustand Stores / Custom Hooks:** `useLectureStore`
 
 **Functional Details:**
@@ -7824,7 +7894,7 @@ export const useLectureStore = create<LectureState>((set, get) => ({
 
 #### File: [apps/web/store/pipeline.store.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/store/pipeline.store.ts)
 **Technical Specifications:**
-- **Key Imports:** `zustand, sse-client`
+- **Key Imports:** `sse-client, zustand`
 - **Interfaces/Types:** `PipelineState`
 - **Zustand Stores / Custom Hooks:** `usePipelineStore`
 
@@ -8028,7 +8098,7 @@ Frontend utility, API client handler, or configuration script.
 
 #### File: [apps/web/types/agent.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/types/agent.ts)
 **Technical Specifications:**
-- **Interfaces/Types:** `definitions, AgentStatus`
+- **Interfaces/Types:** `AgentStatus, definitions`
 
 **Functional Details:**
 Frontend utility, API client handler, or configuration script.
@@ -8069,7 +8139,7 @@ export type ChatMessage = {
 
 #### File: [apps/web/types/lecture.ts](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/apps/web/types/lecture.ts)
 **Technical Specifications:**
-- **Interfaces/Types:** `definitions, LectureDetail, LectureSummary`
+- **Interfaces/Types:** `LectureDetail, definitions, LectureSummary`
 
 **Functional Details:**
 Frontend utility, API client handler, or configuration script.
@@ -8643,6 +8713,74 @@ __pycache__/
 Thumbs.db
 ```
 
+#### File: [Logo.png](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/Logo.png)
+**Functional Details:**
+Configuration, dependency manifest, or utility helper.
+
+```text
+PNG
+
+   
+IHDR        Q#   IDATx`FG2!0:)3iyqimp87̜q$OۻܗҾk{kWxFڙgf~Ү̬-@ @ @ @ @ @ @ @ @ @?F  c@`/@ @ @ @ @I  =     .@|_|@:@ @ @ @ @ @ @ @@  U	z   &}@@@@@@_9f5_<z p?@:@ @ @ @ @ @H  Uz  '~
+         "!WHu	_z  #q@@@@@NB	nO  Hw0 p?@:@ @ @ @ @ @ @  @@@@@@ :	|z        'h^@@=8@ @ @ @ @ @ @G У?  @{n=@        !hF@@@@W?&?&	؃         !?tM
+7       EO"8         ;j        	4    ?@Ozb
+$: /B~C
+@         *c-?	
+4/@ @ @ @ @ @ @ @E  \@<)&o>@ @ @ @	     #/}XV܏5E6qA}#u'
+
+1;ZXOkBز;pݾ ӆ
+只+Gȉ
+43@AV~95.x{mm཯:{ۘo?fy>o}lz*'~ej;f}cN;C޺s֕v
+Ӓ>x&|y\§F}~
+Y7~|v޻kYh۟`n ?2+S?n϶
+Oo;<Gy>,̋4MCp| xr M0Dp"*!B`ő gC(U ڰ'9c}į/Xeܸ/J_|9n;!q_նVk$~CLGfh[@	y0[Nl?Y.~38u'~~z!Q)f(\,I
+d^%{˨WfоӾѽ׽ӭ3KC4JoP)*EQ):,_RՊ:|J&^WH_(RR4iIrH^DR$xaG?85Í?g&.Th>?@C	/
++|ڧe_lW>-'?鮩/}UP!#fD:-hT-]5DK>}1}hpZH2Q;?ڨ*8+:4VϵuDԣ!GFD<**zJȨ#x8",А
+~2h|>hf7"(!=ʠ!487Z*W)+$*%.WL+Sc$,ظ+1ssu&$^'۲NkZg|#,MTk[@@@!NCe/7g}Sʗ,p9}lʗ[juRdEFq^{3Bgx3LYhFEgD>:1<4|Zx."1Rd0RDJ\$!)&2 ,#ycQL&He\Hdb$D,8	EAAAzv{8ب>h&"bVvAjuAZ"Hz]PiJRE.*fۓ
+3|9oM|kJ_zzƽaϯ?ox]>e4,8ЪUAƕCv	5vNcD؜А"BBe#j]T&Bja}0jtn S[Qf7J4)PYeu]XrTU㱓U
+߬yv7Z͚7ˎޭuN힫
+o5V[ךL]<BAIF8!\̈J((JjIRJ*U%
++AJ\Js2IQ/Y!b.J)rNʷۦaR}7nU\t`?@ @_B)'@7 f|.kKGe|̵;2X\+W5!
+mIд  f^l4F:TJg9pb|}vk;3[7;[o۝kꭎ5Vzzmeű7=9f7f[Tvדq68vuuf[ZެnjzX]oPexyO(z\88B0mTdx`(hnVV:Ę&",?D]kdJbD.]ɥݾ`ץ1<=?575
+?[Nhn<6cfm8>lƺ@<cۙ)#[+dA 1X}F%?hF3ڶ8fzmJm#tN;oT:xʾ;wެ۶J庵n}R;^KooV;ﭷvZyM/C+*in
+j YcE|CV1tWsPV=!4U<XBwrki>h6sRa+ ̋['#NZRkUh!h	ҶUۡa	:I5(3T&/އKr2s?<6o.9wD9l7h? sG%iK`8CNHJtkHDZNlӿnԎjz5RTDKcszs]wݮܭ2ݬO0<nOovئ;	h.I˟1i߇F<2<xJlVa9yO]9q=nCL4) EJ.~lLRɓ㓖<3)A&L-6gzxnb*e]eᅛw^k\}˷nYyx]CЍ<JAmfRr63R] JBŨϜozyF-tS׿{mneÞvS~cO|&ɋiKL
+YfZSM
+LC2EWF|lU][%=s8~86 +
+˵
+Z.W7_mW޶8=0T$KAbAJ	;ɞeHOFگZ60L!
+Vhja|B!?IUTѳrR!%	, a zQ05q51~緐(%IG
+~vͭwܶ]ifkYy+ujZ,-   IDAT4O+ABB!!aN
+#hO%A>diFrFTAL&}] g5)/|sz *5	>ܠLrS1.﫲8LgT(WE^mR1:*cFbRVarUZ]49=83nf<=N(=QYO]S/%7}sGF^3=[mz&N-Oo2={XE8ezxı/xxGolEO.aY_S}y Hj1VZ̯;55nA. -}VOqzvmۇ$/=܍sחOZ_-˝SWi9u)K[Nya˩Om9NDIZ9j y^9	Ir$!
+N^o
+ ޼n5<!bHZ
+!!PCu6vvDޝkգMV=Fw&vnjȰvl5r`Ǩؾ"Gn>W">#Dd`ӭm3m3mԒ:ke/ԩft('8(H	 |>&GT'ov:wxde!HpV@^yݷ	DH!a{!dN;nWmuf7849[va{q^-꾡#gN֨
+bQ	M0
+6xhwV6}Q\lzmik2?neMI)j`ЮiUDDzhH3Z~AH1 W[6ܮmXsݒ5uN;CϤ l>Tũb_O5y7TSȖUrhόyOQOR,,`XO9|:;fmsA5M
+-;.P+jդ[ό
+4Kex36ذov0}[]e3c	m['6zaT)rTR"RFhTqqA HcD#6`4s `p#0nڂ`!t:vu r(T* ɅrcgT74_~ݣݮ8xƞ.?uq[;܅/^xG,=yN]窪v-TSBu5Uo6ԝkilv;8:@($\ʃ
+E0W\:$HB>bqL$"'D![bH+y!0G&8f!z!}FXBĮ^7
+z>nXw-O18d#&4]YWkW\qK_aX&id6s6Z딚%($eXreӅآm	7Ȁ@@+yk}mGF|c>΋MrbA!{5ؠˎ
+VSiu1Tvl9v٥W+U--.ǳ⸜̧><GGI<bRb_
+ߛnn{#{G/|(bY]lE=,dw$W[V4\_},A08P%jݓjmZD0Ŝ]o7w2}^WGu#^r-' |JprlJ"HbrYgDJ"x݄ppH%@'X"H@
+^X]huM-ҵ`ҝ5pșKwt.}w=..;r}G]sݦ=Xޝu.NpNmuC
+v ܧN{1oY}̚fZVzx@?aֳ83Y ؤzɬrًX-n45{,Nk4NCkUrA&
+׫_igFtsTʤ,O'B|+s3t٨gBN Bjĺ}Hg1 8I:Hw:km4ոL* A*UJ+96)yv4}=250#m?I4G/|WƗh#ZxUVU$ȱj 梨3wu2yC^6EBxf?:'Ff?1զ'ƚx=c-OZԨ˅ȟ23Wxx6Wkf\k\taYv_ ńǨt*e?RQKhD5,I4)m3?w^|6o
+	$MyFOFiT:mw1(0)-m;K6VԷX*pep)ppEp5P[[BF )I`Z+dbZj.ͨ:ֹNm0UᭂnxyPfZ?敾A}ڸ
+i\G% J".":F(g4:>"/)WEkJH)dY-:}Z5fsܳw&u[ܨp@ScMuQHjۨqtS:qAUS9Kvpx#mU1`DcbJFx nWmn}6jm&erW)S%B"V)sJ`"-O#C~  	gH	dmiLWpbqAVxԡMKB;NKCyz%M#(O IC-2ؿ.ѵű7=k]hluCC.-{`_G؝xYbw>0$n	!7hUaƈhrTFg}1;ڧ+j?G?,ʌT)TcP+Rx2% F!\Z88 @r	Pn5456 KC#66T	"#AHУC;лkGУc[!:
+tn
+Cөg;EDCcTX,2<H.:BFk5mCtamSZ5B,&m'U=AygPc=o+U?FxD>TS\ґU:^WE^WLojqnԣGQL(HGi ,]HƐ;rb{|7JRF8aq(aduSyMMo2zq=vg
+@>RjP+ja*
+=ҔblA䴲|ǱlZFP_*dLͿ)!S5TQiTuZG,e|ow0[B SYkK~]tK
+ٛw(@#O*1Mfsԝ/T'f#rr&Yž5yָAWM~/=UѿIjG? sc{"<_63za*im}S%v kfde$ϽH~'[fe}Y6@+u@܆돶c%$iIAZ,
+3l%i8`8L.x=(8p	6h,[pz-k@T D}de{shߵծk׮O;|GVx7=wa3Nn񓛿8ztgGO~乍NvӅ_lt
+Wo{]`ߍO4~zeõFˎ;fVǞ+5
+/ީ:j2ם˰/ŰQ	Fsm5څ'x{΃   IDATR~OK<*yQ>_Sv|,c>'[0eҐ6뭸ᝎav"//tbt;
+ͪ\s5'_{vm+<ùXFEݴ>J9=\&/ī< 82h++NGv`^4׍q1fy\3QcpaAݾP)ϩQ(5a#"^nc07qZŖ;F+v  W"3M .{TF3KNK]nۻ(2GLX>iG6ۍ	ďR7߹	LxEr0Pq+Z-{. vhP!
+I
+ohnEڲyoebwo쟠^hfq|r2dN+Ҫ0N/@/܂  8 , MB$,!!37[7ݻwA۠PW._9:|Pׇ/]vG/^u+o>NͩcU_<rNu#Z'ڼZhAXCz 8vŰ0a|(co)fBǹ13ftAgZٙ&,jLM4nsabx,M ImKB`EUsV:UJ\I@̻v--ulgF/{ǒ'Zv
+# ... (truncated, total lines: 5615)
+```
+
 #### File: [README.md](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/README.md)
 **Functional Details:**
 Configuration, dependency manifest, or utility helper.
@@ -8656,6 +8794,17 @@ Configuration, dependency manifest, or utility helper.
 
 <p align="center">
   <b>Agentic AI Framework for Lecture-to-Animation Transformation</b>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Celery-5.3-37814A?style=for-the-badge&logo=celery&logoColor=white" alt="Celery" />
+  <img src="https://img.shields.io/badge/Docker-24+-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/LLM--Orchestrator-Groq-orange?style=for-the-badge" alt="Groq" />
+  <img src="https://img.shields.io/badge/Manim-Community-FC60A8?style=for-the-badge" alt="Manim" />
+  <img src="https://img.shields.io/badge/Video--Generation%20Models-Zero%20Used-red?style=for-the-badge" alt="Zero Video Models" />
 </p>
 
 ---
@@ -8697,18 +8846,75 @@ Below are visual frames of the 3Blue1Brown-style animations produced by the Anem
 * **Real-time Pipeline Tracking:** Monitor the progress of the agentic pipeline using a live Server-Sent Events (SSE) stream.
 * **Auto-Publishing:** Connect a YouTube account via OAuth2 for hands-free video deployment complete with auto-generated chapters and SEO tags.
 * **Analytics & Management:** Audit history of past runs, retry failed render scenes, and track processing metrics.
+# ... (truncated, total lines: 276)
+```
 
-### Student Study Hub
-* **Concept-Synced Video Player:** Interactive custom-controlled HTML5 media player mapped directly to conceptual chapters.
-* **Interactive AI Quizzes:** Dynamically generated multiple-choice tests created by LLMs based on the lecture contents.
-* **RAG Study Assistant:** A localized Retrieval-Augmented Generation (RAG) chatbot grounded in the professor's exact words. Provides answers backed by clickable timestamp citations.
+#### File: [docs/Anemo-Comprehensive-Architecture-and-System-Design.md](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/docs/Anemo-Comprehensive-Architecture-and-System-Design.md)
+**Functional Details:**
+Configuration, dependency manifest, or utility helper.
+
+```text
+# Anemo: Autonomous Lecture-to-Animation Synthesis Framework
+### A Comprehensive Architectural, Mathematical, and Codebase Analysis
+
+**Author:** Lead Architect & Agentic AI Systems Group  
+**Status:** Production & Research Specification Document  
+**Version:** 1.0.0 (Comprehensive Build)  
+
+---
+## Table of Contents
+1. [Abstract & Executive Summary](#1-abstract--executive-summary)
+2. [Introduction & Pedagogical Motivation](#2-introduction--pedagogical-motivation)
+3. [High-Level System Design & Network Topology](#3-high-level-system-design--network-topology)
+4. [The 8-Stage Agentic Pipeline Specifications](#4-the-8-stage-agentic-pipeline-specifications)
+5. [Relational and Vector Database Schema](#5-relational-and-vector-database-schema)
+6. [Service Layer & External Integrations](#6-service-layer--external-integrations)
+7. [Asynchronous Task Architecture & Celery Topology](#7-asynchronous-task-architecture--celery-topology)
+8. [Deep File-by-File Codebase Walkthrough](#8-deep-file-by-file-codebase-walkthrough)
+   - [8.1 Backend API (FastAPI)](#81-backend-api-fastapi)
+   - [8.2 Frontend Web Portal (Next.js 15)](#82-frontend-web-portal-nextjs-15)
+9. [Verification, Benchmarking & Evaluation](#9-verification-benchmarking--evaluation)
+10. [Local Development & Production Deployment Playbook](#10-local-development--production-deployment-playbook)
+11. [Conclusion, Limitations & Future Work](#11-conclusion-limitations--future-work)
 
 ---
 
-## System Architecture and Flow
+## 1. Abstract & Executive Summary
+Anemo is an advanced agentic AI platform designed to close the accessibility and retention gap in online educational content. Busy academics face immense post-production barriers when attempting to create high-retention, visual animations (e.g., 3Blue1Brown-style) for complex STEM subjects. Anemo solves this by orchestrating a pipeline of specialized AI agents that ingest raw, unedited lecture videos (with native support for Urdu-English code-switching), transcribe and segment them into discrete pedagogical concepts, dynamically synthesize and compile executable Manim animation code, composite the visual clips with synchronized cleaned voiceovers and burned-in subtitles, and automatically index the context for a student-facing RAG study chatbot and quiz generator.
 
-Anemo is structured as a robust monorepo built for high throughput and long-running GPU/CPU-intensive rendering tasks.
-# ... (truncated, total lines: 265)
+This document details the architectural configuration, agent control loops, mathematical RAG indexing formulations, database structures, and a complete, file-by-file review of the codebase, serving as a comprehensive systems manual and research-grade specification.
+
+---
+
+## 2. Introduction & Pedagogical Motivation
+Modern digital education relies heavily on visual storytelling to maximize student engagement and concept retention. Empirical studies in cognitive multimedia learning demonstrate that animations matching spoken explanations improve student retention by up to 40% compared to static slides or simple talking-head recordings. However, the software of choice for high-fidelity mathematical animation, Manim (Mathematical Animation Engine), features a steep learning curve and requires substantial programming expertise and development time (often 20+ hours per 5 minutes of footage).
+
+Furthermore, in regions like Pakistan, academic speech is heavily code-switched (frequently alternating between English and Urdu). Standard transcription tools fail to resolve this linguistic mixing, corrupting downstream NLP tasks like concept segmentation. Anemo targets this intersection: enabling a zero-touch, automated path from code-switched spoken audio to high-quality 3Blue1Brown-style vector animations, backed by timestamp-anchored interactive student learning tools.
+
+---
+
+## 3. High-Level System Design & Network Topology
+### System Architecture Diagram
+```mermaid
+graph TD
+    Prof[Professor User] -->|1. Upload Raw Video| UT[UploadThing CDN]
+    Prof -->|2. Register/Monitor Status| Web[Next.js Web Portal]
+    Web -->|3. Proxy Router| Nginx[Nginx Reverse Proxy]
+    Nginx -->|4. Proxy SSE/REST| API[FastAPI Backend]
+    API -->|5. Store Metadata| DB[PostgreSQL + pgvector]
+    API -->|6. Enqueue Tasks| Redis[Redis Broker]
+    Redis -->|7. Worker Queue| CW[Celery Worker Pool]
+    CW -->|8. Run Whisper Agent| Whis[Whisper API / Local Model]
+    CW -->|9. Run LLM Agents| LLM[DeepSeek-V3 / Qwen2.5]
+    CW -->|10. Execute Python scripts| Manim[Manim Engine]
+    CW -->|11. Concatenate & burn subtitles| FFmpeg[FFmpeg Service]
+    CW -->|12. Auto-Publish| YT[YouTube Data API v3]
+    Stud[Student User] -->|13. Load Subtitles & Chapters| Web
+    Stud -->|14. Ask Chatbot RAG| API
+```
+
+### Topology Analysis
+# ... (truncated, total lines: 9395)
 ```
 
 #### File: [docs/agent-pipeline.md](file:///C:/Users/ahmad/Desktop/agentic-framwork-for-lecture-to-animation/docs/agent-pipeline.md)
@@ -9204,10 +9410,10 @@ Configuration, dependency manifest, or utility helper.
   "packageManager": "pnpm@9.0.0",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "turbo dev --filter=!anemo",
-    "build": "turbo build --filter=!anemo",
-    "lint": "turbo lint --filter=!anemo",
-    "test": "turbo test --filter=!anemo",
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
     "setup": "bash infra/scripts/setup_dev.sh",
     "health": "bash infra/scripts/health_check.sh",
     "stop": "bash infra/scripts/teardown.sh",
