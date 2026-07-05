@@ -41,18 +41,6 @@ By utilizing an advanced pipeline of 8 specialized, autonomous AI agents—cover
 
 ---
 
-## Animation Gallery
-
-Below are visual frames of the 3Blue1Brown-style animations produced by the Anemo multi-agent orchestration pipeline:
-
-<p align="center">
-  <img src="./image.png" width="32%" alt="Manim Animation Frame 1" />
-  <img src="./image%20copy.png" width="32%" alt="Manim Animation Frame 2" />
-  <img src="./image%20copy%202.png" width="32%" alt="Manim Animation Frame 3" />
-</p>
-
----
-
 ## Portals and Feature Set
 
 ### Professor Dashboard
